@@ -1,37 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Villas del Palmar</title>
-  <meta name="description" content="Villas del Palmar — departamentos con alberca, áreas verdes y seguridad 24/7." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <%- include('partials/head') %>
 </head>
 <body>
 
-  <!-- ===== Header / Navbar ===== -->
-  <header class="site-header" id="header">
-    <div class="nav-wrap">
-      <a href="#inicio" class="brand">
-        <span class="logo">VP</span>
-        <span class="brand-name">Villas del Palmar</span>
-      </a>
-
-      <nav class="nav-buttons" id="nav-menu">
-        <a href="#inicio">Inicio</a>
-        <a href="#galeria">El lugar</a>
-        <a href="#amenidades">Amenidades</a>
-        <a href="#contacto">Contacto</a>
-      </nav>
-
-      <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </header>
+  <%- include('partials/header') %>
 
   <!-- ===== Hero ===== -->
   <section class="hero" id="inicio">
@@ -60,18 +34,18 @@
     </div>
 
     <div class="gallery-grid" data-reveal>
-      <figure class="gallery-item gallery-item--wide">
-        <div class="gallery-thumb thumb-1"></div>
-        <figcaption>Alberca &amp; terraza</figcaption>
-      </figure>
-      <figure class="gallery-item">
-        <div class="gallery-thumb thumb-2"></div>
-        <figcaption>Áreas verdes</figcaption>
-      </figure>
-      <figure class="gallery-item">
-        <div class="gallery-thumb thumb-3"></div>
-        <figcaption>Departamentos</figcaption>
-      </figure>
+      <a href="/alberca" class="gallery-item gallery-item--wide">
+        <span class="gallery-thumb thumb-1"></span>
+        <span class="gallery-caption">Alberca &amp; terraza <em>Ver más →</em></span>
+      </a>
+      <a href="/areas-verdes" class="gallery-item">
+        <span class="gallery-thumb thumb-2"></span>
+        <span class="gallery-caption">Áreas verdes <em>Ver más →</em></span>
+      </a>
+      <a href="/departamentos" class="gallery-item">
+        <span class="gallery-thumb thumb-3"></span>
+        <span class="gallery-caption">Departamentos <em>Ver más →</em></span>
+      </a>
     </div>
   </section>
 
@@ -172,15 +146,7 @@
     </div>
   </section>
 
-  <!-- ===== Footer ===== -->
-  <footer class="site-footer">
-    <div class="footer-brand">
-      <span class="logo">VP</span>
-      <span class="brand-name">Villas del Palmar</span>
-    </div>
-    <p>&copy; <span id="year"></span> Villas del Palmar. Todos los derechos reservados.</p>
-  </footer>
+  <%- include('partials/footer') %>
 
-  <script src="js/main.js"></script>
 </body>
 </html>

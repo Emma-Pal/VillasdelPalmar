@@ -229,6 +229,9 @@ section {
 /* ===== Hero ===== */
 .hero {
   position: relative;
+  width: 100%;
+  max-width: none;
+  margin: 0;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -236,6 +239,9 @@ section {
   text-align: center;
   padding: 0 24px;
   background: linear-gradient(135deg, #1f4b43 0%, #143530 55%, #0d241f 100%);
+  background-image: url("../images/hero/atardecer-alberca.jpg");
+  background-size: cover;
+  background-position: center 30%;
   overflow: hidden;
 }
 
@@ -243,8 +249,10 @@ section {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle at 20% 20%, rgba(201, 162, 75, 0.25), transparent 45%),
-                     radial-gradient(circle at 80% 75%, rgba(201, 162, 75, 0.18), transparent 50%);
+  /* Oscurece la foto para que el texto siga siendo legible, conservando el tono verde/dorado de la marca */
+  background-image: linear-gradient(160deg, rgba(20, 53, 48, 0.55) 0%, rgba(13, 36, 31, 0.75) 100%),
+                     radial-gradient(circle at 20% 20%, rgba(201, 162, 75, 0.2), transparent 45%),
+                     radial-gradient(circle at 80% 75%, rgba(201, 162, 75, 0.14), transparent 50%);
 }
 
 .hero-content {
@@ -313,14 +321,35 @@ section {
 .gallery-item {
   position: relative;
   margin: 0;
+  padding: 0;
+  border: none;
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  font-family: inherit;
+  transition: box-shadow var(--transition);
+}
+
+.gallery-item:hover,
+.gallery-item:focus-visible {
+  box-shadow: var(--shadow-md);
+}
+
+.gallery-item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .gallery-thumb {
+  display: block;
   width: 100%;
   height: 100%;
+  background-size: cover;
+  background-position: center;
   transition: transform 0.4s ease;
 }
 
@@ -329,26 +358,47 @@ section {
 }
 
 .thumb-1 {
-  background: linear-gradient(135deg, #2f6b60, #c9a24b);
+  background-image: url("../images/galeria/alberca-tobogan.jpg");
 }
 
 .thumb-2 {
-  background: linear-gradient(135deg, #3f7a4f, #1f4b43);
+  background-image: url("../images/galeria/areas-verdes.jpg");
 }
 
 .thumb-3 {
-  background: linear-gradient(135deg, #8a6a2f, #1f4b43);
+  background-image: url("../images/galeria/fachada-departamentos.jpg");
 }
 
-.gallery-item figcaption {
+.gallery-caption {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
   padding: 16px 18px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
   color: #fff;
   font-weight: 600;
+  text-align: left;
+}
+
+.gallery-caption em {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--color-accent-light);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity var(--transition), transform var(--transition);
+}
+
+.gallery-item:hover .gallery-caption em,
+.gallery-item:focus-visible .gallery-caption em {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* ===== Amenities ===== */
@@ -510,6 +560,147 @@ section {
   color: var(--color-primary-dark);
 }
 
+/* ===== Páginas de detalle (Alberca / Áreas verdes / Departamentos) ===== */
+.page-banner {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  min-height: 46vh;
+  display: flex;
+  align-items: flex-end;
+  padding: 100px 24px 48px;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.page-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(13, 36, 31, 0.55) 0%, rgba(13, 36, 31, 0.82) 100%);
+}
+
+.page-banner-content {
+  position: relative;
+  z-index: 1;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  width: 100%;
+  color: #fff;
+}
+
+.page-banner .eyebrow {
+  color: var(--color-accent-light);
+}
+
+.page-banner h1 {
+  color: #fff;
+  font-size: clamp(32px, 5vw, 48px);
+  margin: 4px 0 12px;
+}
+
+.page-banner-lead {
+  max-width: 560px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 16.5px;
+}
+
+.back-link {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  transition: color var(--transition);
+}
+
+.back-link:hover {
+  color: #fff;
+}
+
+.detail-sections {
+  padding-top: 80px;
+  padding-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 72px;
+}
+
+.detail-block {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+
+.detail-block.is-reverse {
+  flex-direction: row-reverse;
+}
+
+.detail-media,
+.detail-text {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.detail-media img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.detail-text h2 {
+  font-size: 28px;
+  margin: 4px 0 14px;
+}
+
+.detail-text p {
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.feature-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feature-list li {
+  padding-left: 22px;
+  position: relative;
+  font-size: 14.5px;
+  color: var(--color-text);
+}
+
+.feature-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.detail-cta {
+  text-align: center;
+  padding: 40px 24px 96px;
+}
+
+.detail-cta p {
+  color: var(--color-text-muted);
+  margin-bottom: 20px;
+}
+
 /* ===== Scroll reveal ===== */
 [data-reveal] {
   opacity: 0;
@@ -587,5 +778,20 @@ section {
   .contact-info,
   .contact-form {
     padding: 36px 28px;
+  }
+
+  .detail-block,
+  .detail-block.is-reverse {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .detail-sections {
+    padding-top: 56px;
+    gap: 48px;
+  }
+
+  .page-banner {
+    padding: 90px 20px 36px;
   }
 }

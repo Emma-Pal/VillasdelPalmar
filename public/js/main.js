@@ -42,15 +42,20 @@ const revealObserver = new IntersectionObserver(
 revealTargets.forEach((el) => revealObserver.observe(el));
 
 // ===== Formulario de contacto (aún sin backend real) =====
+// Solo existe en la página de inicio, por eso se revisa antes de usarlo
+// (este mismo archivo se comparte con las páginas de detalle).
 const form = document.getElementById('contact-form');
 const formNote = document.getElementById('form-note');
 
-form.addEventListener('submit', (event) => {
-  event.preventDefault();
-  // TODO: conectar con un endpoint en Express (ej. POST /api/contacto)
-  formNote.hidden = false;
-  form.reset();
-});
+if (form) {
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    // TODO: conectar con un endpoint en Express (ej. POST /api/contacto)
+    formNote.hidden = false;
+    form.reset();
+  });
+}
 
 // ===== Año dinámico en el footer =====
-document.getElementById('year').textContent = new Date().getFullYear();
+const yearEl = document.getElementById('year');
+if (yearEl) yearEl.textContent = new Date().getFullYear();
