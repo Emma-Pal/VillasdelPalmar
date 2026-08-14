@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <%- include('partials/head') %>
+  <%- include('../partials/head') %>
 </head>
 <body>
 
-  <%- include('partials/header') %>
+  <%- include('../partials/portal-header') %>
 
   <!-- ===== Banner ===== -->
   <section class="page-banner" style="background-image: url('/images/galeria/alberca-tobogan.jpg');">
     <div class="page-banner-content">
-      <a href="/#galeria" class="back-link">← Volver al inicio</a>
-      <span class="eyebrow">Para relajarte</span>
+      <a href="/panel/instalaciones" class="back-link">← Volver a instalaciones</a>
+      <span class="eyebrow">Espacios comunes</span>
       <h1>Alberca &amp; terraza</h1>
       <p class="page-banner-lead">
         Tres espacios distintos para nadar, tomar el sol o simplemente desconectar sin salir del residencial.
@@ -79,13 +79,11 @@
     </div>
   </section>
 
-  <!-- ===== CTA ===== -->
   <div class="detail-cta" data-reveal>
-    <p>¿Quieres conocerlas en persona?</p>
-    <a href="/#contacto" class="btn btn-primary">Agenda una visita</a>
+    <a href="/panel/instalaciones" class="back-link" style="justify-content: center; margin: 0 auto;">← Volver a instalaciones</a>
   </div>
 
-  <%- include('partials/footer') %>
+  <%- include('../partials/footer') %>
 
 </body>
 </html>

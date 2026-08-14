@@ -569,7 +569,8 @@ section {
   min-height: 46vh;
   display: flex;
   align-items: flex-end;
-  padding: 100px 24px 48px;
+  /* Espacio para que el header fijo (~68px, una sola fila) no tape el título. */
+  padding: 112px 24px 48px;
   background-size: cover;
   background-position: center;
   overflow: hidden;
@@ -733,28 +734,44 @@ section {
     display: flex;
   }
 
-  .nav-buttons {
+  .portal-nav {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
     flex-direction: column;
+    align-items: stretch;
+    flex-wrap: nowrap;
     gap: 0;
-    background: var(--color-surface);
-    box-shadow: var(--shadow-md);
     max-height: 0;
     overflow: hidden;
     transition: max-height var(--transition);
+    background: var(--color-primary-dark);
+    box-shadow: var(--shadow-md);
   }
 
-  .nav-buttons.open {
-    max-height: 320px;
+  .portal-nav.open {
+    max-height: 360px;
+    overflow-y: auto;
+    padding: 8px 12px 16px;
   }
 
-  .nav-buttons a {
-    color: var(--color-text);
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--color-border);
+  .portal-nav a {
+    border-radius: 0;
+    padding: 13px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .portal-nav a.is-active {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .nav-user-text {
+    display: none;
+  }
+
+  .portal-header-actions {
+    gap: 10px;
   }
 
   .gallery-grid {
@@ -792,6 +809,579 @@ section {
   }
 
   .page-banner {
-    padding: 90px 20px 36px;
+    padding: 100px 20px 36px;
+  }
+}
+
+/* ===================================================================
+   Portal privado (propietarios / mesa directiva)
+   =================================================================== */
+
+/* ===== Header del portal: una sola fila, a todo el ancho ===== */
+.site-header.portal-header {
+  background: linear-gradient(135deg, #1f4b43 0%, #143530 100%);
+  box-shadow: 0 6px 24px rgba(13, 36, 31, 0.28);
+  backdrop-filter: none;
+}
+
+/* El .nav-wrap normal está limitado a var(--max-width) y centrado — aquí se
+   anula para que el header aproveche todo el ancho de la pantalla y no se
+   vea apretado con marca + nav + usuario + salir todo junto. */
+.portal-header .nav-wrap {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 14px 32px;
+  gap: 24px;
+}
+
+.portal-header .brand {
+  flex-shrink: 0;
+}
+
+.site-header.scrolled.portal-header .brand-name {
+  /* Selector con el mismo "peso" que .site-header.scrolled .brand-name (la
+     regla que ponía este texto en verde oscuro) para poder ganarle. */
+  color: #fff;
+}
+
+.portal-header .brand-name {
+  /* Dorado se perdía contra el verde oscuro; blanco da el mayor contraste posible. */
+  color: #fff;
+}
+
+.portal-header .logo {
+  background: var(--color-accent);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(20, 53, 48, 0.4);
+  box-shadow: 0 0 0 3px rgba(201, 162, 75, 0.22);
+}
+
+.site-header.portal-header .nav-toggle span {
+  background: #fff;
+}
+
+.portal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+/* Usuario: avatar con inicial + nombre/rol */
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(201, 162, 75, 0.45);
+  color: var(--color-accent-light);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-user-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.nav-user-nombre {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.nav-user-rol {
+  font-size: 12px;
+  color: var(--color-accent-light);
+}
+
+.nav-logout-form {
+  display: inline-flex;
+}
+
+.nav-logout-btn {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 13.5px;
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.32);
+  color: rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.nav-logout-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+/* Nav: segmento central de la misma fila, centrado y repartido en el
+   espacio que sobra entre la marca y el bloque de usuario/salir. */
+.portal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.portal-nav a {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.72);
+  transition: color var(--transition), background var(--transition);
+}
+
+.portal-nav a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.portal-nav a.is-active {
+  color: #fff;
+  background: rgba(201, 162, 75, 0.28);
+}
+
+/* Banner "plano" (sin foto de fondo) para páginas internas del portal */
+.page-banner--plain {
+  background: linear-gradient(135deg, #1f4b43 0%, #143530 100%);
+  min-height: 30vh;
+  align-items: center;
+}
+
+.page-banner--plain::before {
+  display: none;
+}
+
+/* Encabezado corto del panel */
+.panel-hero {
+  width: 100%;
+  background: linear-gradient(135deg, #1f4b43 0%, #143530 100%);
+  /* Mismo motivo que .page-banner: espacio para el header fijo. */
+  padding: 112px 24px 40px;
+  color: #fff;
+}
+
+.panel-hero-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.panel-hero h1 {
+  color: #fff;
+  font-size: 32px;
+  margin: 4px 0 0;
+}
+
+.panel-hero .eyebrow {
+  color: var(--color-accent-light);
+}
+
+/* Tarjetas de resumen del dashboard */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.dashboard-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.dashboard-card h2 {
+  font-size: 24px;
+  margin: 6px 0 10px;
+}
+
+.dashboard-card p {
+  color: var(--color-text-muted);
+  margin-bottom: 18px;
+}
+
+.dashboard-card--alerta {
+  border-color: #d98a5f;
+  background: #fdf3ec;
+}
+
+.dashboard-card--ok {
+  border-color: #7fae8f;
+  background: #f1f8f3;
+}
+
+.btn-ghost-light {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 28px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 15px;
+  border: 1.5px solid var(--color-primary);
+  color: var(--color-primary);
+  background: transparent;
+  transition: background var(--transition), color var(--transition);
+}
+
+.btn-ghost-light:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Tabla de pagos */
+.tabla-wrap {
+  overflow-x: auto;
+  margin-bottom: 40px;
+}
+
+.tabla-pagos {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.tabla-pagos th,
+.tabla-pagos td {
+  text-align: left;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 14.5px;
+}
+
+.tabla-pagos th {
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tabla-pagos tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.badge--alerta {
+  background: #fdf3ec;
+  color: #a15a2e;
+}
+
+.badge--ok {
+  background: #f1f8f3;
+  color: #2f6b45;
+}
+
+/* Formulario dentro de tarjeta (agregar movimiento / nueva publicación) */
+.form-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.form-card h2 {
+  font-size: 22px;
+  margin: 4px 0 20px;
+}
+
+/* .contact-form ya trae su propio fondo/padding (pensado para la sección de
+   contacto); dentro de .form-card se anula para no duplicar la "caja". */
+.form-card .contact-form {
+  background: none;
+  padding: 0;
+}
+
+.form-card .contact-form select {
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Tabs de categoría en Avisos */
+.categoria-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.categoria-tab {
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-border);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.categoria-tab:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.categoria-tab.is-active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.categoria-tab-cta {
+  margin-left: auto;
+  padding: 8px 18px;
+}
+
+/* Tarjetas de publicaciones (feed de avisos) */
+.publicaciones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.publicacion-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.publicacion-card h3 {
+  font-size: 19px;
+  margin: 8px 0 10px;
+}
+
+.publicacion-card p {
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.publicacion-card footer {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+/* Botón de eliminar (usuarios, publicaciones): sutil hasta que se pasa el mouse */
+.btn-eliminar {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  background: none;
+  border: 1.5px solid var(--color-border);
+  color: #a15a2e;
+  border-radius: 999px;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.btn-eliminar:hover {
+  background: #fdf3ec;
+  border-color: #a15a2e;
+}
+
+.tabla-acciones {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  white-space: nowrap;
+}
+
+.publicacion-categoria {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.publicacion-categoria--financiero {
+  background: #eaf1ee;
+  color: var(--color-primary);
+}
+
+.publicacion-categoria--mejora {
+  background: #fbf1de;
+  color: #8a6a2f;
+}
+
+.publicacion-categoria--aviso {
+  background: #f1eef8;
+  color: #5b4a8a;
+}
+
+/* Pantalla de login */
+.login-screen {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #1f4b43 0%, #143530 55%, #0d241f 100%);
+}
+
+.login-card {
+  background: var(--color-surface);
+  border-radius: 20px;
+  padding: 48px 40px;
+  max-width: 380px;
+  width: 100%;
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.login-sub {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+.login-error {
+  background: #fdf3ec;
+  color: #a15a2e;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.login-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.login-form input {
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition: border-color var(--transition);
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.login-submit {
+  margin-top: 4px;
+  width: 100%;
+}
+
+/* Responsive: portal */
+@media (max-width: 860px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Un poco antes de colapsar todo a hamburguesa (700px), se libera espacio
+     ocultando el nombre/rol y dejando solo el avatar — así el nav respira. */
+  .nav-user-text {
+    display: none;
+  }
+
+  .portal-header .nav-wrap {
+    padding: 14px 20px;
+    gap: 14px;
+  }
+
+  .portal-nav {
+    gap: 2px;
+  }
+
+  .portal-nav a {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 700px) {
+  .categoria-tab-cta {
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .publicacion-card {
+    padding: 22px 20px;
+  }
+
+  .login-card {
+    padding: 36px 26px;
   }
 }

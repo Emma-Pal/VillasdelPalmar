@@ -1,2 +1,7 @@
 node_modules/
 .env
+
+# Base de datos local y archivos subidos: contienen datos de propietarios
+# (nombres, pagos, adeudos) y nunca deben subirse al repositorio.
+data/
+uploads/

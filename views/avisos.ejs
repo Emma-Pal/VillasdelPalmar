@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('partials/head') %>
+</head>
+<body>
+
+  <%- include('partials/portal-header') %>
+
+  <section class="page-banner page-banner--plain">
+    <div class="page-banner-content">
+      <span class="eyebrow">Comunicación</span>
+      <h1>Avisos</h1>
+      <p class="page-banner-lead">Estados financieros, mejoras y avisos generales publicados por la mesa directiva.</p>
+    </div>
+  </section>
+
+  <section class="detail-sections">
+    <div class="categoria-tabs" data-reveal>
+      <a href="/panel/avisos" class="categoria-tab <%= !categoriaActual ? 'is-active' : '' %>">Todos</a>
+      <a href="/panel/avisos?categoria=financiero" class="categoria-tab <%= categoriaActual === 'financiero' ? 'is-active' : '' %>">Estados financieros</a>
+      <a href="/panel/avisos?categoria=mejora" class="categoria-tab <%= categoriaActual === 'mejora' ? 'is-active' : '' %>">Mejoras</a>
+      <a href="/panel/avisos?categoria=aviso" class="categoria-tab <%= categoriaActual === 'aviso' ? 'is-active' : '' %>">Avisos generales</a>
+
+      <% if (usuario.tipo === 'mesa') { %>
+        <a href="/panel/avisos/nueva" class="btn btn-primary categoria-tab-cta">+ Nueva publicación</a>
+      <% } %>
+    </div>
+
+    <div class="publicaciones-list" data-reveal>
+      <% if (publicaciones.length === 0) { %>
+        <p class="placeholder-note">No hay publicaciones en esta categoría todavía.</p>
+      <% } %>
+      <% publicaciones.forEach(function (pub) { %>
+        <article class="publicacion-card">
+          <span class="publicacion-categoria publicacion-categoria--<%= pub.categoria %>">
+            <%= ({ financiero: 'Estado financiero', mejora: 'Mejora', aviso: 'Aviso' })[pub.categoria] %>
+          </span>
+          <h3><%= pub.titulo %></h3>
+          <p><%= pub.cuerpo %></p>
+          <% if (pub.archivo) { %>
+            <p><a href="/panel/archivos/<%= pub.id %>" class="back-link" style="margin: 8px 0;">📎 <%= pub.archivo_nombre_original %></a></p>
+          <% } %>
+          <footer>
+            <span><%= pub.autor_nombre %> · <%= pub.autor_cargo %> — <%= pub.fecha %></span>
+            <% if (usuario.tipo === 'mesa') { %>
+              <form action="/panel/avisos/<%= pub.id %>/eliminar" method="POST"
+                    onsubmit="return confirm('¿Eliminar esta publicación? Esto no se puede deshacer.');">
+                <button type="submit" class="btn-eliminar">Eliminar</button>
+              </form>
+            <% } %>
+          </footer>
+        </article>
+      <% }); %>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
+</body>
+</html>

@@ -1,28 +1,36 @@
 // ===== Header: fondo sólido al hacer scroll =====
+// (guardas con `if`: no todas las páginas tienen header — ej. login)
 const header = document.getElementById('header');
 
-const updateHeader = () => {
-  header.classList.toggle('scrolled', window.scrollY > 40);
-};
-updateHeader();
-window.addEventListener('scroll', updateHeader);
+if (header) {
+  const updateHeader = () => {
+    // El header del portal (.portal-header) no tiene hero detrás: siempre
+    // se ve "sólido", así que no se le quita la clase al estar arriba.
+    if (header.classList.contains('portal-header')) return;
+    header.classList.toggle('scrolled', window.scrollY > 40);
+  };
+  updateHeader();
+  window.addEventListener('scroll', updateHeader);
+}
 
 // ===== Menú móvil =====
 const navToggle = document.getElementById('nav-toggle');
 const navMenu = document.getElementById('nav-menu');
 
-navToggle.addEventListener('click', () => {
-  const isOpen = navMenu.classList.toggle('open');
-  navToggle.setAttribute('aria-expanded', String(isOpen));
-});
-
-// Cierra el menú al elegir una opción (útil en móvil)
-navMenu.querySelectorAll('a').forEach((link) => {
-  link.addEventListener('click', () => {
-    navMenu.classList.remove('open');
-    navToggle.setAttribute('aria-expanded', 'false');
+if (navToggle && navMenu) {
+  navToggle.addEventListener('click', () => {
+    const isOpen = navMenu.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', String(isOpen));
   });
-});
+
+  // Cierra el menú al elegir una opción (útil en móvil)
+  navMenu.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      navMenu.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+}
 
 // ===== Animación de aparición al hacer scroll =====
 const revealTargets = document.querySelectorAll('[data-reveal]');
@@ -59,3 +67,18 @@ if (form) {
 // ===== Año dinámico en el footer =====
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+// ===== Formulario de usuario: mostrar solo "Unidad" o "Cargo" según el tipo =====
+const tipoSelect = document.getElementById('tipo-select');
+const campoUnidad = document.getElementById('campo-unidad');
+const campoCargo = document.getElementById('campo-cargo');
+
+if (tipoSelect && campoUnidad && campoCargo) {
+  const actualizarCampos = () => {
+    const esMesa = tipoSelect.value === 'mesa';
+    campoUnidad.hidden = esMesa;
+    campoCargo.hidden = !esMesa;
+  };
+  actualizarCampos();
+  tipoSelect.addEventListener('change', actualizarCampos);
+}

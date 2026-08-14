@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('partials/head') %>
+</head>
+<body>
+
+  <%- include('partials/portal-header') %>
+
+  <section class="page-banner page-banner--plain">
+    <div class="page-banner-content">
+      <span class="eyebrow">Cuotas de mantenimiento</span>
+      <h1>Pagos</h1>
+      <p class="page-banner-lead">Estado de cuenta de todos los propietarios.</p>
+    </div>
+  </section>
+
+  <section class="detail-sections">
+    <div class="tabla-wrap" data-reveal>
+      <table class="tabla-pagos">
+        <thead>
+          <tr>
+            <th>Unidad</th>
+            <th>Propietario</th>
+            <th>Saldo</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% propietarios.forEach(function (p) { %>
+            <tr>
+              <td><%= p.unidad %></td>
+              <td><%= p.nombre %></td>
+              <td>
+                <span class="badge <%= p.saldo > 0 ? 'badge--alerta' : 'badge--ok' %>">
+                  <%= p.saldo > 0 ? ('Debe $' + p.saldo.toLocaleString('es-MX')) : 'Al corriente' %>
+                </span>
+              </td>
+              <td><a href="/panel/pagos/<%= p.id %>" class="back-link" style="margin: 0;">Ver detalle →</a></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
+</body>
+</html>

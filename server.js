@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('path');
+const session = require('express-session');
+const { exponerUsuario, requireAuth } = require('./middleware/auth');
 
 const app = express();
 // Puerto dedicado para este proyecto: el 3000 lo ha estado ocupando otro
@@ -7,10 +9,26 @@ const app = express();
 // cargara ese sitio en vez de este. Usamos un puerto propio para no competir.
 const PORT = process.env.PORT || 3100;
 
-// Motor de plantillas: las páginas viven en /views y comparten header/footer
-// (views/partials/) para no repetir ese HTML en cada archivo.
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+app.use(express.urlencoded({ extended: true })); // formularios normales (login, movimientos)
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'villas-del-palmar-dev-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 1000 * 60 * 60 * 8 }, // 8 horas
+  })
+);
+app.use(exponerUsuario);
+
+// Disponible en todas las vistas para marcar el link activo en el nav del portal.
+app.use((req, res, next) => {
+  res.locals.currentPath = req.path;
+  next();
+});
 
 // Ídem para las páginas renderizadas (no solo CSS/JS): así un F5 normal
 // siempre trae el HTML más reciente en vez de una versión vieja cacheada.
@@ -36,33 +54,25 @@ app.use(
   })
 );
 
-// Una ruta por página. Cada una solo define su título/descripción y qué vista renderizar;
-// el layout (header, fuentes, footer) ya está resuelto dentro de cada .ejs vía los partials.
+// El sitio es completamente privado: "/" solo decide a dónde mandar según la sesión.
 app.get('/', (req, res) => {
-  res.render('index', {
-    title: 'Villas del Palmar',
-    description: 'Villas del Palmar — departamentos con alberca, áreas verdes y seguridad 24/7.',
-  });
+  res.redirect(req.session.user ? '/panel' : '/login');
 });
 
-app.get('/alberca', (req, res) => {
-  res.render('alberca', {
-    title: 'Alberca & terraza — Villas del Palmar',
-    description: 'Conoce las tres albercas de Villas del Palmar: alberca con tobogán, alberca infinita y alberca común.',
-  });
-});
+app.use(require('./routes/auth'));
+app.use(require('./routes/panel'));
+app.use(require('./routes/pagos'));
+app.use(require('./routes/avisos'));
+app.use(require('./routes/mesa'));
+app.use(require('./routes/instalaciones'));
+app.use(require('./routes/usuarios'));
 
-app.get('/areas-verdes', (req, res) => {
-  res.render('areas-verdes', {
-    title: 'Áreas verdes — Villas del Palmar',
-    description: 'Jardines, andadores y espacios abiertos de Villas del Palmar.',
-  });
-});
-
-app.get('/departamentos', (req, res) => {
-  res.render('departamentos', {
-    title: 'Departamentos — Villas del Palmar',
-    description: 'Conoce los departamentos de Villas del Palmar: fachadas, terrazas y su entorno natural.',
+// 404 genérico para cualquier otra ruta dentro del portal.
+app.use(requireAuth, (req, res) => {
+  res.status(404).render('error', {
+    title: 'No encontrado — Villas del Palmar',
+    description: 'Página no encontrada.',
+    mensaje: 'No encontramos esa página.',
   });
 });
 

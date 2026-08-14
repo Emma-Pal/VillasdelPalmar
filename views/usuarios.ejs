@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('partials/head') %>
+</head>
+<body>
+
+  <%- include('partials/portal-header') %>
+
+  <section class="page-banner page-banner--plain">
+    <div class="page-banner-content">
+      <span class="eyebrow">Mesa directiva</span>
+      <h1>Usuarios</h1>
+      <p class="page-banner-lead">Cuentas de propietarios y mesa directiva, y sus privilegios.</p>
+    </div>
+  </section>
+
+  <section class="detail-sections">
+    <p style="text-align: right; margin-bottom: 16px;">
+      <a href="/panel/usuarios/nuevo" class="btn btn-primary">+ Nuevo usuario</a>
+    </p>
+
+    <div class="tabla-wrap" data-reveal>
+      <table class="tabla-pagos">
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Nombre</th>
+            <th>Unidad / Cargo</th>
+            <th>Usuario</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% usuarios.forEach(function (u) { %>
+            <tr>
+              <td>
+                <span class="badge <%= u.tipo === 'mesa' ? 'badge--ok' : '' %>">
+                  <%= u.tipo === 'mesa' ? 'Mesa directiva' : 'Propietario' %>
+                </span>
+              </td>
+              <td><%= u.nombre %></td>
+              <td><%= u.tipo === 'mesa' ? u.cargo : u.unidad %></td>
+              <td><%= u.usuario %></td>
+              <td class="tabla-acciones">
+                <a href="/panel/usuarios/<%= u.id %>/editar" class="back-link" style="margin: 0;">Editar</a>
+                <% if (u.id !== usuario.id) { %>
+                  <form action="/panel/usuarios/<%= u.id %>/eliminar" method="POST"
+                        onsubmit="return confirm('¿Eliminar la cuenta de <%= u.nombre.replace(/'/g, '') %>? Esto no se puede deshacer.');">
+                    <button type="submit" class="btn-eliminar">Eliminar</button>
+                  </form>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
+</body>
+</html>
