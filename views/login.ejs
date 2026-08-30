@@ -18,9 +18,10 @@
       <% } %>
 
       <form action="/login" method="POST" class="login-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <label>
           Usuario
-          <input type="text" name="usuario" placeholder="ej. depto1" required autofocus />
+          <input type="text" name="usuario" placeholder="ej. propietarios" required autofocus />
         </label>
         <label>
           Contraseña

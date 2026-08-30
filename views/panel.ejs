@@ -16,31 +16,23 @@
 
   <section class="detail-sections">
 
-    <% if (usuario.tipo === 'propietario') { %>
-      <div class="dashboard-grid" data-reveal>
-        <div class="dashboard-card <%= saldo > 0 ? 'dashboard-card--alerta' : 'dashboard-card--ok' %>">
-          <span class="eyebrow"><%= usuario.unidad %></span>
-          <h2><%= saldo > 0 ? ('Debes $' + saldo.toLocaleString('es-MX')) : 'Estás al corriente' %></h2>
-          <p><%= saldo > 0 ? 'Consulta el detalle de tus cargos y pagos.' : 'No tienes adeudos pendientes por ahora.' %></p>
-          <a href="/panel/pagos" class="btn btn-primary">Ver mis pagos</a>
-        </div>
+    <div class="dashboard-grid" data-reveal>
+      <div class="dashboard-card <%= avisosNuevos > 0 ? 'dashboard-card--alerta' : 'dashboard-card--ok' %>">
+        <span class="eyebrow">Comunicación</span>
+        <h2><%= avisosNuevos > 0 ? (avisosNuevos + ' ' + (avisosNuevos === 1 ? 'publicación nueva' : 'publicaciones nuevas')) : 'Estás al día' %></h2>
+        <p><%= totalPublicaciones %> publicaciones en total entre estados financieros, mejoras y avisos.</p>
+        <a href="/panel/avisos" class="btn btn-primary">Ver avisos</a>
       </div>
-    <% } else { %>
-      <div class="dashboard-grid" data-reveal>
-        <div class="dashboard-card <%= resumen.morosos > 0 ? 'dashboard-card--alerta' : 'dashboard-card--ok' %>">
-          <span class="eyebrow">Propietarios</span>
-          <h2><%= resumen.totalPropietarios %> unidades</h2>
-          <p><%= resumen.morosos %> con adeudo pendiente · $<%= resumen.totalAdeudo.toLocaleString('es-MX') %> en total</p>
-          <a href="/panel/pagos" class="btn btn-primary">Ver pagos</a>
-        </div>
+
+      <% if (usuario.tipo === 'mesa') { %>
         <div class="dashboard-card">
-          <span class="eyebrow">Comunicación</span>
-          <h2>Publicaciones</h2>
-          <p>Estados financieros, mejoras y avisos publicados hasta ahora.</p>
+          <span class="eyebrow">Mesa directiva</span>
+          <h2>Publicar algo nuevo</h2>
+          <p>Comparte un estado financiero, una mejora o un aviso general.</p>
           <a href="/panel/avisos/nueva" class="btn btn-ghost-light">Nueva publicación</a>
         </div>
-      </div>
-    <% } %>
+      <% } %>
+    </div>
 
     <div class="section-heading" data-reveal style="margin-top: 24px;">
       <span class="eyebrow">Al día</span>
@@ -48,25 +40,25 @@
     </div>
 
     <div class="publicaciones-list" data-reveal>
-      <% if (ultimosAvisos.length === 0) { %>
+      <% if (ultimasPublicaciones.length === 0) { %>
         <p class="placeholder-note">Todavía no hay publicaciones.</p>
       <% } %>
-      <% ultimosAvisos.forEach(function (pub) { %>
+      <% ultimasPublicaciones.forEach(function (pub) { %>
         <article class="publicacion-card">
           <span class="publicacion-categoria publicacion-categoria--<%= pub.categoria %>">
             <%= ({ financiero: 'Estado financiero', mejora: 'Mejora', aviso: 'Aviso' })[pub.categoria] %>
           </span>
           <h3><%= pub.titulo %></h3>
-          <p><%= pub.cuerpo %></p>
+          <p><%- nl2br(pub.cuerpo) %></p>
           <footer>
-            <%= pub.autor_nombre %> · <%= pub.autor_cargo %> — <%= pub.fecha %>
+            <span><%= pub.autor_nombre %> · <%= pub.autor_cargo %> — <%= pub.fecha %></span>
           </footer>
         </article>
       <% }); %>
     </div>
 
     <p style="text-align: center; margin-top: 8px;">
-      <a href="/panel/avisos" class="back-link" style="display: inline-flex; margin: 0 auto;">Ver todos los avisos →</a>
+      <a href="/panel/avisos" class="back-link back-link--dark" style="display: inline-flex; margin: 0 auto;">Ver todos los avisos →</a>
     </p>
 
   </section>

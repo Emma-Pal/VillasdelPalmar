@@ -29,10 +29,12 @@
         method="POST"
         class="contact-form"
       >
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
         <label>
           Tipo de cuenta
           <select name="tipo" id="tipo-select" required>
-            <option value="propietario" <%= usuarioEditado && usuarioEditado.tipo === 'propietario' ? 'selected' : '' %>>Propietario</option>
+            <option value="propietario" <%= usuarioEditado && usuarioEditado.tipo === 'propietario' ? 'selected' : '' %>>Propietario (cuenta compartida)</option>
             <option value="mesa" <%= usuarioEditado && usuarioEditado.tipo === 'mesa' ? 'selected' : '' %>>Mesa directiva (privilegios de administrador)</option>
           </select>
         </label>
@@ -40,11 +42,6 @@
         <label>
           Nombre completo
           <input type="text" name="nombre" value="<%= usuarioEditado ? usuarioEditado.nombre : '' %>" required />
-        </label>
-
-        <label id="campo-unidad">
-          Unidad (ej. "Depto 5")
-          <input type="text" name="unidad" value="<%= usuarioEditado ? (usuarioEditado.unidad || '') : '' %>" />
         </label>
 
         <label id="campo-cargo">
@@ -58,8 +55,13 @@
         </label>
 
         <label>
-          <%= usuarioEditado ? 'Nueva contraseña (dejar en blanco para no cambiarla)' : 'Contraseña' %>
-          <input type="password" name="password" <%= usuarioEditado ? '' : 'required' %> />
+          <%= usuarioEditado ? 'Nueva contraseña (dejar en blanco para no cambiarla, mínimo 8 caracteres)' : 'Contraseña (mínimo 8 caracteres)' %>
+          <input type="password" name="password" minlength="8" autocomplete="new-password" <%= usuarioEditado ? '' : 'required' %> />
+        </label>
+
+        <label>
+          Confirmar <%= usuarioEditado ? 'nueva contraseña' : 'contraseña' %>
+          <input type="password" name="passwordConfirmar" minlength="8" autocomplete="new-password" <%= usuarioEditado ? '' : 'required' %> />
         </label>
 
         <button type="submit" class="btn btn-primary">

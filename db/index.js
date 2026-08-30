@@ -1,5 +1,10 @@
 // Capa de datos del portal. Un solo archivo SQLite (better-sqlite3 es síncrono,
 // así que no hace falta async/await ni manejar promesas para consultas simples).
+//
+// Modelo de cuentas: una sola cuenta compartida tipo "propietario" (todos los
+// condóminos entran con la misma), y varias cuentas tipo "mesa" (una por
+// cargo: presidente, tesorero, etc.) que sí necesitan identificarse porque
+// publican contenido a su nombre.
 const path = require('path');
 const fs = require('fs');
 const Database = require('better-sqlite3');
@@ -16,21 +21,10 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tipo TEXT NOT NULL CHECK (tipo IN ('propietario', 'mesa')),
     nombre TEXT NOT NULL,
-    unidad TEXT,            -- solo aplica a propietarios (ej. "Depto 4B")
     cargo TEXT,             -- solo aplica a mesa directiva (ej. "Tesorero")
     usuario TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL
-  );
-
-  CREATE TABLE IF NOT EXISTS movimientos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    -- ON DELETE CASCADE: si se borra un propietario, su historial de pagos
-    -- (que es exclusivamente suyo) se borra con él.
-    propietario_id INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
-    fecha TEXT NOT NULL,    -- YYYY-MM-DD
-    tipo TEXT NOT NULL CHECK (tipo IN ('cargo', 'pago')),
-    concepto TEXT NOT NULL,
-    monto REAL NOT NULL
+    password_hash TEXT NOT NULL,
+    ultima_visita_avisos TEXT  -- ISO datetime; para saber qué publicaciones son "nuevas" para este usuario
   );
 
   CREATE TABLE IF NOT EXISTS publicaciones (
@@ -39,9 +33,16 @@ db.exec(`
     categoria TEXT NOT NULL CHECK (categoria IN ('financiero', 'mejora', 'aviso')),
     titulo TEXT NOT NULL,
     cuerpo TEXT NOT NULL,
-    archivo TEXT,                  -- nombre del archivo guardado en /uploads
-    archivo_nombre_original TEXT,  -- nombre original, para mostrarlo al descargar
-    fecha TEXT NOT NULL            -- YYYY-MM-DD
+    fecha TEXT NOT NULL,       -- YYYY-MM-DD
+    creado_en TEXT NOT NULL    -- ISO datetime real de creación, para "qué es nuevo"
+  );
+
+  -- Varios archivos por publicación (antes solo se permitía uno).
+  CREATE TABLE IF NOT EXISTS archivos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    publicacion_id INTEGER NOT NULL REFERENCES publicaciones(id) ON DELETE CASCADE,
+    archivo TEXT NOT NULL,             -- nombre guardado en /uploads
+    archivo_nombre_original TEXT NOT NULL
   );
 `);
 
@@ -55,42 +56,37 @@ function getUsuarioPorId(id) {
   return db.prepare('SELECT * FROM usuarios WHERE id = ?').get(id);
 }
 
-function getPropietarios() {
-  return db
-    .prepare("SELECT * FROM usuarios WHERE tipo = 'propietario' ORDER BY unidad")
-    .all();
-}
-
 function getMesa() {
   return db.prepare("SELECT * FROM usuarios WHERE tipo = 'mesa' ORDER BY cargo").all();
 }
 
-function crearUsuario({ tipo, nombre, unidad, cargo, usuario, passwordHash }) {
-  return db
-    .prepare(
-      `INSERT INTO usuarios (tipo, nombre, unidad, cargo, usuario, password_hash)
-       VALUES (?, ?, ?, ?, ?, ?)`
-    )
-    .run(tipo, nombre, unidad || null, cargo || null, usuario, passwordHash).lastInsertRowid;
+function getUsuarios() {
+  return db.prepare('SELECT * FROM usuarios ORDER BY tipo DESC, cargo, nombre').all();
 }
 
-function getUsuarios() {
-  return db.prepare('SELECT * FROM usuarios ORDER BY tipo, unidad, cargo').all();
+function crearUsuario({ tipo, nombre, cargo, usuario, passwordHash }) {
+  return db
+    .prepare(
+      `INSERT INTO usuarios (tipo, nombre, cargo, usuario, password_hash)
+       VALUES (?, ?, ?, ?, ?)`
+    )
+    .run(tipo, nombre, tipo === 'mesa' ? cargo || null : null, usuario, passwordHash).lastInsertRowid;
 }
 
 // Actualiza datos de un usuario. `passwordHash` es opcional — si no se manda,
 // se conserva la contraseña actual (así "editar" no obliga a resetear clave).
-function actualizarUsuario({ id, tipo, nombre, unidad, cargo, usuario, passwordHash }) {
+function actualizarUsuario({ id, tipo, nombre, cargo, usuario, passwordHash }) {
+  const cargoFinal = tipo === 'mesa' ? cargo || null : null;
   if (passwordHash) {
     db.prepare(
-      `UPDATE usuarios SET tipo = ?, nombre = ?, unidad = ?, cargo = ?, usuario = ?, password_hash = ?
+      `UPDATE usuarios SET tipo = ?, nombre = ?, cargo = ?, usuario = ?, password_hash = ?
        WHERE id = ?`
-    ).run(tipo, nombre, unidad || null, cargo || null, usuario, passwordHash, id);
+    ).run(tipo, nombre, cargoFinal, usuario, passwordHash, id);
   } else {
     db.prepare(
-      `UPDATE usuarios SET tipo = ?, nombre = ?, unidad = ?, cargo = ?, usuario = ?
+      `UPDATE usuarios SET tipo = ?, nombre = ?, cargo = ?, usuario = ?
        WHERE id = ?`
-    ).run(tipo, nombre, unidad || null, cargo || null, usuario, id);
+    ).run(tipo, nombre, cargoFinal, usuario, id);
   }
 }
 
@@ -102,90 +98,134 @@ function eliminarUsuario(id) {
   db.prepare('DELETE FROM usuarios WHERE id = ?').run(id);
 }
 
-// ===== Movimientos (pagos/cargos) =====
-
-function getMovimientos(propietarioId) {
-  return db
-    .prepare('SELECT * FROM movimientos WHERE propietario_id = ? ORDER BY fecha DESC, id DESC')
-    .all(propietarioId);
+function getUltimaVisitaAvisos(usuarioId) {
+  const row = db.prepare('SELECT ultima_visita_avisos FROM usuarios WHERE id = ?').get(usuarioId);
+  return row ? row.ultima_visita_avisos : null;
 }
 
-// Saldo positivo = el propietario debe esa cantidad (cargos > pagos).
-function getSaldo(propietarioId) {
-  const row = db
-    .prepare(
-      `SELECT
-         COALESCE(SUM(CASE WHEN tipo = 'cargo' THEN monto ELSE 0 END), 0) AS cargos,
-         COALESCE(SUM(CASE WHEN tipo = 'pago' THEN monto ELSE 0 END), 0) AS pagos
-       FROM movimientos WHERE propietario_id = ?`
-    )
-    .get(propietarioId);
-  return row.cargos - row.pagos;
-}
-
-function crearMovimiento({ propietarioId, fecha, tipo, concepto, monto }) {
-  return db
-    .prepare(
-      `INSERT INTO movimientos (propietario_id, fecha, tipo, concepto, monto)
-       VALUES (?, ?, ?, ?, ?)`
-    )
-    .run(propietarioId, fecha, tipo, concepto, monto).lastInsertRowid;
+function marcarVisitaAvisos(usuarioId, fechaIso) {
+  db.prepare('UPDATE usuarios SET ultima_visita_avisos = ? WHERE id = ?').run(fechaIso, usuarioId);
 }
 
 // ===== Publicaciones (estados financieros / mejoras / avisos) =====
 
-function getPublicaciones(categoria) {
+const CATEGORIAS_VALIDAS = ['financiero', 'mejora', 'aviso'];
+
+function getPublicaciones(categoria, { limit = 10, offset = 0 } = {}) {
   const base = `
     SELECT p.*, u.nombre AS autor_nombre, u.cargo AS autor_cargo
     FROM publicaciones p
     JOIN usuarios u ON u.id = p.autor_id`;
+  const params = [];
+  let where = '';
   if (categoria) {
-    return db
-      .prepare(`${base} WHERE p.categoria = ? ORDER BY p.fecha DESC, p.id DESC`)
-      .all(categoria);
+    where = ' WHERE p.categoria = ?';
+    params.push(categoria);
   }
-  return db.prepare(`${base} ORDER BY p.fecha DESC, p.id DESC`).all();
+  const filas = db
+    .prepare(`${base}${where} ORDER BY p.fecha DESC, p.id DESC LIMIT ? OFFSET ?`)
+    .all(...params, limit, offset);
+
+  filas.forEach((p) => {
+    p.archivos = getArchivosDePublicacion(p.id);
+  });
+  return filas;
+}
+
+function contarPublicaciones(categoria) {
+  if (categoria) {
+    return db.prepare('SELECT COUNT(*) AS n FROM publicaciones WHERE categoria = ?').get(categoria).n;
+  }
+  return db.prepare('SELECT COUNT(*) AS n FROM publicaciones').get().n;
 }
 
 function getPublicacionPorId(id) {
-  return db
+  const publicacion = db
     .prepare(
       `SELECT p.*, u.nombre AS autor_nombre, u.cargo AS autor_cargo
        FROM publicaciones p JOIN usuarios u ON u.id = p.autor_id
        WHERE p.id = ?`
     )
     .get(id);
+  if (publicacion) publicacion.archivos = getArchivosDePublicacion(id);
+  return publicacion;
 }
 
-function crearPublicacion({ autorId, categoria, titulo, cuerpo, archivo, archivoNombreOriginal, fecha }) {
+function contarPublicacionesDesde(fechaIso) {
+  if (!fechaIso) return contarPublicaciones();
+  // Se compara por fecha de creación real (creado_en), no por la fecha "editorial" (fecha).
+  return db.prepare('SELECT COUNT(*) AS n FROM publicaciones WHERE creado_en > ?').get(fechaIso).n;
+}
+
+function crearPublicacion({ autorId, categoria, titulo, cuerpo, fecha }) {
   return db
     .prepare(
-      `INSERT INTO publicaciones (autor_id, categoria, titulo, cuerpo, archivo, archivo_nombre_original, fecha)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO publicaciones (autor_id, categoria, titulo, cuerpo, fecha, creado_en)
+       VALUES (?, ?, ?, ?, ?, ?)`
     )
-    .run(autorId, categoria, titulo, cuerpo, archivo || null, archivoNombreOriginal || null, fecha)
-    .lastInsertRowid;
+    .run(autorId, categoria, titulo, cuerpo, fecha, new Date().toISOString()).lastInsertRowid;
+}
+
+function actualizarPublicacion({ id, categoria, titulo, cuerpo, fecha }) {
+  db.prepare('UPDATE publicaciones SET categoria = ?, titulo = ?, cuerpo = ?, fecha = ? WHERE id = ?').run(
+    categoria,
+    titulo,
+    cuerpo,
+    fecha,
+    id
+  );
 }
 
 function eliminarPublicacion(id) {
+  // Los archivos (fila de la tabla `archivos`) se borran solos por el
+  // ON DELETE CASCADE; los ARCHIVOS FÍSICOS hay que borrarlos aparte desde
+  // la ruta (ahí sí se sabe la carpeta de uploads), antes de llamar esto.
   db.prepare('DELETE FROM publicaciones WHERE id = ?').run(id);
+}
+
+// ===== Archivos adjuntos (varios por publicación) =====
+
+function getArchivosDePublicacion(publicacionId) {
+  return db.prepare('SELECT * FROM archivos WHERE publicacion_id = ? ORDER BY id').all(publicacionId);
+}
+
+function getArchivoPorId(id) {
+  return db.prepare('SELECT * FROM archivos WHERE id = ?').get(id);
+}
+
+function agregarArchivo({ publicacionId, archivo, archivoNombreOriginal }) {
+  return db
+    .prepare(
+      `INSERT INTO archivos (publicacion_id, archivo, archivo_nombre_original) VALUES (?, ?, ?)`
+    )
+    .run(publicacionId, archivo, archivoNombreOriginal).lastInsertRowid;
+}
+
+function eliminarArchivo(id) {
+  db.prepare('DELETE FROM archivos WHERE id = ?').run(id);
 }
 
 module.exports = {
   db,
+  CATEGORIAS_VALIDAS,
   getUsuarioPorLogin,
   getUsuarioPorId,
-  getPropietarios,
   getMesa,
   getUsuarios,
   crearUsuario,
   actualizarUsuario,
   eliminarUsuario,
-  getMovimientos,
-  getSaldo,
-  crearMovimiento,
+  getUltimaVisitaAvisos,
+  marcarVisitaAvisos,
   getPublicaciones,
+  contarPublicaciones,
+  contarPublicacionesDesde,
   getPublicacionPorId,
   crearPublicacion,
+  actualizarPublicacion,
   eliminarPublicacion,
+  getArchivosDePublicacion,
+  getArchivoPorId,
+  agregarArchivo,
+  eliminarArchivo,
 };

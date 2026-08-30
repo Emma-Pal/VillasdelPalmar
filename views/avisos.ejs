@@ -36,24 +36,76 @@
           <span class="publicacion-categoria publicacion-categoria--<%= pub.categoria %>">
             <%= ({ financiero: 'Estado financiero', mejora: 'Mejora', aviso: 'Aviso' })[pub.categoria] %>
           </span>
-          <h3><%= pub.titulo %></h3>
-          <p><%= pub.cuerpo %></p>
-          <% if (pub.archivo) { %>
-            <p><a href="/panel/archivos/<%= pub.id %>" class="back-link" style="margin: 8px 0;">📎 <%= pub.archivo_nombre_original %></a></p>
+          <% if (pub.esNueva) { %>
+            <span class="publicacion-nueva">Nuevo</span>
           <% } %>
+          <h3><%= pub.titulo %></h3>
+          <p><%- nl2br(pub.cuerpo) %></p>
+
+          <% var imagenes = pub.archivos.filter(function (a) { return esImagen(a.archivo); }); %>
+          <% var otros = pub.archivos.filter(function (a) { return !esImagen(a.archivo); }); %>
+
+          <% if (imagenes.length > 0) { %>
+            <div class="publicacion-imagenes <%= imagenes.length > 1 ? 'imagenes-multiples' : '' %>">
+              <% imagenes.forEach(function (archivo) { %>
+                <button
+                  type="button"
+                  class="publicacion-imagen-btn"
+                  data-lightbox-src="/panel/archivos/<%= archivo.id %>"
+                  data-lightbox-nombre="<%= archivo.archivo_nombre_original %>"
+                >
+                  <img src="/panel/archivos/<%= archivo.id %>" alt="<%= archivo.archivo_nombre_original %>" class="publicacion-imagen" />
+                </button>
+              <% }); %>
+            </div>
+          <% } %>
+
+          <% if (otros.length > 0) { %>
+            <ul class="publicacion-archivos">
+              <% otros.forEach(function (archivo) { %>
+                <li><a href="/panel/archivos/<%= archivo.id %>">📎 <%= archivo.archivo_nombre_original %></a></li>
+              <% }); %>
+            </ul>
+          <% } %>
+
           <footer>
             <span><%= pub.autor_nombre %> · <%= pub.autor_cargo %> — <%= pub.fecha %></span>
             <% if (usuario.tipo === 'mesa') { %>
-              <form action="/panel/avisos/<%= pub.id %>/eliminar" method="POST"
-                    onsubmit="return confirm('¿Eliminar esta publicación? Esto no se puede deshacer.');">
-                <button type="submit" class="btn-eliminar">Eliminar</button>
-              </form>
+              <span class="publicacion-acciones">
+                <a href="/panel/avisos/<%= pub.id %>/editar" class="btn-editar">Editar</a>
+                <form action="/panel/avisos/<%= pub.id %>/eliminar" method="POST"
+                      onsubmit="return confirm('¿Eliminar esta publicación? Esto no se puede deshacer.');">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                  <button type="submit" class="btn-eliminar">Eliminar</button>
+                </form>
+              </span>
             <% } %>
           </footer>
         </article>
       <% }); %>
     </div>
+
+    <% if (totalPaginas > 1) { %>
+      <nav class="paginacion" data-reveal>
+        <% if (paginaActual > 1) { %>
+          <a href="/panel/avisos?pagina=<%= paginaActual - 1 %><%= categoriaActual ? '&categoria=' + categoriaActual : '' %>">← Anterior</a>
+        <% } %>
+        <span class="paginacion-actual">Página <%= paginaActual %> de <%= totalPaginas %></span>
+        <% if (paginaActual < totalPaginas) { %>
+          <a href="/panel/avisos?pagina=<%= paginaActual + 1 %><%= categoriaActual ? '&categoria=' + categoriaActual : '' %>">Siguiente →</a>
+        <% } %>
+      </nav>
+    <% } %>
   </section>
+
+  <!-- ===== Lightbox: ver la imagen completa y desde ahí sí descargarla ===== -->
+  <div class="lightbox-overlay" id="lightbox-overlay" hidden>
+    <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Cerrar">&times;</button>
+    <div class="lightbox-content">
+      <img src="" alt="" id="lightbox-img" class="lightbox-img" />
+      <a href="#" id="lightbox-download" class="btn btn-primary">Descargar imagen</a>
+    </div>
+  </div>
 
   <%- include('partials/footer') %>
 

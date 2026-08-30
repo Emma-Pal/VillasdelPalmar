@@ -11,8 +11,10 @@
 
     <nav class="portal-nav" id="nav-menu">
       <a href="/panel" class="<%= currentPath === '/panel' ? 'is-active' : '' %>">Panel</a>
-      <a href="/panel/pagos" class="<%= currentPath.startsWith('/panel/pagos') ? 'is-active' : '' %>">Pagos</a>
-      <a href="/panel/avisos" class="<%= currentPath.startsWith('/panel/avisos') ? 'is-active' : '' %>">Avisos</a>
+      <a href="/panel/avisos" class="<%= currentPath.startsWith('/panel/avisos') ? 'is-active' : '' %>">
+        Avisos
+        <% if (avisosNuevos > 0) { %><span class="nav-badge"><%= avisosNuevos %></span><% } %>
+      </a>
       <a href="/panel/instalaciones" class="<%= currentPath.startsWith('/panel/instalaciones') ? 'is-active' : '' %>">Instalaciones</a>
       <a href="/panel/mesa" class="<%= currentPath === '/panel/mesa' ? 'is-active' : '' %>">Mesa directiva</a>
       <% if (usuario.tipo === 'mesa') { %>
@@ -21,14 +23,25 @@
     </nav>
 
     <div class="portal-header-actions">
-      <span class="nav-user">
-        <span class="nav-user-avatar"><%= usuario.nombre.charAt(0) %></span>
-        <span class="nav-user-text">
-          <span class="nav-user-nombre"><%= usuario.nombre %></span>
-          <span class="nav-user-rol"><%= usuario.tipo === 'mesa' ? usuario.cargo : usuario.unidad %></span>
+      <% if (usuario.tipo === 'mesa') { %>
+        <a href="/panel/mi-cuenta" class="nav-user" title="Editar mi cuenta">
+          <span class="nav-user-avatar"><%= usuario.nombre.charAt(0) %></span>
+          <span class="nav-user-text">
+            <span class="nav-user-nombre"><%= usuario.nombre %></span>
+            <span class="nav-user-rol"><%= usuario.cargo %></span>
+          </span>
+        </a>
+      <% } else { %>
+        <span class="nav-user">
+          <span class="nav-user-avatar"><%= usuario.nombre.charAt(0) %></span>
+          <span class="nav-user-text">
+            <span class="nav-user-nombre"><%= usuario.nombre %></span>
+            <span class="nav-user-rol">Propietario</span>
+          </span>
         </span>
-      </span>
+      <% } %>
       <form action="/logout" method="POST" class="nav-logout-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
         <button type="submit" class="nav-logout-btn">Cerrar sesión</button>
       </form>
       <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false">

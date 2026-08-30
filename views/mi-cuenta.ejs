@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('partials/head') %>
+</head>
+<body>
+
+  <%- include('partials/portal-header') %>
+
+  <section class="page-banner page-banner--plain">
+    <div class="page-banner-content">
+      <span class="eyebrow">Mi cuenta</span>
+      <h1><%= datos.nombre %></h1>
+      <p class="page-banner-lead">Edita tu nombre, cargo, usuario o contraseña.</p>
+    </div>
+  </section>
+
+  <section class="detail-sections">
+    <div class="form-card" data-reveal style="max-width: 480px; margin: 0 auto;">
+      <% if (guardado) { %>
+        <p class="login-error" style="background: #f1f8f3; color: #2f6b45;">Tus datos se guardaron correctamente.</p>
+      <% } %>
+      <% if (error) { %>
+        <p class="login-error"><%= error %></p>
+      <% } %>
+
+      <form action="/panel/mi-cuenta" method="POST" class="contact-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+        <label>
+          Nombre completo
+          <input type="text" name="nombre" value="<%= datos.nombre %>" required />
+        </label>
+
+        <label>
+          Cargo
+          <input type="text" name="cargo" value="<%= datos.cargo || '' %>" required />
+        </label>
+
+        <label>
+          Usuario (login)
+          <input type="text" name="usuario" value="<%= datos.usuario %>" required />
+        </label>
+
+        <hr class="form-separador" />
+        <p class="form-nota">Cambiar contraseña (opcional — deja estos 3 campos en blanco para no tocarla)</p>
+
+        <label>
+          Contraseña actual
+          <input type="password" name="contrasenaActual" autocomplete="current-password" />
+        </label>
+
+        <label>
+          Nueva contraseña (mínimo 8 caracteres)
+          <input type="password" name="password" minlength="8" autocomplete="new-password" />
+        </label>
+
+        <label>
+          Confirmar nueva contraseña
+          <input type="password" name="passwordConfirmar" minlength="8" autocomplete="new-password" />
+        </label>
+
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+      </form>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
+</body>
+</html>

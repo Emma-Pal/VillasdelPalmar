@@ -26,7 +26,7 @@
           <tr>
             <th>Tipo</th>
             <th>Nombre</th>
-            <th>Unidad / Cargo</th>
+            <th>Cargo</th>
             <th>Usuario</th>
             <th></th>
           </tr>
@@ -40,13 +40,14 @@
                 </span>
               </td>
               <td><%= u.nombre %></td>
-              <td><%= u.tipo === 'mesa' ? u.cargo : u.unidad %></td>
+              <td><%= u.cargo || '—' %></td>
               <td><%= u.usuario %></td>
               <td class="tabla-acciones">
-                <a href="/panel/usuarios/<%= u.id %>/editar" class="back-link" style="margin: 0;">Editar</a>
+                <a href="/panel/usuarios/<%= u.id %>/editar" class="btn-editar">Editar</a>
                 <% if (u.id !== usuario.id) { %>
                   <form action="/panel/usuarios/<%= u.id %>/eliminar" method="POST"
                         onsubmit="return confirm('¿Eliminar la cuenta de <%= u.nombre.replace(/'/g, '') %>? Esto no se puede deshacer.');">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                     <button type="submit" class="btn-eliminar">Eliminar</button>
                   </form>
                 <% } %>

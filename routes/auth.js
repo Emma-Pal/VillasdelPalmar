@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { getUsuarioPorLogin } = require('../db');
+const { verifyCsrfToken } = require('../middleware/csrf');
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ router.get('/login', (req, res) => {
   });
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', verifyCsrfToken, (req, res) => {
   const { usuario, password } = req.body;
   const cuenta = usuario ? getUsuarioPorLogin(usuario.trim()) : null;
 
@@ -31,13 +32,12 @@ router.post('/login', (req, res) => {
     id: cuenta.id,
     tipo: cuenta.tipo,
     nombre: cuenta.nombre,
-    unidad: cuenta.unidad,
     cargo: cuenta.cargo,
   };
   res.redirect('/panel');
 });
 
-router.post('/logout', (req, res) => {
+router.post('/logout', verifyCsrfToken, (req, res) => {
   req.session.destroy(() => res.redirect('/login'));
 });
 

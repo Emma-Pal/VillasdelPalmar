@@ -68,17 +68,100 @@ if (form) {
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-// ===== Formulario de usuario: mostrar solo "Unidad" o "Cargo" según el tipo =====
+// ===== Formulario de usuario: el campo "Cargo" solo aplica a mesa directiva =====
 const tipoSelect = document.getElementById('tipo-select');
-const campoUnidad = document.getElementById('campo-unidad');
 const campoCargo = document.getElementById('campo-cargo');
 
-if (tipoSelect && campoUnidad && campoCargo) {
+if (tipoSelect && campoCargo) {
   const actualizarCampos = () => {
-    const esMesa = tipoSelect.value === 'mesa';
-    campoUnidad.hidden = esMesa;
-    campoCargo.hidden = !esMesa;
+    campoCargo.hidden = tipoSelect.value !== 'mesa';
   };
   actualizarCampos();
   tipoSelect.addEventListener('change', actualizarCampos);
+}
+
+// ===== Lightbox de imágenes en publicaciones =====
+// Al hacer clic en una imagen se abre en grande, con una animación de zoom
+// que sale exactamente del lugar donde estaba la miniatura (técnica "FLIP":
+// se mide dónde empieza y dónde termina, y se anima la diferencia con
+// transform, que es lo único que el navegador puede animar sin trabarse).
+const lightboxOverlay = document.getElementById('lightbox-overlay');
+const lightboxImg = document.getElementById('lightbox-img');
+const lightboxDownload = document.getElementById('lightbox-download');
+const lightboxClose = document.getElementById('lightbox-close');
+
+if (lightboxOverlay && lightboxImg && lightboxDownload && lightboxClose) {
+  let origenRect = null;
+
+  const transformDesdeOrigen = (origen, destino) => {
+    const dx = origen.left + origen.width / 2 - (destino.left + destino.width / 2);
+    const dy = origen.top + origen.height / 2 - (destino.top + destino.height / 2);
+    const sx = origen.width / destino.width;
+    const sy = origen.height / destino.height;
+    return `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
+  };
+
+  const animarDesdeOrigen = () => {
+    const destinoRect = lightboxImg.getBoundingClientRect();
+    lightboxImg.style.transition = 'none';
+    lightboxImg.style.transform = transformDesdeOrigen(origenRect, destinoRect);
+    lightboxImg.style.opacity = '0.5';
+    // Forzar que el navegador aplique lo de arriba ANTES de animar a su lugar final.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        lightboxImg.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        lightboxImg.style.transform = 'translate(0, 0) scale(1, 1)';
+        lightboxImg.style.opacity = '1';
+      });
+    });
+  };
+
+  const abrirLightbox = (boton, src, nombre) => {
+    origenRect = boton.getBoundingClientRect();
+    lightboxDownload.href = src;
+    lightboxOverlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+
+    if (lightboxImg.src.endsWith(src) && lightboxImg.complete) {
+      animarDesdeOrigen();
+    } else {
+      lightboxImg.src = src;
+      lightboxImg.alt = nombre || '';
+      lightboxImg.onload = animarDesdeOrigen;
+    }
+  };
+
+  const cerrarLightbox = () => {
+    if (origenRect) {
+      const actualRect = lightboxImg.getBoundingClientRect();
+      lightboxImg.style.transition = 'transform 0.22s ease, opacity 0.22s ease';
+      lightboxImg.style.transform = transformDesdeOrigen(origenRect, actualRect);
+      lightboxImg.style.opacity = '0';
+    }
+    setTimeout(() => {
+      lightboxOverlay.hidden = true;
+      lightboxImg.src = '';
+      lightboxImg.style.transition = '';
+      lightboxImg.style.transform = '';
+      lightboxImg.style.opacity = '';
+      document.body.style.overflow = '';
+    }, origenRect ? 220 : 0);
+  };
+
+  document.querySelectorAll('[data-lightbox-src]').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      abrirLightbox(boton, boton.dataset.lightboxSrc, boton.dataset.lightboxNombre);
+    });
+  });
+
+  lightboxClose.addEventListener('click', cerrarLightbox);
+
+  // Cerrar al hacer clic afuera de la imagen (pero no al hacer clic en la imagen o en descargar)
+  lightboxOverlay.addEventListener('click', (event) => {
+    if (event.target === lightboxOverlay) cerrarLightbox();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !lightboxOverlay.hidden) cerrarLightbox();
+  });
 }

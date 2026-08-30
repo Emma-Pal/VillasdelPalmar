@@ -21,6 +21,13 @@ const upload = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
   fileFilter: (req, file, cb) => {
+    // Un <input type="file"> vacío igual manda una "parte" en el formulario
+    // (con nombre de archivo vacío) — no es un archivo real, solo se ignora.
+    // Sin este caso, cualquier edición sin adjuntar nada nuevo se rechazaba
+    // como si fuera un archivo inválido y la publicación no se guardaba.
+    if (!file.originalname) {
+      return cb(null, false);
+    }
     const permitidos = ['.pdf', '.jpg', '.jpeg', '.png'];
     if (permitidos.includes(path.extname(file.originalname).toLowerCase())) {
       cb(null, true);

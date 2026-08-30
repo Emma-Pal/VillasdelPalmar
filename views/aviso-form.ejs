@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('partials/head') %>
+</head>
+<body>
+
+  <%- include('partials/portal-header') %>
+
+  <section class="page-banner page-banner--plain">
+    <div class="page-banner-content">
+      <a href="/panel/avisos" class="back-link">← Volver a avisos</a>
+      <span class="eyebrow">Mesa directiva</span>
+      <h1><%= publicacionEditada ? 'Editar publicación' : 'Nueva publicación' %></h1>
+      <% if (!publicacionEditada) { %>
+        <p class="page-banner-lead">Se firmará como <%= usuario.nombre %> — <%= usuario.cargo %>.</p>
+      <% } %>
+    </div>
+  </section>
+
+  <section class="detail-sections">
+    <div class="form-card" data-reveal style="max-width: 640px; margin: 0 auto;">
+
+      <!-- OJO: esto va FUERA del <form> de abajo a propósito. Un <form>
+           dentro de otro <form> es HTML inválido — el navegador los
+           reorganiza de forma impredecible (ej. duplica el campo _csrf,
+           o corta el formulario principal antes de tiempo), lo que hacía
+           fallar tanto "Quitar" como "Guardar cambios". -->
+      <% if (publicacionEditada && publicacionEditada.archivos.length > 0) { %>
+        <div class="archivos-existentes">
+          <span class="archivos-existentes-titulo">Archivos ya adjuntos</span>
+          <% publicacionEditada.archivos.forEach(function (archivo) { %>
+            <div class="archivo-existente">
+              <a href="/panel/archivos/<%= archivo.id %>">📎 <%= archivo.archivo_nombre_original %></a>
+              <form action="/panel/avisos/<%= publicacionEditada.id %>/archivos/<%= archivo.id %>/eliminar" method="POST"
+                    onsubmit="return confirm('¿Quitar este archivo de la publicación?');">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <button type="submit" class="btn-eliminar">Quitar</button>
+              </form>
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
+
+      <form
+        action="<%= publicacionEditada ? `/panel/avisos/${publicacionEditada.id}/editar` : '/panel/avisos' %>"
+        method="POST"
+        enctype="multipart/form-data"
+        class="contact-form"
+      >
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+        <label>
+          Categoría
+          <select name="categoria" required>
+            <option value="financiero" <%= publicacionEditada && publicacionEditada.categoria === 'financiero' ? 'selected' : '' %>>Estado financiero</option>
+            <option value="mejora" <%= publicacionEditada && publicacionEditada.categoria === 'mejora' ? 'selected' : '' %>>Mejora</option>
+            <option value="aviso" <%= publicacionEditada && publicacionEditada.categoria === 'aviso' ? 'selected' : '' %>>Aviso general</option>
+          </select>
+        </label>
+
+        <label>
+          Título
+          <input type="text" name="titulo" value="<%= publicacionEditada ? publicacionEditada.titulo : '' %>" placeholder="ej. Estado financiero — agosto 2026" required />
+        </label>
+
+        <label>
+          Fecha
+          <input type="date" name="fecha" value="<%= publicacionEditada ? publicacionEditada.fecha : new Date().toISOString().slice(0, 10) %>" required />
+        </label>
+
+        <label>
+          Contenido
+          <textarea name="cuerpo" rows="6" placeholder="Escribe el contenido de la publicación..." required><%= publicacionEditada ? publicacionEditada.cuerpo : '' %></textarea>
+        </label>
+
+        <label>
+          <%= publicacionEditada ? 'Agregar más archivos (opcional — PDF o imagen)' : 'Archivos adjuntos (opcional — PDF o imagen, hasta 5)' %>
+          <input type="file" name="archivos" accept=".pdf,.jpg,.jpeg,.png" multiple />
+        </label>
+
+        <button type="submit" class="btn btn-primary"><%= publicacionEditada ? 'Guardar cambios' : 'Publicar' %></button>
+      </form>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
+</body>
+</html>
