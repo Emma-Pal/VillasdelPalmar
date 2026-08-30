@@ -60,7 +60,7 @@ $sufijoQuery = $categoriaActual ? '&categoria=' . urlencode($categoriaActual) : 
         <p class="placeholder-note">No hay publicaciones en esta categoría todavía.</p>
       <?php endif; ?>
       <?php foreach ($publicaciones as $pub): ?>
-        <article class="publicacion-card">
+        <article class="publicacion-card" id="aviso-<?= (int) $pub['id'] ?>">
           <span class="publicacion-categoria publicacion-categoria--<?= htmlspecialchars($pub['categoria']) ?>">
             <?= htmlspecialchars(etiquetaCategoria($pub['categoria'])) ?>
           </span>

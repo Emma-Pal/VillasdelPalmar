@@ -59,16 +59,18 @@ $totalPublicaciones = contarPublicaciones();
         <p class="placeholder-note">Todavía no hay publicaciones.</p>
       <?php endif; ?>
       <?php foreach ($ultimasPublicaciones as $pub): ?>
-        <article class="publicacion-card">
-          <span class="publicacion-categoria publicacion-categoria--<?= htmlspecialchars($pub['categoria']) ?>">
-            <?= htmlspecialchars(etiquetaCategoria($pub['categoria'])) ?>
-          </span>
-          <h3><?= htmlspecialchars($pub['titulo']) ?></h3>
-          <p><?= nl2brSeguro($pub['cuerpo']) ?></p>
-          <footer>
-            <span><?= htmlspecialchars($pub['autor_nombre']) ?> · <?= htmlspecialchars($pub['autor_cargo']) ?> — <?= htmlspecialchars($pub['fecha']) ?></span>
-          </footer>
-        </article>
+        <a href="/panel/avisos#aviso-<?= (int) $pub['id'] ?>" class="publicacion-card-link">
+          <article class="publicacion-card">
+            <span class="publicacion-categoria publicacion-categoria--<?= htmlspecialchars($pub['categoria']) ?>">
+              <?= htmlspecialchars(etiquetaCategoria($pub['categoria'])) ?>
+            </span>
+            <h3><?= htmlspecialchars($pub['titulo']) ?></h3>
+            <p><?= nl2brSeguro($pub['cuerpo']) ?></p>
+            <footer>
+              <span><?= htmlspecialchars($pub['autor_nombre']) ?> · <?= htmlspecialchars($pub['autor_cargo']) ?> — <?= htmlspecialchars($pub['fecha']) ?></span>
+            </footer>
+          </article>
+        </a>
       <?php endforeach; ?>
     </div>
 

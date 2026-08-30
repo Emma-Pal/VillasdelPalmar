@@ -1215,6 +1215,35 @@ a.nav-user:hover {
   box-shadow: var(--shadow-sm);
 }
 
+/* Vista previa de "Últimos avisos" en el panel de inicio: toda la tarjeta
+   es un link hacia el aviso completo (con imágenes) en /panel/avisos. */
+.publicacion-card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.publicacion-card-link .publicacion-card {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.publicacion-card-link:hover .publicacion-card,
+.publicacion-card-link:focus-visible .publicacion-card {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Al llegar desde ese link (o cualquier otro anchor #aviso-X), resalta la
+   tarjeta un momento para que sea fácil ubicarla en la lista completa. */
+.publicacion-card:target {
+  animation: publicacion-card-resaltada 1.6s ease;
+}
+
+@keyframes publicacion-card-resaltada {
+  0% { box-shadow: 0 0 0 3px var(--color-accent); }
+  100% { box-shadow: var(--shadow-sm); }
+}
+
 .publicacion-card h3 {
   font-size: 19px;
   margin: 8px 0 10px;
