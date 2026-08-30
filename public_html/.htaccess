@@ -1,0 +1,21 @@
+# Permite usar las URLs sin ".php" (ej. /panel/avisos en vez de
+# /panel/avisos/index.php, o /panel/avisos/editar en vez de
+# /panel/avisos/editar.php) — regla estándar, funciona en cualquier
+# Apache con mod_rewrite (prácticamente todos los cPanel).
+RewriteEngine On
+
+# Un archivo real (css, js, imágenes, etc.) se sirve tal cual.
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Una carpeta real con su propio index.php (ej. /panel/avisos →
+# panel/avisos/index.php) se reescribe directo, sin el redirect con "/"
+# que pondría Apache por su cuenta.
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteCond %{REQUEST_FILENAME}/index.php -f
+RewriteRule ^(.*[^/])$ $1/index.php [L]
+
+# Si agregarle ".php" sí es un archivo real (ej. /login → login.php,
+# /panel/avisos/editar → panel/avisos/editar.php), se sirve ese.
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [L]

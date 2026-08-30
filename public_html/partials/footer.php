@@ -1,0 +1,11 @@
+<!-- ===== Footer =====
+     Igual que el header: un solo archivo compartido por todas las páginas. -->
+<footer class="site-footer">
+  <div class="footer-brand">
+    <span class="logo">VP</span>
+    <span class="brand-name">Villas del Palmar</span>
+  </div>
+  <p>&copy; <span id="year"></span> Villas del Palmar. Todos los derechos reservados.</p>
+</footer>
+
+<script src="/js/main.js"></script>

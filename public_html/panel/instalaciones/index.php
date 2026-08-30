@@ -1,0 +1,45 @@
+<?php
+require_once __DIR__ . '/../../../app/bootstrap.php';
+requireAuth();
+
+$title = 'Instalaciones — Villas del Palmar';
+$description = 'Referencia de instalaciones para residentes de Villas del Palmar.';
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <?php include __DIR__ . '/../../partials/head.php'; ?>
+</head>
+<body>
+
+  <?php include __DIR__ . '/../../partials/portal-header.php'; ?>
+
+  <section class="page-banner page-banner--plain">
+    <div class="page-banner-content">
+      <span class="eyebrow">Referencia para residentes</span>
+      <h1>Instalaciones</h1>
+      <p class="page-banner-lead">Conoce a detalle los espacios comunes del residencial.</p>
+    </div>
+  </section>
+
+  <section class="gallery" style="max-width: var(--max-width); margin: 0 auto; padding: 40px 24px 96px;">
+    <div class="gallery-grid" data-reveal>
+      <a href="/panel/instalaciones/alberca" class="gallery-item gallery-item--wide">
+        <span class="gallery-thumb thumb-1"></span>
+        <span class="gallery-caption">Alberca &amp; terraza <em>Ver más →</em></span>
+      </a>
+      <a href="/panel/instalaciones/areas-verdes" class="gallery-item">
+        <span class="gallery-thumb thumb-2"></span>
+        <span class="gallery-caption">Áreas verdes <em>Ver más →</em></span>
+      </a>
+      <a href="/panel/instalaciones/departamentos" class="gallery-item">
+        <span class="gallery-thumb thumb-3"></span>
+        <span class="gallery-caption">Departamentos <em>Ver más →</em></span>
+      </a>
+    </div>
+  </section>
+
+  <?php include __DIR__ . '/../../partials/footer.php'; ?>
+
+</body>
+</html>
