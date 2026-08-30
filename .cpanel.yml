@@ -14,9 +14,14 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/villasdel2309/
+    # Respalda el config.php REAL (con las credenciales de MySQL en uso)
+    # antes de copiar nada — así, si por algún motivo el checkout del repo
+    # llegara a tener un config.php viejo/de prueba, no sobrescribe al bueno.
+    - /bin/cp $DEPLOYPATH/app/config.php $DEPLOYPATH/.cpanel-config-backup.php 2>/dev/null || true
     - /bin/mkdir -p $DEPLOYPATH/public_html
     - /bin/cp -R public_html/. $DEPLOYPATH/public_html/
     - /bin/mkdir -p $DEPLOYPATH/app
     - /bin/cp -R app/. $DEPLOYPATH/app/
+    - /bin/cp $DEPLOYPATH/.cpanel-config-backup.php $DEPLOYPATH/app/config.php 2>/dev/null || true
     - /bin/mkdir -p $DEPLOYPATH/scripts
     - /bin/cp -R scripts/. $DEPLOYPATH/scripts/
