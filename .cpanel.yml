@@ -1,0 +1,22 @@
+---
+# Le dice a la herramienta "Git™ Version Control" de cPanel qué copiar y a
+# dónde cada vez que se le da click a "Deploy" (o "Deploy HEAD Commit").
+# Esto evita tener que mover carpetas a mano después de cada actualización:
+# solo hace falta "Update" (pull) + "Deploy" desde la interfaz de cPanel.
+#
+# Copia el CONTENIDO de public_html/, app/ y scripts/ (tal como quedan
+# después del pull, dentro de repositories/VillasdelPalmar) hacia las
+# carpetas reales que sirve el dominio, en /home/<usuario>/.
+#
+# No borra archivos que ya existan en el destino y no estén en el repo —
+# por eso app/config.php (que nunca se sube a git) no se pierde entre
+# despliegues: solo existe en el destino, nunca en el checkout del repo.
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/villasdel2309/
+    - /bin/mkdir -p $DEPLOYPATH/public_html
+    - /bin/cp -R public_html/. $DEPLOYPATH/public_html/
+    - /bin/mkdir -p $DEPLOYPATH/app
+    - /bin/cp -R app/. $DEPLOYPATH/app/
+    - /bin/mkdir -p $DEPLOYPATH/scripts
+    - /bin/cp -R scripts/. $DEPLOYPATH/scripts/
