@@ -4,7 +4,7 @@ requireAuth();
 
 $title = 'Panel — Villas del Palmar';
 $description = 'Panel de Villas del Palmar.';
-$ultimasPublicaciones = getPublicaciones(null, 3, 0);
+$ultimasPublicaciones = getPublicaciones(null, 10, 0);
 $totalPublicaciones = contarPublicaciones();
 ?>
 <!DOCTYPE html>
@@ -54,7 +54,7 @@ $totalPublicaciones = contarPublicaciones();
       <h2>Últimos avisos</h2>
     </div>
 
-    <div class="publicaciones-list" data-reveal>
+    <div class="publicaciones-grid" data-reveal>
       <?php if (empty($ultimasPublicaciones)): ?>
         <p class="placeholder-note">Todavía no hay publicaciones.</p>
       <?php endif; ?>
