@@ -15,11 +15,15 @@ CREATE TABLE IF NOT EXISTS usuarios (
 CREATE TABLE IF NOT EXISTS publicaciones (
   id INT AUTO_INCREMENT PRIMARY KEY,
   autor_id INT NOT NULL,
-  categoria ENUM('financiero','mejora','aviso') NOT NULL,
+  -- VARCHAR y no ENUM: además de "financiero"/"mejora"/"aviso" (con
+  -- estilo y pestaña propios), la mesa directiva puede escribir una
+  -- categoría libre ("Otra") — un ENUM no lo permitiría sin ALTER TABLE.
+  categoria VARCHAR(50) NOT NULL,
   titulo VARCHAR(255) NOT NULL,
   cuerpo TEXT NOT NULL,
-  fecha DATE NOT NULL,
-  creado_en DATETIME NOT NULL,         -- fecha/hora real de creación (distinta de "fecha", que es editorial)
+  fecha DATE NOT NULL,                 -- fecha editorial; se fija sola al crear, nunca se edita
+  creado_en DATETIME NOT NULL,         -- fecha/hora real de creación
+  editado_en DATETIME NULL,            -- se llena cada vez que se guarda una edición
   FOREIGN KEY (autor_id) REFERENCES usuarios(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

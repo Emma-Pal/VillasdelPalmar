@@ -80,6 +80,19 @@ if (tipoSelect && campoCargo) {
   tipoSelect.addEventListener('change', actualizarCampos);
 }
 
+// ===== Formulario de publicaciones: el campo de texto libre solo aplica
+// cuando se elige "Otra (especificar)" en Categoría =====
+const categoriaSelect = document.getElementById('categoria-select');
+const campoCategoriaOtra = document.getElementById('campo-categoria-otra');
+
+if (categoriaSelect && campoCategoriaOtra) {
+  const actualizarCampoCategoria = () => {
+    campoCategoriaOtra.hidden = categoriaSelect.value !== '__otra__';
+  };
+  actualizarCampoCategoria();
+  categoriaSelect.addEventListener('change', actualizarCampoCategoria);
+}
+
 // ===== Lightbox de imágenes en publicaciones =====
 // Al hacer clic en una imagen se abre en grande, con una animación de zoom
 // que sale exactamente del lugar donde estaba la miniatura (técnica "FLIP":

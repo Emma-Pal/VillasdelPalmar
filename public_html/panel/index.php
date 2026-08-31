@@ -61,7 +61,7 @@ $totalPublicaciones = contarPublicaciones();
       <?php foreach ($ultimasPublicaciones as $pub): ?>
         <a href="/panel/avisos#aviso-<?= (int) $pub['id'] ?>" class="publicacion-card-link">
           <article class="publicacion-card">
-            <span class="publicacion-categoria publicacion-categoria--<?= htmlspecialchars($pub['categoria']) ?>">
+            <span class="publicacion-categoria publicacion-categoria--<?= categoriaSlug($pub['categoria']) ?>">
               <?= htmlspecialchars(etiquetaCategoria($pub['categoria'])) ?>
             </span>
             <h3><?= htmlspecialchars($pub['titulo']) ?></h3>
@@ -69,6 +69,9 @@ $totalPublicaciones = contarPublicaciones();
             <footer>
               <span><?= htmlspecialchars($pub['autor_nombre']) ?> · <?= htmlspecialchars($pub['autor_cargo']) ?> — <?= htmlspecialchars($pub['fecha']) ?></span>
             </footer>
+            <?php if (!empty($pub['editado_en'])): ?>
+              <p class="publicacion-editada">Editado el <?= htmlspecialchars(date('d/m/Y', strtotime($pub['editado_en']))) ?></p>
+            <?php endif; ?>
           </article>
         </a>
       <?php endforeach; ?>

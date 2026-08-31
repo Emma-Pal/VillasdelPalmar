@@ -1280,6 +1280,13 @@ a.nav-user:hover {
   color: var(--color-text-muted);
 }
 
+.publicacion-editada {
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
 /* Botón de eliminar (usuarios, publicaciones): sutil hasta que se pasa el mouse */
 .btn-eliminar {
   font-family: inherit;
@@ -1347,6 +1354,10 @@ a.nav-user:hover {
   letter-spacing: 0.05em;
   padding: 3px 10px;
   border-radius: 999px;
+  /* Look por default para una categoría "Otra" (libre) que no tiene su
+     propio color más abajo — financiero/mejora/aviso lo sobreescriben. */
+  background: #eef0ee;
+  color: var(--color-text-muted);
 }
 
 .publicacion-categoria--financiero {

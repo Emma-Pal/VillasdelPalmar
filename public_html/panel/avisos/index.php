@@ -7,7 +7,9 @@ const POR_PAGINA = 10;
 $title = 'Avisos — Villas del Palmar';
 $description = 'Estados financieros, mejoras y avisos de Villas del Palmar.';
 
-$categoriaActual = in_array($_GET['categoria'] ?? '', CATEGORIAS_VALIDAS, true) ? $_GET['categoria'] : null;
+$categoriasUsadas = getCategoriasUsadas();
+$categoriaActual = in_array($_GET['categoria'] ?? '', $categoriasUsadas, true) ? $_GET['categoria'] : null;
+$categoriasLibres = array_diff($categoriasUsadas, CATEGORIAS_BASE);
 $paginaActual = max(1, (int) ($_GET['pagina'] ?? 1));
 $total = contarPublicaciones($categoriaActual);
 $totalPaginas = max(1, (int) ceil($total / POR_PAGINA));
@@ -50,6 +52,10 @@ $sufijoQuery = $categoriaActual ? '&categoria=' . urlencode($categoriaActual) : 
       <a href="/panel/avisos?categoria=mejora" class="categoria-tab <?= $categoriaActual === 'mejora' ? 'is-active' : '' ?>">Mejoras</a>
       <a href="/panel/avisos?categoria=aviso" class="categoria-tab <?= $categoriaActual === 'aviso' ? 'is-active' : '' ?>">Avisos generales</a>
 
+      <?php foreach ($categoriasLibres as $cat): ?>
+        <a href="/panel/avisos?categoria=<?= urlencode($cat) ?>" class="categoria-tab <?= $categoriaActual === $cat ? 'is-active' : '' ?>"><?= htmlspecialchars(etiquetaCategoria($cat)) ?></a>
+      <?php endforeach; ?>
+
       <?php if ($usuario['tipo'] === 'mesa'): ?>
         <a href="/panel/avisos/nueva" class="btn btn-primary categoria-tab-cta">+ Nueva publicación</a>
       <?php endif; ?>
@@ -61,7 +67,7 @@ $sufijoQuery = $categoriaActual ? '&categoria=' . urlencode($categoriaActual) : 
       <?php endif; ?>
       <?php foreach ($publicaciones as $pub): ?>
         <article class="publicacion-card" id="aviso-<?= (int) $pub['id'] ?>">
-          <span class="publicacion-categoria publicacion-categoria--<?= htmlspecialchars($pub['categoria']) ?>">
+          <span class="publicacion-categoria publicacion-categoria--<?= categoriaSlug($pub['categoria']) ?>">
             <?= htmlspecialchars(etiquetaCategoria($pub['categoria'])) ?>
           </span>
           <?php if ($pub['esNueva']): ?>
@@ -111,6 +117,9 @@ $sufijoQuery = $categoriaActual ? '&categoria=' . urlencode($categoriaActual) : 
               </span>
             <?php endif; ?>
           </footer>
+          <?php if (!empty($pub['editado_en'])): ?>
+            <p class="publicacion-editada">Editado el <?= htmlspecialchars(date('d/m/Y', strtotime($pub['editado_en']))) ?></p>
+          <?php endif; ?>
         </article>
       <?php endforeach; ?>
     </div>

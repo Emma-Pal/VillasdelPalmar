@@ -2,7 +2,11 @@
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/archivos.php';
 
-const CATEGORIAS_VALIDAS = ['financiero', 'mejora', 'aviso'];
+// Las 3 categorías "de fábrica", con pestaña y color propio en el diseño.
+// La mesa directiva puede además escribir una categoría libre ("Otra") al
+// crear/editar una publicación — se guarda tal cual y se le da una pestaña
+// dinámica en /panel/avisos (ver getCategoriasUsadas()).
+const CATEGORIAS_BASE = ['financiero', 'mejora', 'aviso'];
 
 // $categoria puede ser null (sin filtro). $limit/$offset se bindean como
 // enteros a propósito: con PDO::ATTR_EMULATE_PREPARES=false, MySQL rechaza
@@ -35,6 +39,15 @@ function getPublicaciones(?string $categoria, int $limit = 10, int $offset = 0):
     unset($fila);
 
     return $filas;
+}
+
+// Todas las categorías que ya se han usado alguna vez (para poder ofrecer
+// pestaña de filtro también a las categorías "libres" que la mesa haya
+// escrito con "Otra", además de las 3 de fábrica).
+function getCategoriasUsadas(): array
+{
+    $stmt = db()->query('SELECT DISTINCT categoria FROM publicaciones ORDER BY categoria');
+    return $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
 function contarPublicaciones(?string $categoria = null): int
@@ -85,12 +98,15 @@ function crearPublicacion($autorId, string $categoria, string $titulo, string $c
     return db()->lastInsertId();
 }
 
-function actualizarPublicacion($id, string $categoria, string $titulo, string $cuerpo, string $fecha): void
+// Sin parámetro de fecha a propósito: la fecha editorial se fija una sola
+// vez al crear la publicación y no se puede modificar después. En cambio sí
+// se registra editado_en, para poder avisar en pantalla "Editado el ...".
+function actualizarPublicacion($id, string $categoria, string $titulo, string $cuerpo): void
 {
     $stmt = db()->prepare(
-        'UPDATE publicaciones SET categoria = ?, titulo = ?, cuerpo = ?, fecha = ? WHERE id = ?'
+        'UPDATE publicaciones SET categoria = ?, titulo = ?, cuerpo = ?, editado_en = ? WHERE id = ?'
     );
-    $stmt->execute([$categoria, $titulo, $cuerpo, $fecha, $id]);
+    $stmt->execute([$categoria, $titulo, $cuerpo, date('Y-m-d H:i:s'), $id]);
 }
 
 // Los registros de la tabla `archivos` se borran solos por el ON DELETE

@@ -22,10 +22,21 @@ $description = $esEdicion
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verificarCsrf();
 
-    $categoria = in_array($_POST['categoria'] ?? '', CATEGORIAS_VALIDAS, true) ? $_POST['categoria'] : 'aviso';
+    $categoriaPost = trim($_POST['categoria'] ?? '');
+    if ($categoriaPost === '__otra__') {
+        $categoria = trim($_POST['categoria_otra'] ?? '');
+        if ($categoria === '') {
+            $categoria = 'aviso'; // no escribió nada en "Otra" — cae a un valor seguro
+        }
+        $categoria = mb_substr($categoria, 0, 50); // límite de la columna en la base de datos
+    } elseif (in_array($categoriaPost, CATEGORIAS_BASE, true)) {
+        $categoria = $categoriaPost;
+    } else {
+        $categoria = 'aviso';
+    }
+
     $titulo = trim($_POST['titulo'] ?? '');
     $cuerpo = trim($_POST['cuerpo'] ?? '');
-    $fecha = $_POST['fecha'] ?? date('Y-m-d');
 
     try {
         $archivosSubidos = procesarArchivosSubidos();
@@ -36,10 +47,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($esEdicion) {
-        actualizarPublicacion($publicacionEditada['id'], $categoria, $titulo, $cuerpo, $fecha);
+        // Sin fecha: la fecha editorial no se puede tocar al editar, solo se
+        // registra que hubo una edición (actualizarPublicacion pone editado_en).
+        actualizarPublicacion($publicacionEditada['id'], $categoria, $titulo, $cuerpo);
         $idDestino = $publicacionEditada['id'];
     } else {
-        $idDestino = crearPublicacion($usuario['id'], $categoria, $titulo, $cuerpo, $fecha);
+        // La fecha SIEMPRE es la de hoy, fijada aquí en el servidor — nunca
+        // se confía en un valor que pudiera venir del formulario.
+        $idDestino = crearPublicacion($usuario['id'], $categoria, $titulo, $cuerpo, date('Y-m-d'));
     }
 
     // Los archivos nuevos se agregan a los que ya tenía (no los reemplazan);
@@ -53,6 +68,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $accionFormulario = $esEdicion ? '/panel/avisos/editar?id=' . (int) $publicacionEditada['id'] : '/panel/avisos/nueva';
+
+// ¿La publicación (al editar) tiene una categoría que no es ninguna de las
+// 3 de fábrica? Entonces el select debe abrir directo en "Otra", con el
+// campo de texto ya visible y con su valor actual.
+$categoriaEsLibre = $esEdicion && !in_array($publicacionEditada['categoria'], CATEGORIAS_BASE, true);
+
+// Categorías libres ya usadas antes (para sugerirlas con autocompletar y
+// evitar que se creen variantes del mismo nombre por error de dedo).
+$categoriasLibresExistentes = array_diff(getCategoriasUsadas(), CATEGORIAS_BASE);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -107,11 +131,29 @@ $accionFormulario = $esEdicion ? '/panel/avisos/editar?id=' . (int) $publicacion
 
         <label>
           Categoría
-          <select name="categoria" required>
+          <select name="categoria" id="categoria-select" required>
             <option value="financiero" <?= $esEdicion && $publicacionEditada['categoria'] === 'financiero' ? 'selected' : '' ?>>Estado financiero</option>
             <option value="mejora" <?= $esEdicion && $publicacionEditada['categoria'] === 'mejora' ? 'selected' : '' ?>>Mejora</option>
             <option value="aviso" <?= $esEdicion && $publicacionEditada['categoria'] === 'aviso' ? 'selected' : '' ?>>Aviso general</option>
+            <option value="__otra__" <?= $categoriaEsLibre ? 'selected' : '' ?>>Otra (especificar)</option>
           </select>
+        </label>
+
+        <label id="campo-categoria-otra">
+          Especifica la categoría
+          <input
+            type="text"
+            name="categoria_otra"
+            list="categorias-libres-existentes"
+            maxlength="50"
+            value="<?= $categoriaEsLibre ? htmlspecialchars($publicacionEditada['categoria']) : '' ?>"
+            placeholder="ej. Reglamento interno"
+          />
+          <datalist id="categorias-libres-existentes">
+            <?php foreach ($categoriasLibresExistentes as $cat): ?>
+              <option value="<?= htmlspecialchars($cat) ?>"></option>
+            <?php endforeach; ?>
+          </datalist>
         </label>
 
         <label>
@@ -119,10 +161,15 @@ $accionFormulario = $esEdicion ? '/panel/avisos/editar?id=' . (int) $publicacion
           <input type="text" name="titulo" value="<?= $esEdicion ? htmlspecialchars($publicacionEditada['titulo']) : '' ?>" placeholder="ej. Estado financiero — agosto 2026" required />
         </label>
 
-        <label>
-          Fecha
-          <input type="date" name="fecha" value="<?= $esEdicion ? htmlspecialchars($publicacionEditada['fecha']) : date('Y-m-d') ?>" required />
-        </label>
+        <?php if ($esEdicion): ?>
+          <p class="form-nota">
+            Fecha de publicación: <strong><?= htmlspecialchars($publicacionEditada['fecha']) ?></strong> (no se puede cambiar).
+          </p>
+        <?php else: ?>
+          <p class="form-nota">
+            Se publicará con la fecha de hoy: <strong><?= date('d/m/Y') ?></strong>.
+          </p>
+        <?php endif; ?>
 
         <label>
           Contenido
