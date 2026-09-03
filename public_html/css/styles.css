@@ -977,27 +977,40 @@ a.nav-user:hover {
   background: rgba(201, 162, 75, 0.28);
 }
 
-/* Banner "plano" (sin foto de fondo) para páginas internas del portal */
+/* Banner de páginas internas del portal (Avisos, Instalaciones, Mesa
+   directiva, Usuarios, Mi cuenta...): misma foto + degradado oscuro que las
+   páginas de detalle de Instalaciones, para que ninguna pantalla del portal
+   se sienta "vacía" con solo un color plano de fondo. */
 .page-banner--plain {
-  background: linear-gradient(135deg, #1f4b43 0%, #143530 100%);
+  background-image: url("../images/galeria/alberca-infinita.jpg");
+  background-position: center 78%;
   min-height: 30vh;
   align-items: center;
 }
 
-.page-banner--plain::before {
-  display: none;
-}
-
-/* Encabezado corto del panel */
+/* Encabezado corto del panel — mismo tratamiento que .page-banner. */
 .panel-hero {
+  position: relative;
   width: 100%;
-  background: linear-gradient(135deg, #1f4b43 0%, #143530 100%);
+  overflow: hidden;
+  background-image: url("../images/galeria/alberca-infinita.jpg");
+  background-size: cover;
+  background-position: center 78%;
   /* Mismo motivo que .page-banner: espacio para el header fijo. */
   padding: 112px 24px 40px;
   color: #fff;
 }
 
+.panel-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(13, 36, 31, 0.55) 0%, rgba(13, 36, 31, 0.82) 100%);
+}
+
 .panel-hero-content {
+  position: relative;
+  z-index: 1;
   max-width: var(--max-width);
   margin: 0 auto;
 }
@@ -1026,6 +1039,12 @@ a.nav-user:hover {
   border-radius: var(--radius);
   padding: 32px;
   box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.dashboard-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .dashboard-card h2 {
@@ -1383,10 +1402,39 @@ a.nav-user:hover {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: linear-gradient(135deg, #1f4b43 0%, #143530 55%, #0d241f 100%);
+  position: relative;
+  overflow: hidden;
+  background: #143530; /* respaldo mientras carga la foto */
+}
+
+/* Foto de fondo con un zoom lentísimo en loop (técnica "Ken Burns"), para
+   que la pantalla de login se sienta viva en vez de una tarjeta flotando
+   sobre un color plano. */
+.login-screen::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  background-image: url("../images/hero/atardecer-alberca.jpg");
+  background-size: cover;
+  background-position: center 35%;
+  animation: login-fondo-zoom 26s ease-in-out infinite alternate;
+}
+
+.login-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(13, 36, 31, 0.72) 0%, rgba(13, 36, 31, 0.88) 100%);
+}
+
+@keyframes login-fondo-zoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.12); }
 }
 
 .login-card {
+  position: relative;
+  z-index: 1;
   background: var(--color-surface);
   border-radius: 20px;
   padding: 48px 40px;
@@ -1394,6 +1442,21 @@ a.nav-user:hover {
   width: 100%;
   box-shadow: var(--shadow-md);
   text-align: center;
+  animation: login-card-entrada 0.6s ease-out;
+}
+
+@keyframes login-card-entrada {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-screen::before {
+    animation: none;
+  }
+  .login-card {
+    animation: none;
+  }
 }
 
 .login-logo {
