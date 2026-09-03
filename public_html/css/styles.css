@@ -814,7 +814,7 @@ section {
 }
 
 /* ===================================================================
-   Portal privado (propietarios / mesa directiva)
+   Portal privado (propietarios / comité administrativo)
    =================================================================== */
 
 /* ===== Header del portal: una sola fila, a todo el ancho ===== */
@@ -875,7 +875,7 @@ section {
   gap: 10px;
 }
 
-/* Cuando es un link (mesa directiva, va a "Mi cuenta") */
+/* Cuando es un link (comité administrativo, va a "Mi cuenta") */
 a.nav-user {
   text-decoration: none;
   border-radius: 999px;
@@ -977,8 +977,8 @@ a.nav-user:hover {
   background: rgba(201, 162, 75, 0.28);
 }
 
-/* Banner de páginas internas del portal (Avisos, Instalaciones, Mesa
-   directiva, Usuarios, Mi cuenta...): misma foto + degradado oscuro que las
+/* Banner de páginas internas del portal (Avisos, Instalaciones, Comité,
+   Usuarios, Mi cuenta...): misma foto + degradado oscuro que las
    páginas de detalle de Instalaciones, para que ninguna pantalla del portal
    se sienta "vacía" con solo un color plano de fondo. */
 .page-banner--plain {

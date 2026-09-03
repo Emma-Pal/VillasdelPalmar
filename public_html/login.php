@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../app/bootstrap.php';
 
 $title = 'Ingresar — Villas del Palmar';
-$description = 'Portal privado de propietarios y mesa directiva de Villas del Palmar.';
+$description = 'Portal privado de propietarios y comité administrativo de Villas del Palmar.';
 
 if ($usuario) {
     header('Location: /panel');
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <span class="logo">VP</span>
         <span class="brand-name">Villas del Palmar</span>
       </div>
-      <p class="login-sub">Portal de propietarios y mesa directiva</p>
+      <p class="login-sub">Portal de propietarios y comité administrativo</p>
 
       <?php if ($error): ?>
         <p class="login-error">Usuario o contraseña incorrectos.</p>

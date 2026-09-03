@@ -41,7 +41,7 @@ $totalPublicaciones = contarPublicaciones();
 
       <?php if ($usuario['tipo'] === 'mesa'): ?>
         <div class="dashboard-card">
-          <span class="eyebrow">Mesa directiva</span>
+          <span class="eyebrow">Comité</span>
           <h2>Publicar algo nuevo</h2>
           <p>Comparte un estado financiero, una mejora o un aviso general.</p>
           <a href="/panel/avisos/nueva" class="btn btn-ghost-light">Nueva publicación</a>

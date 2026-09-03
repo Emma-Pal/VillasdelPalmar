@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../../app/bootstrap.php';
 requireMesa();
 
 $title = 'Usuarios — Villas del Palmar';
-$description = 'Administración de cuentas de propietarios y mesa directiva.';
+$description = 'Administración de cuentas de propietarios y comité administrativo.';
 $usuarios = getUsuarios();
 ?>
 <!DOCTYPE html>
@@ -17,9 +17,9 @@ $usuarios = getUsuarios();
 
   <section class="page-banner page-banner--plain">
     <div class="page-banner-content">
-      <span class="eyebrow">Mesa directiva</span>
+      <span class="eyebrow">Comité</span>
       <h1>Usuarios</h1>
-      <p class="page-banner-lead">Cuentas de propietarios y mesa directiva, y sus privilegios.</p>
+      <p class="page-banner-lead">Cuentas de propietarios y comité administrativo, y sus privilegios.</p>
     </div>
   </section>
 
@@ -44,7 +44,7 @@ $usuarios = getUsuarios();
             <tr>
               <td>
                 <span class="badge <?= $u['tipo'] === 'mesa' ? 'badge--ok' : '' ?>">
-                  <?= $u['tipo'] === 'mesa' ? 'Mesa directiva' : 'Propietario' ?>
+                  <?= $u['tipo'] === 'mesa' ? 'Comité' : 'Propietario' ?>
                 </span>
               </td>
               <td><?= htmlspecialchars($u['nombre']) ?></td>

@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Cambiar la contraseña es lo único que exige más que "estar logueado":
     // sin esto, cualquiera que se encuentre la sesión abierta (ej. la
-    // computadora de la mesa desatendida) podría tomar la cuenta con solo
+    // computadora del comité desatendida) podría tomar la cuenta con solo
     // escribir una contraseña nueva.
     if ($password !== '') {
         if (!passwordEsValida($password)) {

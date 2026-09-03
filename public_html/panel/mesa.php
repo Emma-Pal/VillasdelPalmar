@@ -2,8 +2,8 @@
 require_once __DIR__ . '/../../app/bootstrap.php';
 requireAuth();
 
-$title = 'Mesa directiva — Villas del Palmar';
-$description = 'Integrantes de la mesa directiva de Villas del Palmar.';
+$title = 'Comité — Villas del Palmar';
+$description = 'Integrantes del comité administrativo de Villas del Palmar.';
 $mesa = getMesa();
 ?>
 <!DOCTYPE html>
@@ -18,7 +18,7 @@ $mesa = getMesa();
   <section class="page-banner page-banner--plain">
     <div class="page-banner-content">
       <span class="eyebrow">Quién es quién</span>
-      <h1>Mesa directiva</h1>
+      <h1>Comité</h1>
       <p class="page-banner-lead">Integrantes actuales y su cargo.</p>
     </div>
   </section>

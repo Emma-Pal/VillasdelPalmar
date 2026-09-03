@@ -68,7 +68,7 @@ if (form) {
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-// ===== Formulario de usuario: el campo "Cargo" solo aplica a mesa directiva =====
+// ===== Formulario de usuario: el campo "Cargo" solo aplica al comité =====
 const tipoSelect = document.getElementById('tipo-select');
 const campoCargo = document.getElementById('campo-cargo');
 

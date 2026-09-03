@@ -41,7 +41,7 @@ $sufijoQuery = $categoriaActual ? '&categoria=' . urlencode($categoriaActual) : 
     <div class="page-banner-content">
       <span class="eyebrow">Comunicación</span>
       <h1>Avisos</h1>
-      <p class="page-banner-lead">Estados financieros, mejoras y avisos generales publicados por la mesa directiva.</p>
+      <p class="page-banner-lead">Estados financieros, mejoras y avisos generales publicados por el comité administrativo.</p>
     </div>
   </section>
 

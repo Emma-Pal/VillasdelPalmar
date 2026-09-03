@@ -90,7 +90,7 @@ $categoriasLibresExistentes = array_diff(getCategoriasUsadas(), CATEGORIAS_BASE)
   <section class="page-banner page-banner--plain">
     <div class="page-banner-content">
       <a href="/panel/avisos" class="back-link">← Volver a avisos</a>
-      <span class="eyebrow">Mesa directiva</span>
+      <span class="eyebrow">Comité</span>
       <h1><?= $esEdicion ? 'Editar publicación' : 'Nueva publicación' ?></h1>
       <?php if (!$esEdicion): ?>
         <p class="page-banner-lead">Se firmará como <?= htmlspecialchars($usuario['nombre']) ?> — <?= htmlspecialchars($usuario['cargo']) ?>.</p>

@@ -90,10 +90,10 @@ $accionFormulario = $esEdicion ? '/panel/usuarios/editar?id=' . (int) $usuarioEd
   <section class="page-banner page-banner--plain">
     <div class="page-banner-content">
       <a href="/panel/usuarios" class="back-link">← Volver a usuarios</a>
-      <span class="eyebrow">Mesa directiva</span>
+      <span class="eyebrow">Comité</span>
       <h1><?= $esEdicion ? 'Editar usuario' : 'Nuevo usuario' ?></h1>
       <?php if ($esEdicion): ?>
-        <p class="page-banner-lead">Cambiar aquí el "Tipo" da o quita privilegios de mesa directiva.</p>
+        <p class="page-banner-lead">Cambiar aquí el "Tipo" da o quita privilegios de comité.</p>
       <?php endif; ?>
     </div>
   </section>
@@ -115,7 +115,7 @@ $accionFormulario = $esEdicion ? '/panel/usuarios/editar?id=' . (int) $usuarioEd
           Tipo de cuenta
           <select name="tipo" id="tipo-select" required>
             <option value="propietario" <?= $datosFormulario['tipo'] === 'propietario' ? 'selected' : '' ?>>Propietario (cuenta compartida)</option>
-            <option value="mesa" <?= $datosFormulario['tipo'] === 'mesa' ? 'selected' : '' ?>>Mesa directiva (privilegios de administrador)</option>
+            <option value="mesa" <?= $datosFormulario['tipo'] === 'mesa' ? 'selected' : '' ?>>Comité (privilegios de administrador)</option>
           </select>
         </label>
 
