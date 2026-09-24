@@ -1401,15 +1401,14 @@ a.nav-user:hover {
   display: flex;
 }
 
-/* ----- Panel izquierdo: oscuro, con patrón de rejilla sutil ----- */
+/* ----- Panel izquierdo: foto de la entrada real, con degradado oscuro
+   encima para que el texto siga siendo legible ----- */
 .login-side-dark {
+  position: relative;
+  overflow: hidden;
   flex: 1 1 46%;
   min-width: 0;
-  background: #0d241f;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
-  background-size: 42px 42px;
+  background-color: #0d241f; /* respaldo mientras carga la foto */
   color: #fff;
   padding: 44px;
   display: flex;
@@ -1417,7 +1416,42 @@ a.nav-user:hover {
   justify-content: space-between;
 }
 
+/* La foto va en su propio pseudo-elemento (no en el fondo directo del
+   panel) para poder animarle un zoom lentísimo sin mover el degradado ni
+   el texto — misma técnica "Ken Burns" que usa la pantalla de login vieja. */
+.login-side-dark::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  z-index: 0;
+  background-image: url("../images/galeria/entrada-principal-de.jpg");
+  background-size: cover;
+  background-position: 72% 42%;
+  animation: login-side-zoom 28s ease-in-out infinite alternate;
+}
+
+.login-side-dark::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(13, 36, 31, 0.88) 0%, rgba(13, 36, 31, 0.65) 45%, rgba(13, 36, 31, 0.92) 100%);
+}
+
+@keyframes login-side-zoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-side-dark::before {
+    animation: none;
+  }
+}
+
 .login-mark {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1451,6 +1485,8 @@ a.nav-user:hover {
 }
 
 .login-side-main {
+  position: relative;
+  z-index: 2;
   max-width: 420px;
 }
 
@@ -1490,6 +1526,8 @@ a.nav-user:hover {
 }
 
 .login-side-foot {
+  position: relative;
+  z-index: 2;
   font-size: 13px;
   color: rgba(255, 255, 255, 0.45);
 }

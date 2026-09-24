@@ -91,5 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   </div>
 
+  <script src="/js/main.js?v=<?= (int) @filemtime(__DIR__ . '/js/main.js') ?>"></script>
+
 </body>
 </html>

@@ -8,4 +8,4 @@
   <p>&copy; <span id="year"></span> Villas del Palmar. Todos los derechos reservados.</p>
 </footer>
 
-<script src="/js/main.js"></script>
+<script src="/js/main.js?v=<?= (int) @filemtime(__DIR__ . '/../js/main.js') ?>"></script>
