@@ -12,6 +12,10 @@
 
   --font-heading: 'Playfair Display', Georgia, serif;
   --font-body: 'Inter', 'Segoe UI', Arial, sans-serif;
+  /* Serif editorial más ligera, para el look tipo "departamento
+     universitario" del panel privado (marca, encabezados del dashboard,
+     galería) — el sitio público sigue con Playfair Display. */
+  --font-display: 'Fraunces', Georgia, serif;
 
   --max-width: 1140px;
   --radius: 14px;
@@ -817,10 +821,13 @@ section {
    Portal privado (propietarios / comité administrativo)
    =================================================================== */
 
-/* ===== Header del portal: una sola fila, a todo el ancho ===== */
+/* ===== Header del portal: fijo, look editorial (oscuro, esquinas rectas,
+   texto en mayúsculas espaciadas) — rediseño 2026-09 basado en referencia
+   de Figma, adaptado a la paleta verde/dorado ya establecida. ===== */
 .site-header.portal-header {
-  background: linear-gradient(135deg, #1f4b43 0%, #143530 100%);
-  box-shadow: 0 6px 24px rgba(13, 36, 31, 0.28);
+  background: #0d241f;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
   backdrop-filter: none;
 }
 
@@ -831,7 +838,7 @@ section {
   max-width: none;
   width: 100%;
   margin: 0;
-  padding: 14px 32px;
+  padding: 12px 32px;
   gap: 24px;
 }
 
@@ -839,22 +846,21 @@ section {
   flex-shrink: 0;
 }
 
-.site-header.scrolled.portal-header .brand-name {
-  /* Selector con el mismo "peso" que .site-header.scrolled .brand-name (la
-     regla que ponía este texto en verde oscuro) para poder ganarle. */
-  color: #fff;
-}
-
+.site-header.scrolled.portal-header .brand-name,
 .portal-header .brand-name {
-  /* Dorado se perdía contra el verde oscuro; blanco da el mayor contraste posible. */
+  /* Selectores con el mismo "peso" que .site-header.scrolled .brand-name. */
   color: #fff;
+  font-family: var(--font-display);
+  font-weight: 500;
 }
 
 .portal-header .logo {
   background: var(--color-accent);
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(20, 53, 48, 0.4);
-  box-shadow: 0 0 0 3px rgba(201, 162, 75, 0.22);
+  color: #0d241f;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-shadow: none;
+  box-shadow: none;
 }
 
 .site-header.portal-header .nav-toggle span {
@@ -878,25 +884,24 @@ section {
 /* Cuando es un link (comité administrativo, va a "Mi cuenta") */
 a.nav-user {
   text-decoration: none;
-  border-radius: 999px;
-  padding: 4px 10px 4px 4px;
+  padding: 4px 8px 4px 4px;
   transition: background var(--transition);
 }
 
 a.nav-user:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .nav-user-avatar {
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1.5px solid rgba(201, 162, 75, 0.45);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(201, 162, 75, 0.4);
   color: var(--color-accent-light);
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 15px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
   text-transform: uppercase;
   display: flex;
   align-items: center;
@@ -911,14 +916,16 @@ a.nav-user:hover {
 }
 
 .nav-user-nombre {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   color: #fff;
 }
 
 .nav-user-rol {
-  font-size: 12px;
-  color: var(--color-accent-light);
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .nav-logout-form {
@@ -926,20 +933,22 @@ a.nav-user:hover {
 }
 
 .nav-logout-btn {
-  font-family: inherit;
-  font-weight: 600;
-  font-size: 13.5px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   background: transparent;
-  border: 1.5px solid rgba(255, 255, 255, 0.32);
-  color: rgba(255, 255, 255, 0.85);
-  border-radius: 999px;
-  padding: 7px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.65);
+  border-radius: 0;
+  padding: 7px 14px;
   cursor: pointer;
   transition: background var(--transition), border-color var(--transition), color var(--transition);
 }
 
 .nav-logout-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
   border-color: var(--color-accent);
   color: #fff;
 }
@@ -951,7 +960,7 @@ a.nav-user:hover {
   align-items: center;
   justify-content: center;
   flex: 1;
-  gap: 4px;
+  gap: 2px;
   flex-wrap: wrap;
 }
 
@@ -959,22 +968,24 @@ a.nav-user:hover {
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
-  padding: 9px 16px;
-  border-radius: 999px;
-  font-size: 14.5px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.72);
-  transition: color var(--transition), background var(--transition);
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  border-bottom: 1px solid transparent;
+  transition: color var(--transition), background var(--transition), border-color var(--transition);
 }
 
 .portal-nav a:hover {
   color: #fff;
-  background: rgba(255, 255, 255, 0.08);
 }
 
 .portal-nav a.is-active {
-  color: #fff;
-  background: rgba(201, 162, 75, 0.28);
+  color: var(--color-accent-light);
+  background: rgba(201, 162, 75, 0.08);
+  border-bottom-color: var(--color-accent);
 }
 
 /* Banner de páginas internas del portal (Avisos, Instalaciones, Comité,
@@ -988,16 +999,17 @@ a.nav-user:hover {
   align-items: center;
 }
 
-/* Encabezado corto del panel — mismo tratamiento que .page-banner. */
+/* Encabezado del panel — look "departamento" editorial: fondo oscuro
+   plano, rejilla sutil + acento diagonal dorado (rediseño 2026-09, basado en
+   referencia de Figma). El resto de páginas internas (.page-banner--plain)
+   sigue con su propia foto, sin cambios. */
 .panel-hero {
   position: relative;
   width: 100%;
   overflow: hidden;
-  background-image: url("../images/galeria/alberca-infinita.jpg");
-  background-size: cover;
-  background-position: center 78%;
+  background: #0d241f;
   /* Mismo motivo que .page-banner: espacio para el header fijo. */
-  padding: 112px 24px 40px;
+  padding: 112px 24px 48px;
   color: #fff;
 }
 
@@ -1005,7 +1017,22 @@ a.nav-user:hover {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(13, 36, 31, 0.55) 0%, rgba(13, 36, 31, 0.82) 100%);
+  opacity: 0.05;
+  background-image:
+    linear-gradient(var(--color-accent) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-accent) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.panel-hero::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 260px;
+  opacity: 0.18;
+  background: linear-gradient(135deg, transparent 40%, var(--color-accent) 100%);
 }
 
 .panel-hero-content {
@@ -1016,38 +1043,47 @@ a.nav-user:hover {
 }
 
 .panel-hero h1 {
+  font-family: var(--font-display);
+  font-weight: 300;
   color: #fff;
-  font-size: 32px;
+  font-size: clamp(30px, 4vw, 40px);
   margin: 4px 0 0;
+}
+
+.panel-hero h1 em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent-light);
 }
 
 .panel-hero .eyebrow {
   color: var(--color-accent-light);
 }
 
-/* Tarjetas de resumen del dashboard */
+/* Tarjetas de resumen del dashboard — esquinas rectas, sin sombra (mismo
+   lenguaje "editorial" plano del resto del rediseño). */
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+  gap: 20px;
   margin-bottom: 16px;
 }
 
 .dashboard-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  border-radius: 0;
   padding: 32px;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  transition: border-color 0.15s ease;
 }
 
 .dashboard-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  border-color: var(--color-accent);
 }
 
 .dashboard-card h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
   font-size: 24px;
   margin: 6px 0 10px;
 }
@@ -1065,6 +1101,187 @@ a.nav-user:hover {
 .dashboard-card--ok {
   border-color: #7fae8f;
   background: #f1f8f3;
+}
+
+/* ===== Panel: "Accesos rápidos" ===== */
+.accesos-rapidos {
+  margin-bottom: 48px;
+}
+
+.accesos-rapidos-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.acceso-rapido {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #f0ede6;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.acceso-rapido:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.acceso-rapido-icono {
+  font-size: 14px;
+}
+
+/* ===== Panel: carrusel de galería con fotos reales del residencial ===== */
+.galeria-carousel {
+  margin-bottom: 48px;
+}
+
+.galeria-carousel-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.galeria-carousel-heading h2 {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 26px;
+  margin: 0;
+}
+
+.galeria-carousel-contador {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.galeria-carousel-main {
+  position: relative;
+  overflow: hidden;
+  height: 380px;
+  background: #0d241f;
+}
+
+.galeria-carousel-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.25s ease;
+}
+
+.galeria-carousel-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(13, 36, 31, 0.88) 0%, rgba(13, 36, 31, 0.1) 55%, transparent 100%);
+}
+
+.galeria-carousel-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 28px;
+  color: #fff;
+}
+
+.galeria-carousel-tag {
+  display: inline-block;
+  background: var(--color-accent);
+  color: #0d241f;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  margin-bottom: 10px;
+}
+
+.galeria-carousel-caption h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 20px;
+  margin: 0 0 4px;
+}
+
+.galeria-carousel-caption p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 520px;
+  margin: 0;
+}
+
+.galeria-carousel-flecha {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(13, 36, 31, 0.55);
+  border: 1px solid rgba(201, 162, 75, 0.35);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.galeria-carousel-flecha:hover {
+  background: rgba(201, 162, 75, 0.3);
+  border-color: var(--color-accent);
+}
+
+.galeria-carousel-flecha--prev {
+  left: 14px;
+}
+
+.galeria-carousel-flecha--next {
+  right: 14px;
+}
+
+.galeria-carousel-miniaturas {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.galeria-carousel-mini {
+  flex: 1;
+  height: 56px;
+  padding: 0;
+  border: 2px solid transparent;
+  background: #0d241f;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.galeria-carousel-mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.45;
+  transition: opacity 0.2s ease;
+}
+
+.galeria-carousel-mini.is-active {
+  border-color: var(--color-accent);
+}
+
+.galeria-carousel-mini.is-active img {
+  opacity: 1;
 }
 
 .btn-ghost-light {
@@ -1239,9 +1456,8 @@ a.nav-user:hover {
 .publicacion-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  border-radius: 0;
   padding: 28px 32px;
-  box-shadow: var(--shadow-sm);
 }
 
 /* Vista previa de "Últimos avisos" en el panel de inicio: toda la tarjeta
@@ -1255,13 +1471,13 @@ a.nav-user:hover {
 
 .publicacion-card-link .publicacion-card {
   height: 100%;
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .publicacion-card-link:hover .publicacion-card,
 .publicacion-card-link:focus-visible .publicacion-card {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  border-color: var(--color-accent);
+  background: #fbf8f2;
 }
 
 /* Al llegar desde ese link (o cualquier otro anchor #aviso-X), resalta la
@@ -1271,11 +1487,13 @@ a.nav-user:hover {
 }
 
 @keyframes publicacion-card-resaltada {
-  0% { box-shadow: 0 0 0 3px var(--color-accent); }
-  100% { box-shadow: var(--shadow-sm); }
+  0% { border-color: var(--color-accent); background: #fbf1de; }
+  100% { border-color: var(--color-border); background: var(--color-surface); }
 }
 
 .publicacion-card h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
   font-size: 19px;
   margin: 8px 0 10px;
 }
@@ -1713,8 +1931,16 @@ a.nav-user:hover {
   }
 
   .portal-nav a {
-    padding: 8px 12px;
-    font-size: 14px;
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .galeria-carousel-main {
+    height: 280px;
+  }
+
+  .galeria-carousel-miniaturas {
+    display: none; /* en móvil, con menos ancho, no alcanzan a verse bien */
   }
 }
 

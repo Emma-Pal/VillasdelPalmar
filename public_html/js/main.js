@@ -64,6 +64,73 @@ if (form) {
   });
 }
 
+// ===== Panel: carrusel de la galería (fotos reales del residencial) =====
+const galeriaMain = document.getElementById('galeria-main');
+const galeriaSlides = window.VP_GALERIA_SLIDES;
+
+if (galeriaMain && Array.isArray(galeriaSlides) && galeriaSlides.length > 0) {
+  const galeriaImg = document.getElementById('galeria-img');
+  const galeriaTag = document.getElementById('galeria-tag');
+  const galeriaTitulo = document.getElementById('galeria-titulo');
+  const galeriaDescripcion = document.getElementById('galeria-descripcion');
+  const galeriaContador = document.getElementById('galeria-contador');
+  const galeriaMiniaturas = document.querySelectorAll('.galeria-carousel-mini');
+  const galeriaPrev = document.getElementById('galeria-prev');
+  const galeriaNext = document.getElementById('galeria-next');
+
+  let galeriaIndiceActual = 0;
+  let galeriaTemporizador = null;
+
+  const pad2 = (n) => String(n).padStart(2, '0');
+
+  const mostrarSlide = (indice) => {
+    galeriaIndiceActual = (indice + galeriaSlides.length) % galeriaSlides.length;
+    const slide = galeriaSlides[galeriaIndiceActual];
+
+    galeriaImg.style.opacity = '0';
+    setTimeout(() => {
+      galeriaImg.src = slide.url;
+      galeriaImg.alt = slide.titulo;
+      galeriaTag.textContent = slide.tag;
+      galeriaTitulo.textContent = slide.titulo;
+      galeriaDescripcion.textContent = slide.descripcion;
+      galeriaImg.style.opacity = '1';
+    }, 200);
+
+    galeriaContador.textContent = `${pad2(galeriaIndiceActual + 1)} / ${pad2(galeriaSlides.length)}`;
+
+    galeriaMiniaturas.forEach((mini, i) => {
+      mini.classList.toggle('is-active', i === galeriaIndiceActual);
+    });
+  };
+
+  const reiniciarAutoAvanceGaleria = () => {
+    if (galeriaTemporizador) clearInterval(galeriaTemporizador);
+    galeriaTemporizador = setInterval(() => mostrarSlide(galeriaIndiceActual + 1), 5000);
+  };
+
+  if (galeriaPrev) {
+    galeriaPrev.addEventListener('click', () => {
+      mostrarSlide(galeriaIndiceActual - 1);
+      reiniciarAutoAvanceGaleria();
+    });
+  }
+  if (galeriaNext) {
+    galeriaNext.addEventListener('click', () => {
+      mostrarSlide(galeriaIndiceActual + 1);
+      reiniciarAutoAvanceGaleria();
+    });
+  }
+  galeriaMiniaturas.forEach((mini, i) => {
+    mini.addEventListener('click', () => {
+      mostrarSlide(i);
+      reiniciarAutoAvanceGaleria();
+    });
+  });
+
+  reiniciarAutoAvanceGaleria();
+}
+
 // ===== Login: mostrar/ocultar la contraseña =====
 const loginPasswordInput = document.getElementById('login-password');
 const loginPasswordToggle = document.getElementById('login-password-toggle');

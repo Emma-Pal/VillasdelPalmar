@@ -1,0 +1,10 @@
+{
+  "description": "This web application offers a sleek and simple login interface for apartment websites, enhancing user experience while maintaining aesthetic appeal.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

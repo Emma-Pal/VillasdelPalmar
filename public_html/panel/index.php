@@ -6,6 +6,41 @@ $title = 'Panel — Villas del Palmar';
 $description = 'Panel de Villas del Palmar.';
 $ultimasPublicaciones = getPublicaciones(null, 10, 0);
 $totalPublicaciones = contarPublicaciones();
+
+// Fotos reales del residencial para el carrusel de la galería (todas ya
+// están en /images, copiadas de las que se usaban en el sitio público).
+$slidesGaleria = [
+    [
+        'url' => '/images/hero/atardecer-alberca.jpg',
+        'titulo' => 'Atardecer en la alberca',
+        'descripcion' => 'La vista que reciben los propietarios al caer la tarde, con las palmeras de fondo.',
+        'tag' => 'Atardecer',
+    ],
+    [
+        'url' => '/images/galeria/alberca-infinita.jpg',
+        'titulo' => 'Alberca infinita con vista al mar',
+        'descripcion' => 'Una de las albercas más fotografiadas del residencial, con vista directa a la bahía.',
+        'tag' => 'Alberca',
+    ],
+    [
+        'url' => '/images/galeria/entrada-principal-de.jpg',
+        'titulo' => 'Entrada principal',
+        'descripcion' => 'El acceso principal de Villas del Palmar, con caseta de vigilancia y control de entrada/salida.',
+        'tag' => 'Acceso',
+    ],
+    [
+        'url' => '/images/galeria/jardin-central.jpg',
+        'titulo' => 'Jardín central',
+        'descripcion' => 'Áreas verdes cuidadas todo el año, parte del mantenimiento cubierto por la cuota.',
+        'tag' => 'Áreas verdes',
+    ],
+    [
+        'url' => '/images/galeria/fachada-departamentos.jpg',
+        'titulo' => 'Fachada de los departamentos',
+        'descripcion' => 'La arquitectura característica de los edificios que conforman el residencial.',
+        'tag' => 'Departamentos',
+    ],
+];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -18,8 +53,8 @@ $totalPublicaciones = contarPublicaciones();
 
   <section class="panel-hero">
     <div class="panel-hero-content">
-      <span class="eyebrow">Hola, <?= htmlspecialchars($usuario['nombre']) ?></span>
-      <h1>Panel</h1>
+      <span class="eyebrow">Bienvenido, <?= htmlspecialchars($usuario['nombre']) ?></span>
+      <h1>Panel <em>Principal</em></h1>
     </div>
   </section>
 
@@ -48,6 +83,55 @@ $totalPublicaciones = contarPublicaciones();
         </div>
       <?php endif; ?>
     </div>
+
+    <div class="accesos-rapidos" data-reveal>
+      <span class="eyebrow">Accesos rápidos</span>
+      <div class="accesos-rapidos-lista">
+        <a href="/panel/avisos" class="acceso-rapido"><span class="acceso-rapido-icono">📌</span> Avisos</a>
+        <a href="/panel/instalaciones" class="acceso-rapido"><span class="acceso-rapido-icono">🏝️</span> Instalaciones</a>
+        <a href="/panel/mesa" class="acceso-rapido"><span class="acceso-rapido-icono">👥</span> Comité</a>
+        <?php if ($usuario['tipo'] === 'mesa'): ?>
+          <a href="/panel/usuarios" class="acceso-rapido"><span class="acceso-rapido-icono">🔐</span> Usuarios</a>
+        <?php endif; ?>
+      </div>
+    </div>
+
+    <div class="galeria-carousel" data-reveal>
+      <div class="galeria-carousel-heading">
+        <div>
+          <span class="eyebrow">Galería</span>
+          <h2>Imágenes de Villas del Palmar</h2>
+        </div>
+        <p class="galeria-carousel-contador" id="galeria-contador">01 / <?= sprintf('%02d', count($slidesGaleria)) ?></p>
+      </div>
+
+      <div class="galeria-carousel-main" id="galeria-main">
+        <img
+          src="<?= htmlspecialchars($slidesGaleria[0]['url']) ?>"
+          alt="<?= htmlspecialchars($slidesGaleria[0]['titulo']) ?>"
+          class="galeria-carousel-img"
+          id="galeria-img"
+        />
+        <div class="galeria-carousel-overlay"></div>
+        <div class="galeria-carousel-caption">
+          <span class="galeria-carousel-tag" id="galeria-tag"><?= htmlspecialchars($slidesGaleria[0]['tag']) ?></span>
+          <h3 id="galeria-titulo"><?= htmlspecialchars($slidesGaleria[0]['titulo']) ?></h3>
+          <p id="galeria-descripcion"><?= htmlspecialchars($slidesGaleria[0]['descripcion']) ?></p>
+        </div>
+        <button type="button" class="galeria-carousel-flecha galeria-carousel-flecha--prev" id="galeria-prev" aria-label="Imagen anterior">‹</button>
+        <button type="button" class="galeria-carousel-flecha galeria-carousel-flecha--next" id="galeria-next" aria-label="Imagen siguiente">›</button>
+      </div>
+
+      <div class="galeria-carousel-miniaturas" id="galeria-miniaturas">
+        <?php foreach ($slidesGaleria as $i => $slide): ?>
+          <button type="button" class="galeria-carousel-mini <?= $i === 0 ? 'is-active' : '' ?>" data-indice="<?= $i ?>" aria-label="Ir a la imagen <?= $i + 1 ?>">
+            <img src="<?= htmlspecialchars($slide['url']) ?>" alt="" />
+          </button>
+        <?php endforeach; ?>
+      </div>
+    </div>
+
+    <script>window.VP_GALERIA_SLIDES = <?= json_encode($slidesGaleria, JSON_UNESCAPED_UNICODE) ?>;</script>
 
     <div class="section-heading" data-reveal style="margin-top: 24px;">
       <span class="eyebrow">Al día</span>
