@@ -64,6 +64,19 @@ if (form) {
   });
 }
 
+// ===== Login: mostrar/ocultar la contraseña =====
+const loginPasswordInput = document.getElementById('login-password');
+const loginPasswordToggle = document.getElementById('login-password-toggle');
+
+if (loginPasswordInput && loginPasswordToggle) {
+  loginPasswordToggle.addEventListener('click', () => {
+    const seVaAMostrar = loginPasswordInput.type === 'password';
+    loginPasswordInput.type = seVaAMostrar ? 'text' : 'password';
+    loginPasswordToggle.classList.toggle('is-active', seVaAMostrar);
+    loginPasswordToggle.setAttribute('aria-label', seVaAMostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
+  });
+}
+
 // ===== Año dinámico en el footer =====
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();

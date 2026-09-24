@@ -1394,76 +1394,137 @@ a.nav-user:hover {
   color: #5b4a8a;
 }
 
-/* Pantalla de login */
-.login-screen {
+/* ===== Pantalla de login: 2 paneles (editorial oscuro + formulario) ===== */
+.login-split {
   min-height: 100vh;
   width: 100%;
   display: flex;
+}
+
+/* ----- Panel izquierdo: oscuro, con patrón de rejilla sutil ----- */
+.login-side-dark {
+  flex: 1 1 46%;
+  min-width: 0;
+  background: #0d241f;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 42px 42px;
+  color: #fff;
+  padding: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.login-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.login-mark-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-accent);
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  position: relative;
-  overflow: hidden;
-  background: #143530; /* respaldo mientras carga la foto */
 }
 
-/* Foto de fondo con un zoom lentísimo en loop (técnica "Ken Burns"), para
-   que la pantalla de login se sienta viva en vez de una tarjeta flotando
-   sobre un color plano. */
-.login-screen::before {
+.login-mark-icon::before {
   content: '';
-  position: absolute;
-  inset: -20px;
-  background-image: url("../images/hero/atardecer-alberca.jpg");
-  background-size: cover;
-  background-position: center 35%;
-  animation: login-fondo-zoom 26s ease-in-out infinite alternate;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
 }
 
-.login-screen::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(13, 36, 31, 0.72) 0%, rgba(13, 36, 31, 0.88) 100%);
+.login-mark-text {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
 }
 
-@keyframes login-fondo-zoom {
-  from { transform: scale(1); }
-  to { transform: scale(1.12); }
+.login-side-main {
+  max-width: 420px;
 }
 
-.login-card {
-  position: relative;
-  z-index: 1;
-  background: var(--color-surface);
-  border-radius: 20px;
-  padding: 48px 40px;
-  max-width: 380px;
+.login-side-main .eyebrow {
+  color: var(--color-accent-light);
+}
+
+.login-side-title {
+  font-family: var(--font-heading);
+  font-size: clamp(38px, 5vw, 52px);
+  line-height: 1.1;
+  margin: 10px 0 20px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.login-side-title em {
+  display: block;
+  font-style: italic;
+  color: var(--color-accent-light);
+  font-weight: 600;
+}
+
+.login-side-divider {
+  display: block;
+  width: 56px;
+  height: 2px;
+  background: var(--color-accent);
+  margin-bottom: 20px;
+}
+
+.login-side-lead {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 360px;
+}
+
+.login-side-foot {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ----- Panel derecho: claro, el formulario en sí ----- */
+.login-side-light {
+  flex: 1 1 54%;
+  min-width: 0;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.login-form-wrap {
   width: 100%;
-  box-shadow: var(--shadow-md);
-  text-align: center;
-  animation: login-card-entrada 0.6s ease-out;
+  max-width: 380px;
+  animation: login-form-entrada 0.6s ease-out;
 }
 
-@keyframes login-card-entrada {
+@keyframes login-form-entrada {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .login-screen::before {
-    animation: none;
-  }
-  .login-card {
+  .login-form-wrap {
     animation: none;
   }
 }
 
-.login-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+.login-title {
+  font-family: var(--font-heading);
+  font-size: 28px;
   margin-bottom: 6px;
 }
 
@@ -1485,27 +1546,32 @@ a.nav-user:hover {
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
   text-align: left;
 }
 
 .login-form label {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 14px;
-  font-weight: 600;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--color-text-muted);
 }
 
 .login-form input {
   font-family: var(--font-body);
   font-size: 15px;
-  padding: 11px 14px;
-  border-radius: 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
   border: 1.5px solid var(--color-border);
-  background: var(--color-bg);
+  background: #fff;
   color: var(--color-text);
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
   transition: border-color var(--transition);
 }
 
@@ -1514,9 +1580,76 @@ a.nav-user:hover {
   border-color: var(--color-accent);
 }
 
+.login-password-wrap {
+  position: relative;
+  display: flex;
+}
+
+.login-password-wrap input {
+  flex: 1;
+  padding-right: 42px;
+}
+
+.login-password-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.login-password-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.login-password-toggle:hover,
+.login-password-toggle.is-active {
+  color: var(--color-accent);
+}
+
 .login-submit {
-  margin-top: 4px;
+  margin-top: 6px;
   width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .login-split {
+    flex-direction: column;
+  }
+
+  .login-side-dark {
+    flex: 0 0 auto;
+    padding: 32px 24px;
+  }
+
+  .login-side-title {
+    font-size: clamp(30px, 8vw, 40px);
+  }
+
+  /* En móvil se prioriza el formulario; con menos alto disponible, esta
+     línea de pie ya no alcanza a verse bien. */
+  .login-side-foot {
+    display: none;
+  }
+
+  .login-side-light {
+    flex: 1 1 auto;
+    padding: 32px 24px 48px;
+  }
 }
 
 /* Responsive: portal */
@@ -1568,10 +1701,6 @@ a.nav-user:hover {
 
   .publicacion-imagenes.imagenes-multiples .publicacion-imagen {
     height: 200px;
-  }
-
-  .login-card {
-    padding: 36px 26px;
   }
 }
 
