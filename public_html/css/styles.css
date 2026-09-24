@@ -1211,6 +1211,7 @@ a.nav-user:hover {
   font-family: var(--font-display);
   font-weight: 400;
   font-size: 20px;
+  color: #fff;
   margin: 0 0 4px;
 }
 
