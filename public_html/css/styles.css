@@ -1118,6 +1118,59 @@ a.nav-user:hover {
   background: #f1f8f3;
 }
 
+/* Panel: layout de 2 columnas (contenido + barra lateral de accesos
+   rápidos), para aprovechar el espacio que sobra a los costados en
+   pantallas anchas. Solo esta página usa un ancho mayor al de las demás. */
+.detail-sections--ancho {
+  max-width: 1360px;
+}
+
+.panel-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.panel-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 72px;
+}
+
+.panel-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.panel-sidebar .accesos-rapidos-lista {
+  flex-direction: column;
+}
+
+.panel-sidebar .acceso-rapido {
+  width: 100%;
+}
+
+@media (max-width: 1000px) {
+  .panel-layout {
+    flex-direction: column;
+  }
+
+  .panel-sidebar {
+    width: 100%;
+  }
+
+  .panel-sidebar .accesos-rapidos-lista {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .panel-sidebar .acceso-rapido {
+    width: auto;
+  }
+}
+
 /* ===== Panel: "Accesos rápidos" ===== */
 .accesos-rapidos {
   margin-bottom: 48px;
