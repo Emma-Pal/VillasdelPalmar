@@ -164,10 +164,12 @@ if (tipoSelect && campoCargo) {
 // cuando se elige "Otra (especificar)" en Categoría =====
 const categoriaSelect = document.getElementById('categoria-select');
 const campoCategoriaOtra = document.getElementById('campo-categoria-otra');
+const campoFechaEvento = document.getElementById('campo-fecha-evento');
 
-if (categoriaSelect && campoCategoriaOtra) {
+if (categoriaSelect && (campoCategoriaOtra || campoFechaEvento)) {
   const actualizarCampoCategoria = () => {
-    campoCategoriaOtra.hidden = categoriaSelect.value !== '__otra__';
+    if (campoCategoriaOtra) campoCategoriaOtra.hidden = categoriaSelect.value !== '__otra__';
+    if (campoFechaEvento) campoFechaEvento.hidden = categoriaSelect.value !== 'convocatoria';
   };
   actualizarCampoCategoria();
   categoriaSelect.addEventListener('change', actualizarCampoCategoria);

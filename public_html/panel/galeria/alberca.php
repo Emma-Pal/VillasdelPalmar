@@ -17,7 +17,7 @@ $description = 'Las tres albercas de Villas del Palmar.';
   <!-- ===== Banner ===== -->
   <section class="page-banner" style="background-image: url('/images/galeria/alberca-tobogan.jpg');">
     <div class="page-banner-content">
-      <a href="/panel/instalaciones" class="back-link">← Volver a instalaciones</a>
+      <a href="/panel/galeria" class="back-link">← Volver a la galería</a>
       <span class="eyebrow">Espacios comunes</span>
       <h1>Alberca &amp; terraza</h1>
       <p class="page-banner-lead">
@@ -86,8 +86,13 @@ $description = 'Las tres albercas de Villas del Palmar.';
     </div>
   </section>
 
+  <div class="horario-nota" data-reveal>
+    <span class="eyebrow">Horario</span>
+    <p>Las tres albercas están disponibles todos los días de <strong>7:00 am a 9:00 pm</strong>.</p>
+  </div>
+
   <div class="detail-cta" data-reveal>
-    <a href="/panel/instalaciones" class="back-link back-link--dark" style="justify-content: center; margin: 0 auto;">← Volver a instalaciones</a>
+    <a href="/panel/galeria" class="back-link back-link--dark" style="justify-content: center; margin: 0 auto;">← Volver a la galería</a>
   </div>
 
   <?php include __DIR__ . '/../../partials/footer.php'; ?>

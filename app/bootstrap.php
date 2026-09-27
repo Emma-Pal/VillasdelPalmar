@@ -15,6 +15,10 @@ require_once __DIR__ . '/subida.php';
 require_once __DIR__ . '/repos/usuarios.php';
 require_once __DIR__ . '/repos/publicaciones.php';
 require_once __DIR__ . '/repos/archivos.php';
+require_once __DIR__ . '/repos/acuerdos.php';
+require_once __DIR__ . '/repos/documentos.php';
+require_once __DIR__ . '/repos/contactos.php';
+require_once __DIR__ . '/repos/solicitudes.php';
 
 // Disponibles en todas las vistas (equivalente a res.locals en Express).
 $usuario = $_SESSION['usuario'] ?? null;

@@ -15,7 +15,7 @@
         Avisos
         <?php if ($avisosNuevos > 0): ?><span class="nav-badge"><?= (int) $avisosNuevos ?></span><?php endif; ?>
       </a>
-      <a href="/panel/instalaciones" class="<?= rutaActivaPrefijo('/panel/instalaciones', $currentPath) ?>">Instalaciones</a>
+      <a href="/panel/galeria" class="<?= rutaActivaPrefijo('/panel/galeria', $currentPath) ?>">Galería</a>
       <a href="/panel/mesa" class="<?= rutaActivaExacta('/panel/mesa', $currentPath) ?>">Comité</a>
       <?php if ($usuario['tipo'] === 'mesa'): ?>
         <a href="/panel/usuarios" class="<?= rutaActivaPrefijo('/panel/usuarios', $currentPath) ?>">Usuarios</a>

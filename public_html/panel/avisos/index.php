@@ -7,7 +7,7 @@ const POR_PAGINA = 10;
 $title = 'Avisos — Villas del Palmar';
 $description = 'Estados financieros, mejoras y avisos de Villas del Palmar.';
 
-$categoriasUsadas = getCategoriasUsadas();
+$categoriasUsadas = array_diff(getCategoriasUsadas(), CATEGORIAS_ASAMBLEA);
 $categoriaActual = in_array($_GET['categoria'] ?? '', $categoriasUsadas, true) ? $_GET['categoria'] : null;
 $categoriasLibres = array_diff($categoriasUsadas, CATEGORIAS_BASE);
 $paginaActual = max(1, (int) ($_GET['pagina'] ?? 1));
@@ -66,61 +66,7 @@ $sufijoQuery = $categoriaActual ? '&categoria=' . urlencode($categoriaActual) : 
         <p class="placeholder-note">No hay publicaciones en esta categoría todavía.</p>
       <?php endif; ?>
       <?php foreach ($publicaciones as $pub): ?>
-        <article class="publicacion-card" id="aviso-<?= (int) $pub['id'] ?>">
-          <span class="publicacion-categoria publicacion-categoria--<?= categoriaSlug($pub['categoria']) ?>">
-            <?= htmlspecialchars(etiquetaCategoria($pub['categoria'])) ?>
-          </span>
-          <?php if ($pub['esNueva']): ?>
-            <span class="publicacion-nueva">Nuevo</span>
-          <?php endif; ?>
-          <h3><?= htmlspecialchars($pub['titulo']) ?></h3>
-          <p><?= nl2brSeguro($pub['cuerpo']) ?></p>
-
-          <?php
-          $imagenes = array_filter($pub['archivos'], function ($a) { return esImagen($a['archivo']); });
-          $otros = array_filter($pub['archivos'], function ($a) { return !esImagen($a['archivo']); });
-          ?>
-
-          <?php if (!empty($imagenes)): ?>
-            <div class="publicacion-imagenes <?= count($imagenes) > 1 ? 'imagenes-multiples' : '' ?>">
-              <?php foreach ($imagenes as $archivo): ?>
-                <button
-                  type="button"
-                  class="publicacion-imagen-btn"
-                  data-lightbox-src="/panel/archivo?id=<?= (int) $archivo['id'] ?>"
-                  data-lightbox-nombre="<?= htmlspecialchars($archivo['archivo_nombre_original']) ?>"
-                >
-                  <img src="/panel/archivo?id=<?= (int) $archivo['id'] ?>" alt="<?= htmlspecialchars($archivo['archivo_nombre_original']) ?>" class="publicacion-imagen" />
-                </button>
-              <?php endforeach; ?>
-            </div>
-          <?php endif; ?>
-
-          <?php if (!empty($otros)): ?>
-            <ul class="publicacion-archivos">
-              <?php foreach ($otros as $archivo): ?>
-                <li><a href="/panel/archivo?id=<?= (int) $archivo['id'] ?>">📎 <?= htmlspecialchars($archivo['archivo_nombre_original']) ?></a></li>
-              <?php endforeach; ?>
-            </ul>
-          <?php endif; ?>
-
-          <footer>
-            <span><?= htmlspecialchars($pub['autor_nombre']) ?> · <?= htmlspecialchars($pub['autor_cargo']) ?> — <?= htmlspecialchars($pub['fecha']) ?></span>
-            <?php if ($usuario['tipo'] === 'mesa'): ?>
-              <span class="publicacion-acciones">
-                <a href="/panel/avisos/editar?id=<?= (int) $pub['id'] ?>" class="btn-editar">Editar</a>
-                <form action="/panel/avisos/eliminar?id=<?= (int) $pub['id'] ?>" method="POST"
-                      onsubmit="return confirm('¿Eliminar esta publicación? Esto no se puede deshacer.');">
-                  <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
-                  <button type="submit" class="btn-eliminar">Eliminar</button>
-                </form>
-              </span>
-            <?php endif; ?>
-          </footer>
-          <?php if (!empty($pub['editado_en'])): ?>
-            <p class="publicacion-editada">Editado el <?= htmlspecialchars(date('d/m/Y', strtotime($pub['editado_en']))) ?></p>
-          <?php endif; ?>
-        </article>
+        <?php include __DIR__ . '/../../partials/tarjeta-publicacion.php'; ?>
       <?php endforeach; ?>
     </div>
 

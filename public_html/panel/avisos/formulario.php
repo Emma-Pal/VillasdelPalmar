@@ -23,13 +23,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verificarCsrf();
 
     $categoriaPost = trim($_POST['categoria'] ?? '');
+    $categoriasFijas = array_merge(CATEGORIAS_BASE, CATEGORIAS_ASAMBLEA);
     if ($categoriaPost === '__otra__') {
         $categoria = trim($_POST['categoria_otra'] ?? '');
         if ($categoria === '') {
             $categoria = 'aviso'; // no escribió nada en "Otra" — cae a un valor seguro
         }
         $categoria = mb_substr($categoria, 0, 50); // límite de la columna en la base de datos
-    } elseif (in_array($categoriaPost, CATEGORIAS_BASE, true)) {
+    } elseif (in_array($categoriaPost, $categoriasFijas, true)) {
         $categoria = $categoriaPost;
     } else {
         $categoria = 'aviso';
@@ -37,6 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $titulo = trim($_POST['titulo'] ?? '');
     $cuerpo = trim($_POST['cuerpo'] ?? '');
+    $destacado = isset($_POST['destacado']);
+    $fechaEvento = ($categoria === 'convocatoria' && !empty($_POST['fecha_evento'])) ? $_POST['fecha_evento'] : null;
 
     try {
         $archivosSubidos = procesarArchivosSubidos();
@@ -49,12 +52,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($esEdicion) {
         // Sin fecha: la fecha editorial no se puede tocar al editar, solo se
         // registra que hubo una edición (actualizarPublicacion pone editado_en).
-        actualizarPublicacion($publicacionEditada['id'], $categoria, $titulo, $cuerpo);
+        actualizarPublicacion($publicacionEditada['id'], $categoria, $titulo, $cuerpo, $destacado, $fechaEvento);
         $idDestino = $publicacionEditada['id'];
     } else {
         // La fecha SIEMPRE es la de hoy, fijada aquí en el servidor — nunca
         // se confía en un valor que pudiera venir del formulario.
-        $idDestino = crearPublicacion($usuario['id'], $categoria, $titulo, $cuerpo, date('Y-m-d'));
+        $idDestino = crearPublicacion($usuario['id'], $categoria, $titulo, $cuerpo, date('Y-m-d'), $destacado, $fechaEvento);
     }
 
     // Los archivos nuevos se agregan a los que ya tenía (no los reemplazan);
@@ -70,13 +73,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $accionFormulario = $esEdicion ? '/panel/avisos/editar?id=' . (int) $publicacionEditada['id'] : '/panel/avisos/nueva';
 
 // ¿La publicación (al editar) tiene una categoría que no es ninguna de las
-// 3 de fábrica? Entonces el select debe abrir directo en "Otra", con el
-// campo de texto ya visible y con su valor actual.
-$categoriaEsLibre = $esEdicion && !in_array($publicacionEditada['categoria'], CATEGORIAS_BASE, true);
+// de fábrica (ni las 3 de avisos, ni convocatoria/acta)? Entonces el select
+// debe abrir directo en "Otra", con el campo de texto ya visible.
+$categoriasFijas = array_merge(CATEGORIAS_BASE, CATEGORIAS_ASAMBLEA);
+$categoriaEsLibre = $esEdicion && !in_array($publicacionEditada['categoria'], $categoriasFijas, true);
 
 // Categorías libres ya usadas antes (para sugerirlas con autocompletar y
 // evitar que se creen variantes del mismo nombre por error de dedo).
-$categoriasLibresExistentes = array_diff(getCategoriasUsadas(), CATEGORIAS_BASE);
+$categoriasLibresExistentes = array_diff(getCategoriasUsadas(), $categoriasFijas);
+
+// Solo aplica al crear (no al editar): permite llegar con la categoría ya
+// preseleccionada, ej. desde el botón "+ Nueva convocatoria" en /panel/asambleas.
+$categoriaPreseleccionada = !$esEdicion ? ($_GET['categoria'] ?? null) : null;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -129,14 +137,30 @@ $categoriasLibresExistentes = array_diff(getCategoriasUsadas(), CATEGORIAS_BASE)
       >
         <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
 
+        <?php
+        // Marca "selected" en modo edición (categoría actual) o en modo
+        // creación cuando se llegó con ?categoria= en la URL.
+        $categoriaSeleccionada = $esEdicion ? $publicacionEditada['categoria'] : $categoriaPreseleccionada;
+        ?>
         <label>
           Categoría
           <select name="categoria" id="categoria-select" required>
-            <option value="financiero" <?= $esEdicion && $publicacionEditada['categoria'] === 'financiero' ? 'selected' : '' ?>>Estado financiero</option>
-            <option value="mejora" <?= $esEdicion && $publicacionEditada['categoria'] === 'mejora' ? 'selected' : '' ?>>Mejora</option>
-            <option value="aviso" <?= $esEdicion && $publicacionEditada['categoria'] === 'aviso' ? 'selected' : '' ?>>Aviso general</option>
+            <option value="financiero" <?= $categoriaSeleccionada === 'financiero' ? 'selected' : '' ?>>Estado financiero</option>
+            <option value="mejora" <?= $categoriaSeleccionada === 'mejora' ? 'selected' : '' ?>>Mejora</option>
+            <option value="aviso" <?= $categoriaSeleccionada === 'aviso' ? 'selected' : '' ?>>Aviso general</option>
+            <option value="convocatoria" <?= $categoriaSeleccionada === 'convocatoria' ? 'selected' : '' ?>>Convocatoria (asamblea)</option>
+            <option value="acta" <?= $categoriaSeleccionada === 'acta' ? 'selected' : '' ?>>Acta (asamblea)</option>
             <option value="__otra__" <?= $categoriaEsLibre ? 'selected' : '' ?>>Otra (especificar)</option>
           </select>
+        </label>
+
+        <label id="campo-fecha-evento">
+          Fecha de la asamblea
+          <input
+            type="date"
+            name="fecha_evento"
+            value="<?= $esEdicion && !empty($publicacionEditada['fecha_evento']) ? htmlspecialchars($publicacionEditada['fecha_evento']) : '' ?>"
+          />
         </label>
 
         <label id="campo-categoria-otra">
@@ -179,6 +203,11 @@ $categoriasLibresExistentes = array_diff(getCategoriasUsadas(), CATEGORIAS_BASE)
         <label>
           <?= $esEdicion ? 'Agregar más archivos (opcional — PDF o imagen)' : 'Archivos adjuntos (opcional — PDF o imagen, hasta 5)' ?>
           <input type="file" name="archivos[]" accept=".pdf,.jpg,.jpeg,.png" multiple />
+        </label>
+
+        <label class="campo-checkbox">
+          <input type="checkbox" name="destacado" <?= $esEdicion && !empty($publicacionEditada['destacado']) ? 'checked' : '' ?> />
+          Marcar como destacado (aparece primero en Avisos y en el Panel)
         </label>
 
         <button type="submit" class="btn btn-primary"><?= $esEdicion ? 'Guardar cambios' : 'Publicar' ?></button>

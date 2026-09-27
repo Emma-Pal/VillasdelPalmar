@@ -19,8 +19,28 @@ function esImagen(string $nombreArchivo): bool
 // nombre bonito; una categoría libre ("Otra") se muestra tal cual se escribió.
 function etiquetaCategoria(string $categoria): string
 {
-    $etiquetas = ['financiero' => 'Estado financiero', 'mejora' => 'Mejora', 'aviso' => 'Aviso'];
+    $etiquetas = [
+        'financiero' => 'Estado financiero',
+        'mejora' => 'Mejora',
+        'aviso' => 'Aviso',
+        'convocatoria' => 'Convocatoria',
+        'acta' => 'Acta',
+    ];
     return $etiquetas[$categoria] ?? $categoria;
+}
+
+// Etiqueta legible de los estatus usados por acuerdos ('cumplido') y
+// solicitudes ('resuelto') — comparten pendiente/en_progreso, cada uno
+// agrega su propio estado final.
+function etiquetaEstatus(string $estatus): string
+{
+    $etiquetas = [
+        'pendiente' => 'Pendiente',
+        'en_progreso' => 'En progreso',
+        'cumplido' => 'Cumplido',
+        'resuelto' => 'Resuelto',
+    ];
+    return $etiquetas[$estatus] ?? $estatus;
 }
 
 // Convierte cualquier categoría (incluida una libre, con espacios/acentos/

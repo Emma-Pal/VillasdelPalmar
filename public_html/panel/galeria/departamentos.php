@@ -17,7 +17,7 @@ $description = 'Fachadas y terrazas de los departamentos.';
   <!-- ===== Banner ===== -->
   <section class="page-banner" style="background-image: url('/images/galeria/fachada-departamentos.jpg');">
     <div class="page-banner-content">
-      <a href="/panel/instalaciones" class="back-link">← Volver a instalaciones</a>
+      <a href="/panel/galeria" class="back-link">← Volver a la galería</a>
       <span class="eyebrow">Espacios comunes</span>
       <h1>Departamentos</h1>
       <p class="page-banner-lead">
@@ -87,7 +87,7 @@ $description = 'Fachadas y terrazas de los departamentos.';
   </section>
 
   <div class="detail-cta" data-reveal>
-    <a href="/panel/instalaciones" class="back-link back-link--dark" style="justify-content: center; margin: 0 auto;">← Volver a instalaciones</a>
+    <a href="/panel/galeria" class="back-link back-link--dark" style="justify-content: center; margin: 0 auto;">← Volver a la galería</a>
   </div>
 
   <?php include __DIR__ . '/../../partials/footer.php'; ?>

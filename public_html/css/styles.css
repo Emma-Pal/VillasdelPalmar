@@ -1628,6 +1628,16 @@ a.nav-user:hover {
   color: #5b4a8a;
 }
 
+.publicacion-categoria--convocatoria {
+  background: #e6f2f0;
+  color: #1f6b5c;
+}
+
+.publicacion-categoria--acta {
+  background: #f3ece2;
+  color: #8a5a2f;
+}
+
 /* ===== Pantalla de login: 2 paneles (editorial oscuro + formulario) ===== */
 .login-split {
   min-height: 100vh;
@@ -1985,6 +1995,251 @@ a.nav-user:hover {
 }
 
 /* ===================================================================
+   Módulos nuevos 2026-09: Asambleas, Documentos, Directorio, Solicitudes
+   =================================================================== */
+
+/* Franja compacta en el Panel — solo aparece si hay una convocatoria futura */
+.proxima-asamblea {
+  display: block;
+  background: #eef2ee;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-accent);
+  border-radius: 8px;
+  padding: 14px 20px;
+  margin-bottom: 24px;
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 15px;
+  transition: border-color var(--transition);
+}
+
+.proxima-asamblea:hover {
+  border-left-color: var(--color-primary);
+}
+
+/* Checkbox de "Marcar como destacado" — fila en vez de columna, a
+   diferencia del resto de .contact-form label */
+.campo-checkbox {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 10px !important;
+}
+
+.campo-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+/* Nota de horario en las páginas de detalle de Galería */
+.horario-nota {
+  max-width: var(--max-width);
+  margin: 0 auto 32px;
+  padding: 0 24px;
+}
+
+.horario-nota p {
+  color: var(--color-text-muted);
+}
+
+/* ----- Asambleas y notas ----- */
+.asambleas-seccion {
+  margin-bottom: 48px;
+}
+
+.section-heading-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.acuerdos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.acuerdo-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-border);
+  border-radius: 8px;
+  padding: 20px 24px;
+}
+
+.acuerdo-card--pendiente { border-left-color: #c98a4b; }
+.acuerdo-card--en_progreso { border-left-color: #4b8ac9; }
+.acuerdo-card--cumplido { border-left-color: #4bac6f; }
+
+.acuerdo-descripcion {
+  margin: 10px 0 12px;
+  color: var(--color-text);
+}
+
+.acuerdo-card footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  flex-wrap: wrap;
+}
+
+/* Pills de estatus, reutilizadas por Acuerdos y Solicitudes */
+.estatus-pill {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.estatus-pill--pendiente {
+  background: #fbf1de;
+  color: #8a6a2f;
+}
+
+.estatus-pill--en_progreso {
+  background: #eaf1fb;
+  color: #2f5f8a;
+}
+
+.estatus-pill--cumplido,
+.estatus-pill--resuelto {
+  background: #eaf6ee;
+  color: #2f8a53;
+}
+
+/* ----- Documentos ----- */
+.documentos-grupo {
+  margin-bottom: 40px;
+}
+
+.documentos-grupo h2 {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.documentos-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.documento-item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+
+.documento-link {
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.documento-link:hover .documento-titulo {
+  color: var(--color-accent);
+}
+
+.documento-descripcion {
+  margin: 6px 0 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.documento-acciones {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+/* ----- Directorio ----- */
+.directorio-grupo {
+  margin-bottom: 40px;
+}
+
+.directorio-grupo h2 {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.directorio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.directorio-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.directorio-card h3 {
+  font-size: 17px;
+  margin-bottom: 2px;
+}
+
+.directorio-puesto {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.directorio-card p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.directorio-notas {
+  color: var(--color-text-muted);
+}
+
+.directorio-acciones {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+/* ----- Solicitudes: confirmación de folio ----- */
+.folio-confirmacion {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.folio-numero {
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 8px 0 16px;
+  letter-spacing: 0.02em;
+}
+
+.folio-resultado {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+}
+
+.folio-resultado h3 {
+  margin: 10px 0 4px;
+}
+
+/* ===================================================================
    Portal de noticias: globito de avisos, "Nuevo", archivos, paginación
    =================================================================== */
 
@@ -2017,6 +2272,29 @@ a.nav-user:hover {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   vertical-align: middle;
+}
+
+/* Igual que .publicacion-nueva pero para "destacado" (lo marca la mesa a
+   mano) — pueden aparecer las dos juntas en la misma tarjeta. */
+.publicacion-destacado {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--color-primary-dark);
+  color: var(--color-accent-light);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+}
+
+/* Fecha de la asamblea, dentro de una tarjeta de convocatoria */
+.publicacion-fecha-evento {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--color-text-muted);
 }
 
 /* Editar/Eliminar juntos en el pie de cada tarjeta */

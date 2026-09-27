@@ -6,6 +6,7 @@ $title = 'Panel — Villas del Palmar';
 $description = 'Panel de Villas del Palmar.';
 $ultimasPublicaciones = getPublicaciones(null, 10, 0);
 $totalPublicaciones = contarPublicaciones();
+$proximaAsamblea = getProximaAsamblea();
 
 // Fotos reales del residencial para el carrusel de la galería (todas ya
 // están en /images, copiadas de las que se usaban en el sitio público).
@@ -60,6 +61,12 @@ $slidesGaleria = [
 
   <section class="detail-sections">
 
+    <?php if ($proximaAsamblea): ?>
+      <a href="/panel/asambleas" class="proxima-asamblea" data-reveal>
+        📅 Próxima asamblea: <strong><?= htmlspecialchars(date('d/m/Y', strtotime($proximaAsamblea['fecha_evento']))) ?></strong> — <?= htmlspecialchars($proximaAsamblea['titulo']) ?>
+      </a>
+    <?php endif; ?>
+
     <div class="dashboard-grid" data-reveal>
       <div class="dashboard-card <?= $avisosNuevos > 0 ? 'dashboard-card--alerta' : 'dashboard-card--ok' ?>">
         <span class="eyebrow">Comunicación</span>
@@ -88,7 +95,13 @@ $slidesGaleria = [
       <span class="eyebrow">Accesos rápidos</span>
       <div class="accesos-rapidos-lista">
         <a href="/panel/avisos" class="acceso-rapido"><span class="acceso-rapido-icono">📌</span> Avisos</a>
-        <a href="/panel/instalaciones" class="acceso-rapido"><span class="acceso-rapido-icono">🏝️</span> Instalaciones</a>
+        <a href="/panel/avisos?categoria=financiero" class="acceso-rapido"><span class="acceso-rapido-icono">💰</span> Transparencia financiera</a>
+        <a href="/panel/avisos?categoria=mejora" class="acceso-rapido"><span class="acceso-rapido-icono">🛠️</span> Mejoras</a>
+        <a href="/panel/galeria" class="acceso-rapido"><span class="acceso-rapido-icono">🏝️</span> Galería</a>
+        <a href="/panel/asambleas" class="acceso-rapido"><span class="acceso-rapido-icono">🗒️</span> Asambleas</a>
+        <a href="/panel/documentos" class="acceso-rapido"><span class="acceso-rapido-icono">📄</span> Documentos</a>
+        <a href="/panel/directorio" class="acceso-rapido"><span class="acceso-rapido-icono">📇</span> Directorio</a>
+        <a href="/panel/solicitudes" class="acceso-rapido"><span class="acceso-rapido-icono">📮</span> Solicitudes</a>
         <a href="/panel/mesa" class="acceso-rapido"><span class="acceso-rapido-icono">👥</span> Comité</a>
         <?php if ($usuario['tipo'] === 'mesa'): ?>
           <a href="/panel/usuarios" class="acceso-rapido"><span class="acceso-rapido-icono">🔐</span> Usuarios</a>
@@ -148,6 +161,9 @@ $slidesGaleria = [
             <span class="publicacion-categoria publicacion-categoria--<?= categoriaSlug($pub['categoria']) ?>">
               <?= htmlspecialchars(etiquetaCategoria($pub['categoria'])) ?>
             </span>
+            <?php if (!empty($pub['destacado'])): ?>
+              <span class="publicacion-destacado">★ Destacado</span>
+            <?php endif; ?>
             <h3><?= htmlspecialchars($pub['titulo']) ?></h3>
             <p><?= nl2brSeguro($pub['cuerpo']) ?></p>
             <footer>
