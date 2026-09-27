@@ -988,6 +988,83 @@ a.nav-user:hover {
   border-bottom-color: var(--color-accent);
 }
 
+/* ===== Menú lateral (escritorio, ≥701px — el mismo punto donde antes
+   colapsaba a hamburguesa) — rediseño 2026-09: con 9 secciones, la barra
+   horizontal de arriba quedaba demasiado apretada. Debajo de 700px se
+   mantiene exactamente el comportamiento de siempre (hamburguesa). ===== */
+@media (min-width: 701px) {
+  body:has(.portal-header) {
+    margin-left: 240px;
+  }
+
+  .site-header.portal-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: auto;
+    width: 240px;
+    height: 100%;
+    overflow-y: auto;
+    border-bottom: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .portal-header .nav-wrap {
+    flex-direction: column;
+    align-items: stretch;
+    height: 100%;
+    padding: 28px 20px;
+    gap: 28px;
+  }
+
+  .portal-nav {
+    flex: 1;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 2px;
+  }
+
+  .portal-nav a {
+    width: 100%;
+    border-bottom: none;
+    border-left: 3px solid transparent;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .portal-nav a.is-active {
+    border-bottom-color: transparent;
+    border-left-color: var(--color-accent);
+  }
+
+  .portal-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .nav-logout-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* El sidebar siempre está visible — no hace falta el botón de hamburguesa. */
+  .site-header.portal-header .nav-toggle {
+    display: none;
+  }
+
+  /* Todas las páginas que antes dejaban 112px de espacio arriba (para no
+     quedar tapadas por la barra horizontal fija) ya no lo necesitan: ahora
+     el espacio a despejar es a la izquierda, no arriba. (.panel-hero tiene
+     su propio override más abajo, después de su regla base, para que gane
+     en el orden de cascada). */
+  .page-banner {
+    padding-top: 48px;
+  }
+}
+
 /* Banner de páginas internas del portal (Avisos, Instalaciones, Comité,
    Usuarios, Mi cuenta...): misma foto + degradado oscuro que las
    páginas de detalle de Instalaciones, para que ninguna pantalla del portal
@@ -1008,9 +1085,16 @@ a.nav-user:hover {
   width: 100%;
   overflow: hidden;
   background-color: #0d241f; /* respaldo mientras carga la foto */
-  /* Mismo motivo que .page-banner: espacio para el header fijo. */
+  /* Mismo motivo que .page-banner: espacio para el header fijo (solo en
+     móvil, <701px — ver el override de abajo para el menú lateral). */
   padding: 112px 24px 48px;
   color: #fff;
+}
+
+@media (min-width: 701px) {
+  .panel-hero {
+    padding-top: 48px;
+  }
 }
 
 /* La foto va en su propio pseudo-elemento (no en el fondo directo), para
@@ -1992,26 +2076,6 @@ a.nav-user:hover {
   .dashboard-grid,
   .publicaciones-grid {
     grid-template-columns: 1fr;
-  }
-
-  /* Un poco antes de colapsar todo a hamburguesa (700px), se libera espacio
-     ocultando el nombre/rol y dejando solo el avatar — así el nav respira. */
-  .nav-user-text {
-    display: none;
-  }
-
-  .portal-header .nav-wrap {
-    padding: 14px 20px;
-    gap: 14px;
-  }
-
-  .portal-nav {
-    gap: 2px;
-  }
-
-  .portal-nav a {
-    padding: 8px 10px;
-    font-size: 11px;
   }
 
   .galeria-carousel-main {
