@@ -92,6 +92,14 @@ $categoriasLibresExistentes = array_diff(getCategoriasUsadas(), $categoriasFijas
 // Solo aplica al crear (no al editar): permite llegar con la categoría ya
 // preseleccionada, ej. desde el botón "+ Nueva convocatoria" en /panel/asambleas.
 $categoriaPreseleccionada = !$esEdicion ? ($_GET['categoria'] ?? null) : null;
+
+// Marca "selected" en modo edición (categoría actual) o en modo creación
+// cuando se llegó con ?categoria= en la URL. Se calcula aquí (no solo más
+// abajo) porque también decide a dónde apunta el link "Volver a...".
+$categoriaSeleccionada = $esEdicion ? $publicacionEditada['categoria'] : $categoriaPreseleccionada;
+$esAsamblea = in_array($categoriaSeleccionada, CATEGORIAS_ASAMBLEA, true);
+$volverHref = $esAsamblea ? '/panel/asambleas' : '/panel/avisos';
+$volverTexto = $esAsamblea ? '← Volver a asambleas' : '← Volver a avisos';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -104,7 +112,7 @@ $categoriaPreseleccionada = !$esEdicion ? ($_GET['categoria'] ?? null) : null;
 
   <section class="page-banner page-banner--plain">
     <div class="page-banner-content">
-      <a href="/panel/avisos" class="back-link">← Volver a avisos</a>
+      <a href="<?= htmlspecialchars($volverHref) ?>" class="back-link"><?= htmlspecialchars($volverTexto) ?></a>
       <span class="eyebrow">Comité</span>
       <h1><?= $esEdicion ? 'Editar publicación' : 'Nueva publicación' ?></h1>
       <?php if (!$esEdicion): ?>
@@ -144,11 +152,6 @@ $categoriaPreseleccionada = !$esEdicion ? ($_GET['categoria'] ?? null) : null;
       >
         <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
 
-        <?php
-        // Marca "selected" en modo edición (categoría actual) o en modo
-        // creación cuando se llegó con ?categoria= en la URL.
-        $categoriaSeleccionada = $esEdicion ? $publicacionEditada['categoria'] : $categoriaPreseleccionada;
-        ?>
         <label>
           Categoría
           <select name="categoria" id="categoria-select" required>

@@ -523,7 +523,9 @@ section {
   border: 1.5px solid var(--color-border);
   background: var(--color-bg);
   color: var(--color-text);
-  resize: vertical;
+  /* Tamaño fijo — nada de arrastrar para agrandar la casilla. Si el texto
+     no cabe, el propio <textarea> ya mete su scroll vertical solo. */
+  resize: none;
   transition: border-color var(--transition);
 }
 
@@ -534,8 +536,15 @@ section {
 }
 
 /* El navegador resalta en azul (color de sistema) el segmento día/mes/año
-   que se está editando dentro de un <input type="date"> — se sobreescribe
-   para que siga la paleta del sitio en vez de verse fuera de lugar. */
+   que se está editando dentro de un <input type="date">, y el círculo del
+   día seleccionado en el calendario emergente — con accent-color, Chrome
+   tiñe ambos con el color de la marca en vez de su azul de sistema. Los
+   pseudo-elementos ::-webkit-datetime-edit-*-field quedan como respaldo
+   para navegadores donde accent-color no alcance a cubrir el segmento. */
+input[type="date"] {
+  accent-color: var(--color-accent);
+}
+
 input[type="date"]::-webkit-datetime-edit-day-field:focus,
 input[type="date"]::-webkit-datetime-edit-month-field:focus,
 input[type="date"]::-webkit-datetime-edit-year-field:focus {
