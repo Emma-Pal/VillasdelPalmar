@@ -166,11 +166,16 @@ $volverTexto = $esAsamblea ? '← Volver a asambleas' : '← Volver a avisos';
 
         <label id="campo-fecha-evento">
           Fecha de la asamblea
-          <input
-            type="date"
-            name="fecha_evento"
-            value="<?= $esEdicion && !empty($publicacionEditada['fecha_evento']) ? htmlspecialchars($publicacionEditada['fecha_evento']) : '' ?>"
-          />
+          <span class="fecha-wrap">
+            <input
+              type="date"
+              name="fecha_evento"
+              class="fecha-real"
+              value="<?= $esEdicion && !empty($publicacionEditada['fecha_evento']) ? htmlspecialchars($publicacionEditada['fecha_evento']) : '' ?>"
+            />
+            <span class="fecha-texto" data-placeholder="Selecciona la fecha de la asamblea"></span>
+            <span class="fecha-wrap-icono" aria-hidden="true">📅</span>
+          </span>
         </label>
 
         <label id="campo-categoria-otra">

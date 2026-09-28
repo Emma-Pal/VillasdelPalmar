@@ -558,6 +558,62 @@ input[type="date"]::-webkit-datetime-edit-year-field:focus {
   outline: none;
 }
 
+/* ===== Casilla de fecha "disfrazada" =====
+   En vez de pelear con el resaltado nativo del navegador (que no se deja
+   recolorear de forma confiable), se oculta el <input type="date"> real
+   (opacity: 0, pero sigue siendo el que recibe el click/teclado y el que
+   abre el calendario y guarda el valor) y se muestra un texto propio
+   encima con los estilos del sitio. Nunca se ve el resaltado feo porque
+   el texto que sí se ve no es el que el navegador considera "editable". */
+.fecha-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color var(--transition);
+}
+
+.fecha-wrap:focus-within {
+  border-color: var(--color-accent);
+}
+
+.fecha-wrap .fecha-real {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.fecha-texto {
+  pointer-events: none; /* el click siempre debe llegar al input real de encima */
+  flex: 1;
+}
+
+.fecha-texto--vacio {
+  color: var(--color-text-muted);
+}
+
+.fecha-wrap-icono {
+  pointer-events: none;
+  opacity: 0.6;
+  font-size: 14px;
+}
+
 .contact-form .btn {
   align-self: flex-start;
   margin-top: 4px;

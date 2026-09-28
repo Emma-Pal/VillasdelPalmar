@@ -191,6 +191,30 @@ document.querySelectorAll('input[type="date"]').forEach((campo) => {
   });
 });
 
+// ===== Casilla de fecha "disfrazada" (.fecha-wrap): el <input type="date">
+// real queda invisible (para que nunca se vea su resaltado nativo) y este
+// texto propio, con los estilos del sitio, muestra el valor por encima. =====
+document.querySelectorAll('.fecha-wrap').forEach((envoltura) => {
+  const real = envoltura.querySelector('.fecha-real');
+  const texto = envoltura.querySelector('.fecha-texto');
+  if (!real || !texto) return;
+
+  const formatearFecha = (valorIso) => {
+    if (!valorIso) return texto.dataset.placeholder || 'Selecciona una fecha';
+    const [anio, mes, dia] = valorIso.split('-');
+    return `${dia}/${mes}/${anio}`;
+  };
+
+  const actualizarTexto = () => {
+    texto.textContent = formatearFecha(real.value);
+    texto.classList.toggle('fecha-texto--vacio', !real.value);
+  };
+
+  actualizarTexto();
+  real.addEventListener('input', actualizarTexto);
+  real.addEventListener('change', actualizarTexto);
+});
+
 // ===== Lightbox de imágenes en publicaciones =====
 // Al hacer clic en una imagen se abre en grande, con una animación de zoom
 // que sale exactamente del lugar donde estaba la miniatura (técnica "FLIP":

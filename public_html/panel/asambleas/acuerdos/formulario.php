@@ -72,7 +72,11 @@ $accionFormulario = $esEdicion ? '/panel/asambleas/acuerdos/editar?id=' . (int) 
 
         <label>
           Fecha límite (opcional)
-          <input type="date" name="fecha_limite" value="<?= htmlspecialchars($datos['fecha_limite'] ?? '') ?>" />
+          <span class="fecha-wrap">
+            <input type="date" name="fecha_limite" class="fecha-real" value="<?= htmlspecialchars($datos['fecha_limite'] ?? '') ?>" />
+            <span class="fecha-texto" data-placeholder="Sin fecha límite"></span>
+            <span class="fecha-wrap-icono" aria-hidden="true">📅</span>
+          </span>
         </label>
 
         <button type="submit" class="btn btn-primary"><?= $esEdicion ? 'Guardar cambios' : 'Crear acuerdo' ?></button>
