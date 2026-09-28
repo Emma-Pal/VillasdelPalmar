@@ -3,12 +3,12 @@ require_once __DIR__ . '/../../../app/bootstrap.php';
 requireAuth();
 
 $title = 'Alberca & terraza — Villas del Palmar';
-$description = 'Las tres albercas de Villas del Palmar.';
+$description = 'Las albercas de Villas del Palmar.';
 
-// Bloques fijos de esta página: 3 (índices 0, 1, 2 — normal/reverso/normal).
+// Bloques fijos de esta página: 4 (índices 0-3 — normal/reverso/normal/reverso).
 // Los que agregue la mesa después continúan alternando desde ahí.
 $itemsGaleria = getGaleriaItems('alberca');
-$bloquesFijos = 3;
+$bloquesFijos = 4;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -26,7 +26,7 @@ $bloquesFijos = 3;
       <span class="eyebrow">Espacios comunes</span>
       <h1>Alberca &amp; terraza</h1>
       <p class="page-banner-lead">
-        Tres espacios distintos para nadar, tomar el sol o simplemente desconectar sin salir del residencial.
+        Distintos espacios para nadar, tomar el sol o simplemente desconectar sin salir del residencial.
       </p>
     </div>
   </section>
@@ -90,6 +90,26 @@ $bloquesFijos = 3;
       </div>
     </div>
 
+    <div class="detail-block is-reverse" data-reveal>
+      <div class="detail-media">
+        <img src="/images/galeria/alberca-infantil-palapa-bar.jpg" alt="Alberca infantil con fuente en forma de hongo y palapa bar" />
+      </div>
+      <div class="detail-text">
+        <span class="eyebrow">Diversión para los más pequeños</span>
+        <h2>Alberca infantil &amp; palapa bar</h2>
+        <p>
+          De profundidad reducida y con una divertida fuente en forma de hongo, es el espacio favorito
+          de los niños. Justo al lado, la palapa bar es el punto perfecto para pedir una bebida
+          sin perderlos de vista.
+        </p>
+        <ul class="feature-list">
+          <li>Fuente en forma de hongo</li>
+          <li>Profundidad reducida, ideal para niños</li>
+          <li>Palapa bar justo al lado</li>
+        </ul>
+      </div>
+    </div>
+
     <?php foreach ($itemsGaleria as $i => $item): ?>
       <?php $esReverse = ($bloquesFijos + $i) % 2 === 1; ?>
       <?php include __DIR__ . '/../../partials/galeria-item.php'; ?>
@@ -104,7 +124,7 @@ $bloquesFijos = 3;
 
   <div class="horario-nota" data-reveal>
     <span class="eyebrow">Horario</span>
-    <p>Las tres albercas están disponibles todos los días de <strong>7:00 am a 9:00 pm</strong>.</p>
+    <p>Las albercas están disponibles todos los días de <strong>7:00 am a 9:00 pm</strong>.</p>
   </div>
 
   <div class="detail-cta" data-reveal>

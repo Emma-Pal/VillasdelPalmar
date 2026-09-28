@@ -6,7 +6,7 @@ $title = 'Áreas verdes — Villas del Palmar';
 $description = 'Jardines y espacios abiertos de Villas del Palmar.';
 
 $itemsGaleria = getGaleriaItems('areas-verdes');
-$bloquesFijos = 3;
+$bloquesFijos = 4;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -84,6 +84,25 @@ $bloquesFijos = 3;
           <li>Espacio abierto para actividades</li>
           <li>Ideal para niños</li>
           <li>Rodeado de palmeras</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="detail-block is-reverse" data-reveal>
+      <div class="detail-media">
+        <img src="/images/galeria/cancha-tenis-atardecer.jpg" alt="Cancha de tenis y pádel al atardecer" />
+      </div>
+      <div class="detail-text">
+        <span class="eyebrow">Para hacer deporte</span>
+        <h2>Cancha deportiva</h2>
+        <p>
+          Una cancha de tenis y pádel entre palmeras, perfecta para un partido al aire libre
+          o para disfrutar del atardecer sobre la bahía.
+        </p>
+        <ul class="feature-list">
+          <li>Uso mixto: tenis y pádel</li>
+          <li>Superficie tipo arcilla</li>
+          <li>Rodeada de vegetación</li>
         </ul>
       </div>
     </div>
