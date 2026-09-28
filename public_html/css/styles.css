@@ -545,6 +545,11 @@ input[type="date"] {
   accent-color: var(--color-accent);
 }
 
+input[type="date"]::selection {
+  background-color: var(--color-accent);
+  color: var(--color-primary-dark);
+}
+
 input[type="date"]::-webkit-datetime-edit-day-field:focus,
 input[type="date"]::-webkit-datetime-edit-month-field:focus,
 input[type="date"]::-webkit-datetime-edit-year-field:focus {
