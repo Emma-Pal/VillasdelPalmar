@@ -6,7 +6,7 @@ $title = 'Departamentos — Villas del Palmar';
 $description = 'Fachadas y terrazas de los departamentos.';
 
 $itemsGaleria = getGaleriaItems('departamentos');
-$bloquesFijos = 3;
+$bloquesFijos = 4;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -84,6 +84,25 @@ $bloquesFijos = 3;
           <li>Rodeado de vegetación</li>
           <li>Vista al residencial</li>
           <li>Ambiente tranquilo</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="detail-block is-reverse" data-reveal>
+      <div class="detail-media">
+        <img src="/images/galeria/departamento-balcones-palmeras.jpg" alt="Departamento con balcones y palmeras altas" />
+      </div>
+      <div class="detail-text">
+        <span class="eyebrow">Espacios con luz natural</span>
+        <h2>Balcones con vista natural</h2>
+        <p>
+          Balcones amplios enmarcados por palmeras altas, ideales para tomar un café por la mañana
+          o simplemente disfrutar del entorno sin salir de casa.
+        </p>
+        <ul class="feature-list">
+          <li>Balcones amplios</li>
+          <li>Vista rodeada de palmeras</li>
+          <li>Luz natural todo el día</li>
         </ul>
       </div>
     </div>

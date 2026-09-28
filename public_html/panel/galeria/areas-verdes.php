@@ -6,7 +6,7 @@ $title = 'Áreas verdes — Villas del Palmar';
 $description = 'Jardines y espacios abiertos de Villas del Palmar.';
 
 $itemsGaleria = getGaleriaItems('areas-verdes');
-$bloquesFijos = 4;
+$bloquesFijos = 5;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -103,6 +103,25 @@ $bloquesFijos = 4;
           <li>Uso mixto: tenis y pádel</li>
           <li>Superficie tipo arcilla</li>
           <li>Rodeada de vegetación</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="detail-block" data-reveal>
+      <div class="detail-media">
+        <img src="/images/galeria/jardin-flores-vista-mar.jpg" alt="Flores de corona de cristo con vista al mar y veleros" />
+      </div>
+      <div class="detail-text">
+        <span class="eyebrow">Detalles con color</span>
+        <h2>Flora tropical con vista al mar</h2>
+        <p>
+          Coronas de cristo y otras plantas de flor asoman en varios puntos del residencial,
+          muchas veces con el mar de fondo — pequeños detalles que hacen la diferencia al caminar por aquí.
+        </p>
+        <ul class="feature-list">
+          <li>Plantas de flor todo el año</li>
+          <li>Vistas al mar desde los jardines</li>
+          <li>Mantenimiento constante</li>
         </ul>
       </div>
     </div>

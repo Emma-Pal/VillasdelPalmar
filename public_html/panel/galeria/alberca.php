@@ -5,10 +5,10 @@ requireAuth();
 $title = 'Alberca & terraza — Villas del Palmar';
 $description = 'Las albercas de Villas del Palmar.';
 
-// Bloques fijos de esta página: 4 (índices 0-3 — normal/reverso/normal/reverso).
+// Bloques fijos de esta página: 6 (índices 0-5 — alternando normal/reverso).
 // Los que agregue la mesa después continúan alternando desde ahí.
 $itemsGaleria = getGaleriaItems('alberca');
-$bloquesFijos = 4;
+$bloquesFijos = 6;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -106,6 +106,44 @@ $bloquesFijos = 4;
           <li>Fuente en forma de hongo</li>
           <li>Profundidad reducida, ideal para niños</li>
           <li>Palapa bar justo al lado</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="detail-block" data-reveal>
+      <div class="detail-media">
+        <img src="/images/galeria/vista-bahia-desde-alberca.jpg" alt="Vista panorámica de la bahía desde la terraza de la alberca" />
+      </div>
+      <div class="detail-text">
+        <span class="eyebrow">La mejor vista</span>
+        <h2>Terraza con vista a la bahía</h2>
+        <p>
+          Desde la terraza junto a la alberca se abre toda la bahía de Manzanillo, con veleros
+          y el pueblo a lo lejos — el rincón favorito para ver el atardecer con una bebida en mano.
+        </p>
+        <ul class="feature-list">
+          <li>Vista abierta a toda la bahía</li>
+          <li>Junto a la palapa y el tobogán</li>
+          <li>Ideal para el atardecer</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="detail-block is-reverse" data-reveal>
+      <div class="detail-media">
+        <img src="/images/galeria/alberca-chapoteadero-jardineras.jpg" alt="Chapoteadero con jardineras junto a la alberca principal" />
+      </div>
+      <div class="detail-text">
+        <span class="eyebrow">Un espacio extra</span>
+        <h2>Chapoteadero con jardineras</h2>
+        <p>
+          Una sección más pequeña y tranquila, separada por jardineras, junto a la alberca principal —
+          perfecta para meter los pies sin buscar demasiada profundidad.
+        </p>
+        <ul class="feature-list">
+          <li>Sección independiente y tranquila</li>
+          <li>Jardineras decorativas</li>
+          <li>Junto a la alberca principal</li>
         </ul>
       </div>
     </div>
