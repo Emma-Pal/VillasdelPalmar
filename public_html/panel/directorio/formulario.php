@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         crearContacto($categoria, $nombre, $puesto, $telefono, $correo, $notas);
     }
-    header('Location: /panel/directorio');
+    header('Location: /panel/directorio#categoria-' . $categoria);
     exit;
 }
 

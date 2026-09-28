@@ -35,7 +35,7 @@ foreach (CATEGORIAS_DOCUMENTO as $cat) {
     <?php endif; ?>
 
     <?php foreach (CATEGORIAS_DOCUMENTO as $cat): ?>
-      <div class="documentos-grupo" data-reveal>
+      <div class="documentos-grupo" id="categoria-<?= htmlspecialchars($cat) ?>" data-reveal>
         <h2><?= htmlspecialchars(etiquetaCategoriaDocumento($cat)) ?></h2>
 
         <?php if (empty($documentosPorCategoria[$cat])): ?>

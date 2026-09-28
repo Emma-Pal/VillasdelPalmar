@@ -28,7 +28,7 @@ $acuerdos = getAcuerdos();
 
   <section class="detail-sections">
 
-    <div class="asambleas-seccion" data-reveal>
+    <div class="asambleas-seccion" id="convocatorias" data-reveal>
       <div class="section-heading-fila">
         <h2>Convocatorias</h2>
         <?php if ($usuario['tipo'] === 'mesa'): ?>
@@ -46,7 +46,7 @@ $acuerdos = getAcuerdos();
       <?php endif; ?>
     </div>
 
-    <div class="asambleas-seccion" data-reveal>
+    <div class="asambleas-seccion" id="actas" data-reveal>
       <div class="section-heading-fila">
         <h2>Actas firmadas</h2>
         <?php if ($usuario['tipo'] === 'mesa'): ?>
@@ -64,7 +64,7 @@ $acuerdos = getAcuerdos();
       <?php endif; ?>
     </div>
 
-    <div class="asambleas-seccion" data-reveal>
+    <div class="asambleas-seccion" id="acuerdos" data-reveal>
       <div class="section-heading-fila">
         <h2>Acuerdos y seguimiento</h2>
         <?php if ($usuario['tipo'] === 'mesa'): ?>

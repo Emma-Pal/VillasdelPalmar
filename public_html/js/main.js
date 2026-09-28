@@ -175,6 +175,22 @@ if (categoriaSelect && (campoCategoriaOtra || campoFechaEvento)) {
   categoriaSelect.addEventListener('change', actualizarCampoCategoria);
 }
 
+// ===== Campos de fecha: que toda la casilla abra el calendario, no solo
+// el iconito (el navegador por sí solo a veces solo lo abre ahí) =====
+document.querySelectorAll('input[type="date"]').forEach((campo) => {
+  campo.addEventListener('click', () => {
+    if (typeof campo.showPicker === 'function') {
+      try {
+        campo.showPicker();
+      } catch (error) {
+        // Algunos navegadores lo bloquean si no vino de una interacción
+        // directa del usuario — sin problema, el click ya cuenta como esa
+        // interacción en el resto de los casos.
+      }
+    }
+  });
+});
+
 // ===== Lightbox de imágenes en publicaciones =====
 // Al hacer clic en una imagen se abre en grande, con una animación de zoom
 // que sale exactamente del lugar donde estaba la miniatura (técnica "FLIP":

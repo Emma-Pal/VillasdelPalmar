@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             crearDocumento($usuario['id'], $categoria, $titulo, $descripcion, $archivosSubidos[0]['archivo'], $archivosSubidos[0]['archivo_nombre_original']);
         }
-        header('Location: /panel/documentos');
+        header('Location: /panel/documentos#categoria-' . $categoria);
         exit;
     }
 }

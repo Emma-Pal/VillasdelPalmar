@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         crearAcuerdo($usuario['id'], $descripcion, $estatus, $fechaLimite);
     }
-    header('Location: /panel/asambleas');
+    header('Location: /panel/asambleas#acuerdos');
     exit;
 }
 

@@ -4,7 +4,15 @@ requireMesa();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verificarCsrf();
-    eliminarContacto((int) ($_GET['id'] ?? 0));
+
+    $id = (int) ($_GET['id'] ?? 0);
+    $contacto = getContactoPorId($id);
+
+    if ($contacto) {
+        eliminarContacto($id);
+        header('Location: /panel/directorio#categoria-' . $contacto['categoria']);
+        exit;
+    }
 }
 
 header('Location: /panel/directorio');

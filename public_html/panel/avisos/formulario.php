@@ -66,7 +66,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         agregarArchivo($idDestino, $archivo['archivo'], $archivo['archivo_nombre_original']);
     }
 
-    header('Location: /panel/avisos');
+    // Una convocatoria/acta se crea desde /panel/asambleas — al guardar hay
+    // que regresar ahí (con ancla a su sección), no al feed general de
+    // avisos, donde de todos modos no se mostraría (ver CATEGORIAS_ASAMBLEA).
+    if (in_array($categoria, CATEGORIAS_ASAMBLEA, true)) {
+        header('Location: /panel/asambleas#' . ($categoria === 'convocatoria' ? 'convocatorias' : 'actas'));
+    } else {
+        header('Location: /panel/avisos');
+    }
     exit;
 }
 

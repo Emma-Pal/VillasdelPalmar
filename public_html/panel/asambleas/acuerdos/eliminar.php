@@ -7,5 +7,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     eliminarAcuerdo((int) ($_GET['id'] ?? 0));
 }
 
-header('Location: /panel/asambleas');
+header('Location: /panel/asambleas#acuerdos');
 exit;

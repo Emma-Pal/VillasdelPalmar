@@ -35,7 +35,7 @@ foreach (CATEGORIAS_CONTACTO as $cat) {
     <?php endif; ?>
 
     <?php foreach (CATEGORIAS_CONTACTO as $cat): ?>
-      <div class="directorio-grupo" data-reveal>
+      <div class="directorio-grupo" id="categoria-<?= htmlspecialchars($cat) ?>" data-reveal>
         <h2><?= htmlspecialchars(etiquetaCategoriaContacto($cat)) ?></h2>
 
         <?php if (empty($contactosPorCategoria[$cat])): ?>

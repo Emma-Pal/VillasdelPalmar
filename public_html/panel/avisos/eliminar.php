@@ -17,6 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     eliminarPublicacion($id);
+
+    // Una convocatoria/acta se elimina desde /panel/asambleas — regresar
+    // ahí (con ancla), igual que al crearla/editarla.
+    if ($publicacion && in_array($publicacion['categoria'], CATEGORIAS_ASAMBLEA, true)) {
+        header('Location: /panel/asambleas#' . ($publicacion['categoria'] === 'convocatoria' ? 'convocatorias' : 'actas'));
+        exit;
+    }
 }
 
 header('Location: /panel/avisos');
