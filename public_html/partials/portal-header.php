@@ -15,13 +15,6 @@
         Avisos
         <?php if ($avisosNuevos > 0): ?><span class="nav-badge"><?= (int) $avisosNuevos ?></span><?php endif; ?>
       </a>
-      <a
-        href="http://pompamzo.no-ip.info:1200/Login.aspx"
-        target="_blank"
-        rel="noopener noreferrer"
-        id="nav-estados-cuenta"
-        title="Se abre en una pestaña nueva — solo funciona desde computadora"
-      >Estados de cuenta ↗</a>
       <a href="/panel/asambleas" class="<?= rutaActivaPrefijo('/panel/asambleas', $currentPath) ?>">Asambleas</a>
       <a href="/panel/documentos" class="<?= rutaActivaPrefijo('/panel/documentos', $currentPath) ?>">Documentos</a>
       <a href="/panel/directorio" class="<?= rutaActivaPrefijo('/panel/directorio', $currentPath) ?>">Directorio</a>
@@ -31,6 +24,13 @@
       <?php if ($usuario['tipo'] === 'mesa'): ?>
         <a href="/panel/usuarios" class="<?= rutaActivaPrefijo('/panel/usuarios', $currentPath) ?>">Usuarios</a>
       <?php endif; ?>
+      <a
+        href="http://pompamzo.no-ip.info:1200/Login.aspx"
+        target="_blank"
+        rel="noopener noreferrer"
+        id="nav-estados-cuenta"
+        title="Se abre en una pestaña nueva — solo funciona desde computadora"
+      >Estados de cuenta ↗</a>
     </nav>
 
     <div class="portal-header-actions">

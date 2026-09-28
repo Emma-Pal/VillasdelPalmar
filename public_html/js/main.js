@@ -23,7 +23,7 @@ if (linkEstadosCuenta) {
   linkEstadosCuenta.addEventListener('click', (event) => {
     if (window.innerWidth <= 700) {
       event.preventDefault();
-      alert('El sistema de Estados de cuenta solo funciona desde una computadora  Ábrelo desde una computadora para poder consultarlo.');
+      alert('El sistema de Estados de cuenta solo funciona desde una computadora - Ábrelo desde una computadora para poder consultarlo.');
     }
   });
 }
