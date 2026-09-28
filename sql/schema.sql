@@ -100,3 +100,22 @@ CREATE TABLE IF NOT EXISTS solicitudes (
   actualizado_en DATETIME NULL,
   FOREIGN KEY (autor_id) REFERENCES usuarios(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ===== Migración 2026-09b: Galería administrable =====
+-- Las 3 páginas de Galería (alberca, áreas verdes, departamentos) siguen
+-- teniendo sus bloques originales fijos en el código; esta tabla es para
+-- las que la mesa vaya agregando después, con el mismo formato (foto +
+-- eyebrow + título + descripción + lista de características).
+CREATE TABLE IF NOT EXISTS galeria_items (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  categoria ENUM('alberca','areas-verdes','departamentos') NOT NULL,
+  eyebrow VARCHAR(100) NOT NULL,
+  titulo VARCHAR(150) NOT NULL,
+  descripcion TEXT NOT NULL,
+  caracteristicas TEXT NULL,          -- una característica por línea
+  archivo VARCHAR(255) NOT NULL,
+  archivo_nombre_original VARCHAR(255) NOT NULL,
+  autor_id INT NOT NULL,
+  creado_en DATETIME NOT NULL,
+  FOREIGN KEY (autor_id) REFERENCES usuarios(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -533,6 +533,17 @@ section {
   border-color: var(--color-accent);
 }
 
+/* El navegador resalta en azul (color de sistema) el segmento día/mes/año
+   que se está editando dentro de un <input type="date"> — se sobreescribe
+   para que siga la paleta del sitio en vez de verse fuera de lugar. */
+input[type="date"]::-webkit-datetime-edit-day-field:focus,
+input[type="date"]::-webkit-datetime-edit-month-field:focus,
+input[type="date"]::-webkit-datetime-edit-year-field:focus {
+  background-color: var(--color-accent);
+  color: var(--color-primary-dark);
+  outline: none;
+}
+
 .contact-form .btn {
   align-self: flex-start;
   margin-top: 4px;
@@ -2190,6 +2201,14 @@ a.nav-user:hover {
   align-items: center;
   gap: 14px;
   margin-top: 10px;
+}
+
+/* Editar/Eliminar bajo un item de galería agregado desde el admin */
+.galeria-item-acciones {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
 }
 
 /* ----- Directorio ----- */

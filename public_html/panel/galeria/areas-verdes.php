@@ -4,6 +4,9 @@ requireAuth();
 
 $title = 'Áreas verdes — Villas del Palmar';
 $description = 'Jardines y espacios abiertos de Villas del Palmar.';
+
+$itemsGaleria = getGaleriaItems('areas-verdes');
+$bloquesFijos = 3;
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -84,6 +87,17 @@ $description = 'Jardines y espacios abiertos de Villas del Palmar.';
         </ul>
       </div>
     </div>
+
+    <?php foreach ($itemsGaleria as $i => $item): ?>
+      <?php $esReverse = ($bloquesFijos + $i) % 2 === 1; ?>
+      <?php include __DIR__ . '/../../partials/galeria-item.php'; ?>
+    <?php endforeach; ?>
+
+    <?php if ($usuario['tipo'] === 'mesa'): ?>
+      <p style="text-align: center;" data-reveal>
+        <a href="/panel/galeria/admin/nuevo?categoria=areas-verdes" class="btn btn-primary">+ Agregar imagen a esta categoría</a>
+      </p>
+    <?php endif; ?>
   </section>
 
   <div class="horario-nota" data-reveal>

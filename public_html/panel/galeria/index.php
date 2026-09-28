@@ -23,6 +23,11 @@ $description = 'Fotografías de las instalaciones y amenidades de Villas del Pal
   </section>
 
   <section class="gallery" style="max-width: var(--max-width); margin: 0 auto; padding: 40px 24px 96px;">
+    <?php if ($usuario['tipo'] === 'mesa'): ?>
+      <p style="text-align: right; margin-bottom: 16px;">
+        <a href="/panel/galeria/admin" class="btn btn-ghost-light">Administrar galería</a>
+      </p>
+    <?php endif; ?>
     <div class="gallery-grid" data-reveal>
       <a href="/panel/galeria/alberca" class="gallery-item gallery-item--wide">
         <span class="gallery-thumb thumb-1"></span>
