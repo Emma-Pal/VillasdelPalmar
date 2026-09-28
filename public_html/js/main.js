@@ -13,6 +13,21 @@ if (header) {
   window.addEventListener('scroll', updateHeader);
 }
 
+// ===== Estados de cuenta (Pompa): el sistema externo directamente da
+// error si se abre desde el celular — mejor avisar antes que dejar que
+// la persona llegue a esa pantalla rota. 700px es el mismo punto donde el
+// resto del sitio ya considera que es una pantalla de celular. =====
+const linkEstadosCuenta = document.getElementById('nav-estados-cuenta');
+
+if (linkEstadosCuenta) {
+  linkEstadosCuenta.addEventListener('click', (event) => {
+    if (window.innerWidth <= 700) {
+      event.preventDefault();
+      alert('El sistema de Estados de cuenta solo funciona desde una computadora  Ábrelo desde una computadora para poder consultarlo.');
+    }
+  });
+}
+
 // ===== Menú móvil =====
 const navToggle = document.getElementById('nav-toggle');
 const navMenu = document.getElementById('nav-menu');
