@@ -777,6 +777,36 @@ input[type="date"]::-webkit-datetime-edit-year-field:focus {
   font-weight: 700;
 }
 
+/* Bloque de "Historia" (Acerca de) — texto corrido en una sola columna con
+   la imagen flotando dentro del párrafo, en vez del layout de dos columnas
+   de .detail-block (para que se vea "integrado" con el texto). */
+.historia {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flow-root;
+}
+
+.historia h2 {
+  font-size: 28px;
+  margin: 4px 0 20px;
+}
+
+.historia p {
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.historia-img {
+  float: right;
+  width: 320px;
+  max-width: 45%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  margin: 4px 0 20px 28px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
 .detail-cta {
   text-align: center;
   padding: 40px 24px 96px;
@@ -886,6 +916,13 @@ input[type="date"]::-webkit-datetime-edit-year-field:focus {
   .detail-block.is-reverse {
     flex-direction: column;
     gap: 24px;
+  }
+
+  .historia-img {
+    float: none;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 0 20px;
   }
 
   .detail-sections {
