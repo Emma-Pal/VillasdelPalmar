@@ -19,7 +19,7 @@
       <a href="/panel/documentos" class="<?= rutaActivaPrefijo('/panel/documentos', $currentPath) ?>">Documentos</a>
       <a href="/panel/directorio" class="<?= rutaActivaPrefijo('/panel/directorio', $currentPath) ?>">Directorio</a>
       <a href="/panel/solicitudes" class="<?= rutaActivaPrefijo('/panel/solicitudes', $currentPath) ?>">Solicitudes</a>
-      <a href="/panel/galeria" class="<?= rutaActivaPrefijo('/panel/galeria', $currentPath) ?>">Galería</a>
+      <a href="/panel/galeria" class="<?= rutaActivaPrefijo('/panel/galeria', $currentPath) ?>">Acerca de</a>
       <a href="/panel/mesa" class="<?= rutaActivaExacta('/panel/mesa', $currentPath) ?>">Comité</a>
       <?php if ($usuario['tipo'] === 'mesa'): ?>
         <a href="/panel/usuarios" class="<?= rutaActivaPrefijo('/panel/usuarios', $currentPath) ?>">Usuarios</a>

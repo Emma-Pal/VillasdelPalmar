@@ -21,7 +21,7 @@ foreach (CATEGORIAS_GALERIA as $cat) {
 
   <section class="page-banner page-banner--plain">
     <div class="page-banner-content">
-      <a href="/panel/galeria" class="back-link">← Volver a la galería</a>
+      <a href="/panel/galeria" class="back-link">← Volver a Acerca de</a>
       <span class="eyebrow">Administración</span>
       <h1>Administrar galería</h1>
       <p class="page-banner-lead">Imágenes agregadas después de las que ya vienen fijas en cada categoría.</p>

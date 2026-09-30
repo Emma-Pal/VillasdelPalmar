@@ -2,8 +2,8 @@
 require_once __DIR__ . '/../../../app/bootstrap.php';
 requireAuth();
 
-$title = 'Galería · Conoce Villas del Palmar';
-$description = 'Fotografías de las instalaciones y amenidades de Villas del Palmar, con sus horarios.';
+$title = 'Acerca de — Villas del Palmar';
+$description = 'La historia de Villas del Palmar y fotografías de sus instalaciones y amenidades, con sus horarios.';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -17,12 +17,59 @@ $description = 'Fotografías de las instalaciones y amenidades de Villas del Pal
   <section class="page-banner page-banner--plain">
     <div class="page-banner-content">
       <span class="eyebrow">Conoce Villas del Palmar</span>
-      <h1>Galería</h1>
-      <p class="page-banner-lead">Fotografías de las instalaciones y amenidades del residencial, con sus horarios.</p>
+      <h1>Acerca de</h1>
+      <p class="page-banner-lead">La historia del condominio y fotografías de sus instalaciones y amenidades.</p>
     </div>
   </section>
 
-  <section class="gallery" style="max-width: var(--max-width); margin: 0 auto; padding: 40px 24px 96px;">
+  <section class="detail-sections" style="padding-bottom: 0;">
+    <div class="detail-block" data-reveal style="align-items: flex-start;">
+      <div class="detail-media">
+        <img src="/images/galeria/entrada-principal-de.jpg" alt="Entrada principal de Villas del Palmar" />
+      </div>
+      <div class="detail-text">
+        <span class="eyebrow">Nuestra historia</span>
+        <h2>Historia del condominio</h2>
+        <p>
+          El Condominio Villas del Palmar se encuentra en una zona privilegiada en la Península de Santiago,
+          municipio de Manzanillo, Colima. Su origen está ligado al desarrollo turístico que tomó forma en esa
+          península durante la segunda mitad del siglo XX y que, con el tiempo, convirtió a Manzanillo en uno
+          de los destinos más conocidos del Pacífico mexicano.
+        </p>
+        <p>
+          En ese entorno se construyeron tres conjuntos residenciales: Villas del Palmar, Villas de PalmAlta
+          y Villas de las Palmas. Aunque cada uno tuvo su propio origen, con los años quedaron incorporados
+          a un mismo régimen de propiedad en condominio. De esa integración surgió el condominio que hoy
+          lleva el nombre de Villas del Palmar.
+        </p>
+        <p>
+          La unión de los tres conjuntos permitió concentrar en una sola administración el mantenimiento
+          de las áreas comunes y reunir en una misma asamblea las decisiones de todos los propietarios.
+        </p>
+        <p>
+          Existen documentos que sitúan el desarrollo, por lo menos, desde la década de 1970. Actualmente
+          el condominio está integrado por 186 villas.
+        </p>
+        <p>
+          A lo largo de estas décadas, la organización interna se ha ido ajustando a lo que las circunstancias
+          han exigido: se formalizó la administración, se estableció un servicio de vigilancia y los
+          propietarios, por medio de la Asamblea y del Comité de Administración, han participado en las
+          decisiones sobre la conservación de las instalaciones.
+        </p>
+        <p>
+          Villas del Palmar es hoy el resultado de aquella integración y del trabajo de varias generaciones
+          de propietarios. Conservar las áreas comunes, mantener una convivencia ordenada y cuidar lo que
+          pertenece a todos siguen siendo las tareas principales de la comunidad.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="gallery" style="max-width: var(--max-width); margin: 0 auto; padding: 56px 24px 96px;">
+    <div style="text-align: center; margin-bottom: 32px;">
+      <span class="eyebrow">Fotografías</span>
+      <h2>Instalaciones y amenidades</h2>
+    </div>
     <?php if ($usuario['tipo'] === 'mesa'): ?>
       <p style="text-align: right; margin-bottom: 16px;">
         <a href="/panel/galeria/admin" class="btn btn-ghost-light">Administrar galería</a>

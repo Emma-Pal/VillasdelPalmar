@@ -20,7 +20,7 @@ $bloquesFijos = 5;
   <!-- ===== Banner ===== -->
   <section class="page-banner" style="background-image: url('/images/galeria/areas-verdes.jpg');">
     <div class="page-banner-content">
-      <a href="/panel/galeria" class="back-link">← Volver a la galería</a>
+      <a href="/panel/galeria" class="back-link">← Volver a Acerca de</a>
       <span class="eyebrow">Espacios comunes</span>
       <h1>Áreas verdes</h1>
       <p class="page-banner-lead">
@@ -144,7 +144,7 @@ $bloquesFijos = 5;
   </div>
 
   <div class="detail-cta" data-reveal>
-    <a href="/panel/galeria" class="back-link back-link--dark" style="justify-content: center; margin: 0 auto;">← Volver a la galería</a>
+    <a href="/panel/galeria" class="back-link back-link--dark" style="justify-content: center; margin: 0 auto;">← Volver a Acerca de</a>
   </div>
 
   <?php include __DIR__ . '/../../partials/footer.php'; ?>
