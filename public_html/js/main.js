@@ -382,3 +382,29 @@ if (avisoModalOverlays.length > 0) {
     if (overlay) abrirModal(overlay);
   }
 }
+
+// ===== Desplegable "Archivos (N)" de la columna Acción, cuando un aviso
+// tiene más de un archivo adjunto (con uno solo, el botón ya es un link de
+// descarga directa y no necesita nada de esto). =====
+document.querySelectorAll('[data-archivos-toggle]').forEach((boton) => {
+  const menu = boton.nextElementSibling;
+  if (!menu) return;
+
+  boton.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const yaAbierto = !menu.hidden;
+    // Cerrar cualquier otro desplegable de archivos que haya quedado abierto.
+    document.querySelectorAll('.archivos-dropdown-menu').forEach((m) => { m.hidden = true; });
+    menu.hidden = yaAbierto;
+  });
+});
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.archivos-dropdown-menu').forEach((m) => { m.hidden = true; });
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    document.querySelectorAll('.archivos-dropdown-menu').forEach((m) => { m.hidden = true; });
+  }
+});

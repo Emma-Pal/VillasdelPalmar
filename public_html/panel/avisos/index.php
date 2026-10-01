@@ -31,6 +31,10 @@ unset($p);
 marcarVisitaAvisos($usuario['id'], date('Y-m-d H:i:s'));
 
 $sufijoQuery = $categoriaActual ? '&categoria=' . urlencode($categoriaActual) : '';
+
+// Para que el botón de "Estado" regrese a la misma categoría/página desde
+// donde se alternó, no siempre al feed general sin filtros.
+$urlActual = $_SERVER['REQUEST_URI'];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -93,19 +97,39 @@ $sufijoQuery = $categoriaActual ? '&categoria=' . urlencode($categoriaActual) : 
                 <td>
                   <span class="badge badge--prioridad-<?= htmlspecialchars($pub['prioridad']) ?>"><?= htmlspecialchars(etiquetaPrioridad($pub['prioridad'])) ?></span>
                 </td>
-                <td>
-                  <span class="badge <?= $pub['publicado'] ? 'badge--ok' : 'badge--alerta' ?>">
-                    <?= $pub['publicado'] ? 'Publicado' : 'Sin publicar' ?>
-                  </span>
+                <td data-no-row-click>
+                  <?php if ($esMesa): ?>
+                    <form method="POST" action="/panel/avisos/estado?id=<?= (int) $pub['id'] ?>">
+                      <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
+                      <input type="hidden" name="volver" value="<?= htmlspecialchars($urlActual) ?>" />
+                      <button
+                        type="submit"
+                        class="badge badge--clic <?= $pub['publicado'] ? 'badge--ok' : 'badge--alerta' ?>"
+                        title="Clic para <?= $pub['publicado'] ? 'pasar a borrador' : 'publicar' ?>"
+                      ><?= $pub['publicado'] ? 'Publicado' : 'Sin publicar' ?></button>
+                    </form>
+                  <?php else: ?>
+                    <span class="badge <?= $pub['publicado'] ? 'badge--ok' : 'badge--alerta' ?>">
+                      <?= $pub['publicado'] ? 'Publicado' : 'Sin publicar' ?>
+                    </span>
+                  <?php endif; ?>
                 </td>
                 <td><?= htmlspecialchars(date('d/m/Y', strtotime($pub['fecha']))) ?></td>
-                <td class="tabla-avisos-archivos" data-no-row-click>
-                  <?php if (!empty($pub['archivos'])): ?>
-                    <?php foreach ($pub['archivos'] as $archivo): ?>
-                      <a href="/panel/archivo?id=<?= (int) $archivo['id'] ?>" class="tabla-archivo-link" title="Descargar: <?= htmlspecialchars($archivo['archivo_nombre_original']) ?>">📎</a>
-                    <?php endforeach; ?>
-                  <?php else: ?>
+                <td data-no-row-click>
+                  <?php $archivosPub = $pub['archivos']; ?>
+                  <?php if (empty($archivosPub)): ?>
                     <span class="tabla-subtexto">—</span>
+                  <?php elseif (count($archivosPub) === 1): ?>
+                    <a href="/panel/archivo?id=<?= (int) $archivosPub[0]['id'] ?>" class="btn-archivos" title="Descargar: <?= htmlspecialchars($archivosPub[0]['archivo_nombre_original']) ?>">Archivos</a>
+                  <?php else: ?>
+                    <div class="archivos-dropdown">
+                      <button type="button" class="btn-archivos" data-archivos-toggle>Archivos (<?= count($archivosPub) ?>)</button>
+                      <div class="archivos-dropdown-menu" hidden>
+                        <?php foreach ($archivosPub as $archivo): ?>
+                          <a href="/panel/archivo?id=<?= (int) $archivo['id'] ?>"><?= htmlspecialchars($archivo['archivo_nombre_original']) ?></a>
+                        <?php endforeach; ?>
+                      </div>
+                    </div>
                   <?php endif; ?>
                 </td>
               </tr>

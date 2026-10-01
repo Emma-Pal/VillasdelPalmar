@@ -186,6 +186,15 @@ function actualizarPublicacion(
     $stmt->execute([$categoria, $prioridad, $destacado ? 1 : 0, $publicado ? 1 : 0, $titulo, $cuerpo, $fechaEvento, date('Y-m-d H:i:s'), $id]);
 }
 
+// Alterna publicado/borrador desde la tabla de /panel/avisos, sin pasar por
+// el formulario completo de edición. No toca editado_en a propósito: esto
+// es un cambio de estado, no una edición de contenido.
+function alternarPublicadoPublicacion($id): void
+{
+    $stmt = db()->prepare('UPDATE publicaciones SET publicado = NOT publicado WHERE id = ?');
+    $stmt->execute([$id]);
+}
+
 // Los registros de la tabla `archivos` se borran solos por el ON DELETE
 // CASCADE; los ARCHIVOS FÍSICOS hay que borrarlos aparte (donde sí se conoce
 // la carpeta de uploads), ANTES de llamar esto.
