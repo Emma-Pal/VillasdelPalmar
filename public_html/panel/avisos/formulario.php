@@ -1,7 +1,14 @@
 <?php
-// Compartido por nueva.php y editar.php (equivalente a aviso-form.ejs, que
-// en la versión Node también era una sola plantilla para ambos casos).
-// Requiere que quien lo incluya ya haya hecho requireMesa().
+// Compartido por nueva.php y editar.php. Requiere que quien lo incluya ya
+// haya hecho requireMesa().
+//
+// A partir del rediseño de oct. 2026 esta pantalla ya NO pregunta la
+// categoría (financiero/mejora/aviso/"otra"): toda publicación creada aquí
+// es categoría 'aviso', fija. La única excepción es cuando se llega desde
+// /panel/asambleas (?categoria=convocatoria o =acta) — ahí la categoría
+// viaja oculta en el formulario, sin selector visible, para no romper ese
+// módulo. Al editar, la categoría existente de la publicación se conserva
+// tal cual (tampoco se puede cambiar desde aquí).
 
 $esEdicion = isset($_GET['id']);
 $publicacionEditada = null;
@@ -17,25 +24,22 @@ if ($esEdicion) {
 $title = ($esEdicion ? 'Editar publicación' : 'Nueva publicación') . ' — Villas del Palmar';
 $description = $esEdicion
     ? 'Editar una publicación existente.'
-    : 'Publicar un nuevo aviso, mejora o estado financiero.';
+    : 'Publicar un nuevo aviso para los propietarios o el comité.';
+
+// Categoría oculta: se conserva al editar; al crear, solo se respeta
+// convocatoria/acta si se llegó desde /panel/asambleas — cualquier otra
+// cosa cae a 'aviso'.
+if ($esEdicion) {
+    $categoriaOculta = $publicacionEditada['categoria'];
+} else {
+    $categoriaOculta = in_array($_GET['categoria'] ?? '', CATEGORIAS_ASAMBLEA, true) ? $_GET['categoria'] : 'aviso';
+}
+$esAsamblea = in_array($categoriaOculta, CATEGORIAS_ASAMBLEA, true);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verificarCsrf();
 
-    $categoriaPost = trim($_POST['categoria'] ?? '');
-    $categoriasFijas = array_merge(CATEGORIAS_BASE, CATEGORIAS_ASAMBLEA);
-    if ($categoriaPost === '__otra__') {
-        $categoria = trim($_POST['categoria_otra'] ?? '');
-        if ($categoria === '') {
-            $categoria = 'aviso'; // no escribió nada en "Otra" — cae a un valor seguro
-        }
-        $categoria = mb_substr($categoria, 0, 50); // límite de la columna en la base de datos
-    } elseif (in_array($categoriaPost, $categoriasFijas, true)) {
-        $categoria = $categoriaPost;
-    } else {
-        $categoria = 'aviso';
-    }
-
+    $categoria = trim($_POST['categoria'] ?? '') ?: 'aviso';
     $titulo = trim($_POST['titulo'] ?? '');
     $cuerpo = trim($_POST['cuerpo'] ?? '');
     $destacado = isset($_POST['destacado']);
@@ -43,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $prioridad = in_array($_POST['prioridad'] ?? '', ['urgente', 'importante', 'informativo'], true)
         ? $_POST['prioridad']
         : 'informativo';
+    $audiencia = in_array($_POST['audiencia'] ?? '', ['todos', 'comite'], true) ? $_POST['audiencia'] : 'todos';
     $fechaEvento = ($categoria === 'convocatoria' && !empty($_POST['fecha_evento'])) ? $_POST['fecha_evento'] : null;
 
     try {
@@ -56,12 +61,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($esEdicion) {
         // Sin fecha: la fecha editorial no se puede tocar al editar, solo se
         // registra que hubo una edición (actualizarPublicacion pone editado_en).
-        actualizarPublicacion($publicacionEditada['id'], $categoria, $titulo, $cuerpo, $destacado, $fechaEvento, $prioridad, $publicado);
+        actualizarPublicacion($publicacionEditada['id'], $categoria, $titulo, $cuerpo, $destacado, $fechaEvento, $prioridad, $publicado, $audiencia);
         $idDestino = $publicacionEditada['id'];
     } else {
         // La fecha SIEMPRE es la de hoy, fijada aquí en el servidor — nunca
         // se confía en un valor que pudiera venir del formulario.
-        $idDestino = crearPublicacion($usuario['id'], $categoria, $titulo, $cuerpo, date('Y-m-d'), $destacado, $fechaEvento, $prioridad, $publicado);
+        $idDestino = crearPublicacion($usuario['id'], $categoria, $titulo, $cuerpo, date('Y-m-d'), $destacado, $fechaEvento, $prioridad, $publicado, $audiencia);
     }
 
     // Los archivos nuevos se agregan a los que ya tenía (no los reemplazan);
@@ -82,26 +87,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $accionFormulario = $esEdicion ? '/panel/avisos/editar?id=' . (int) $publicacionEditada['id'] : '/panel/avisos/nueva';
+$prioridadActual = $esEdicion ? $publicacionEditada['prioridad'] : 'informativo';
+$audienciaActual = $esEdicion ? $publicacionEditada['audiencia'] : 'todos';
+$publicadoActual = $esEdicion ? (bool) $publicacionEditada['publicado'] : true;
 
-// ¿La publicación (al editar) tiene una categoría que no es ninguna de las
-// de fábrica (ni las 3 de avisos, ni convocatoria/acta)? Entonces el select
-// debe abrir directo en "Otra", con el campo de texto ya visible.
-$categoriasFijas = array_merge(CATEGORIAS_BASE, CATEGORIAS_ASAMBLEA);
-$categoriaEsLibre = $esEdicion && !in_array($publicacionEditada['categoria'], $categoriasFijas, true);
-
-// Categorías libres ya usadas antes (para sugerirlas con autocompletar y
-// evitar que se creen variantes del mismo nombre por error de dedo).
-$categoriasLibresExistentes = array_diff(getCategoriasUsadas(), $categoriasFijas);
-
-// Solo aplica al crear (no al editar): permite llegar con la categoría ya
-// preseleccionada, ej. desde el botón "+ Nueva convocatoria" en /panel/asambleas.
-$categoriaPreseleccionada = !$esEdicion ? ($_GET['categoria'] ?? null) : null;
-
-// Marca "selected" en modo edición (categoría actual) o en modo creación
-// cuando se llegó con ?categoria= en la URL. Se calcula aquí (no solo más
-// abajo) porque también decide a dónde apunta el link "Volver a...".
-$categoriaSeleccionada = $esEdicion ? $publicacionEditada['categoria'] : $categoriaPreseleccionada;
-$esAsamblea = in_array($categoriaSeleccionada, CATEGORIAS_ASAMBLEA, true);
 $volverHref = $esAsamblea ? '/panel/asambleas' : '/panel/avisos';
 $volverTexto = $esAsamblea ? '← Volver a asambleas' : '← Volver a avisos';
 ?>
@@ -118,7 +107,7 @@ $volverTexto = $esAsamblea ? '← Volver a asambleas' : '← Volver a avisos';
     <div class="page-banner-content">
       <a href="<?= htmlspecialchars($volverHref) ?>" class="back-link"><?= htmlspecialchars($volverTexto) ?></a>
       <span class="eyebrow">Comité</span>
-      <h1><?= $esEdicion ? 'Editar publicación' : 'Nueva publicación' ?></h1>
+      <h1><?= $esEdicion ? 'Editar publicación' : 'Capturar aviso' ?></h1>
       <?php if (!$esEdicion): ?>
         <p class="page-banner-lead">Se firmará como <?= htmlspecialchars($usuario['nombre']) ?> — <?= htmlspecialchars($usuario['cargo']) ?>.</p>
       <?php endif; ?>
@@ -126,14 +115,14 @@ $volverTexto = $esAsamblea ? '← Volver a asambleas' : '← Volver a avisos';
   </section>
 
   <section class="detail-sections">
-    <div class="form-card" data-reveal style="max-width: 640px; margin: 0 auto;">
+    <div class="form-card-grupo" style="max-width: 680px; margin: 0 auto;">
 
       <!-- OJO: esto va FUERA del <form> de abajo a propósito. Un <form>
            dentro de otro <form> es HTML inválido — el navegador los
            reorganiza de forma impredecible (duplica el campo _csrf, o corta
            el formulario principal antes de tiempo). -->
       <?php if ($esEdicion && !empty($publicacionEditada['archivos'])): ?>
-        <div class="archivos-existentes">
+        <div class="archivos-existentes" style="margin-bottom: 24px;">
           <span class="archivos-existentes-titulo">Archivos ya adjuntos</span>
           <?php foreach ($publicacionEditada['archivos'] as $archivo): ?>
             <div class="archivo-existente">
@@ -155,95 +144,108 @@ $volverTexto = $esAsamblea ? '← Volver a asambleas' : '← Volver a avisos';
         class="contact-form"
       >
         <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
+        <input type="hidden" name="categoria" value="<?= htmlspecialchars($categoriaOculta) ?>" />
 
-        <label>
-          Categoría
-          <select name="categoria" id="categoria-select" required>
-            <option value="financiero" <?= $categoriaSeleccionada === 'financiero' ? 'selected' : '' ?>>Estado financiero</option>
-            <option value="mejora" <?= $categoriaSeleccionada === 'mejora' ? 'selected' : '' ?>>Mejora</option>
-            <option value="aviso" <?= $categoriaSeleccionada === 'aviso' ? 'selected' : '' ?>>Aviso general</option>
-            <option value="convocatoria" <?= $categoriaSeleccionada === 'convocatoria' ? 'selected' : '' ?>>Convocatoria (asamblea)</option>
-            <option value="acta" <?= $categoriaSeleccionada === 'acta' ? 'selected' : '' ?>>Acta (asamblea)</option>
-            <option value="__otra__" <?= $categoriaEsLibre ? 'selected' : '' ?>>Otra (especificar)</option>
-          </select>
-        </label>
+        <div class="form-card" data-reveal>
+          <span class="form-card-numero">1 · Contenido</span>
 
-        <label id="campo-fecha-evento">
-          Fecha de la asamblea
-          <span class="fecha-wrap">
-            <input
-              type="date"
-              name="fecha_evento"
-              class="fecha-real"
-              value="<?= $esEdicion && !empty($publicacionEditada['fecha_evento']) ? htmlspecialchars($publicacionEditada['fecha_evento']) : '' ?>"
-            />
-            <span class="fecha-texto" data-placeholder="Selecciona la fecha de la asamblea"></span>
-            <span class="fecha-wrap-icono" aria-hidden="true">📅</span>
-          </span>
-        </label>
+          <label>
+            Título del aviso
+            <input type="text" name="titulo" value="<?= $esEdicion ? htmlspecialchars($publicacionEditada['titulo']) : '' ?>" placeholder="ej. Suspensión programada de agua — Sección Palmas" required />
+          </label>
 
-        <label id="campo-categoria-otra">
-          Especifica la categoría
-          <input
-            type="text"
-            name="categoria_otra"
-            list="categorias-libres-existentes"
-            maxlength="50"
-            value="<?= $categoriaEsLibre ? htmlspecialchars($publicacionEditada['categoria']) : '' ?>"
-            placeholder="ej. Reglamento interno"
-          />
-          <datalist id="categorias-libres-existentes">
-            <?php foreach ($categoriasLibresExistentes as $cat): ?>
-              <option value="<?= htmlspecialchars($cat) ?>"></option>
-            <?php endforeach; ?>
-          </datalist>
-        </label>
+          <?php if ($esAsamblea): ?>
+            <label id="campo-fecha-evento">
+              Fecha de la asamblea
+              <span class="fecha-wrap">
+                <input
+                  type="date"
+                  name="fecha_evento"
+                  class="fecha-real"
+                  value="<?= $esEdicion && !empty($publicacionEditada['fecha_evento']) ? htmlspecialchars($publicacionEditada['fecha_evento']) : '' ?>"
+                />
+                <span class="fecha-texto" data-placeholder="Selecciona la fecha de la asamblea"></span>
+                <span class="fecha-wrap-icono" aria-hidden="true">📅</span>
+              </span>
+            </label>
+          <?php endif; ?>
 
-        <label>
-          Prioridad
-          <select name="prioridad" required>
-            <?php $prioridadActual = $esEdicion ? $publicacionEditada['prioridad'] : 'informativo'; ?>
-            <option value="urgente" <?= $prioridadActual === 'urgente' ? 'selected' : '' ?>>Urgente</option>
-            <option value="importante" <?= $prioridadActual === 'importante' ? 'selected' : '' ?>>Importante</option>
-            <option value="informativo" <?= $prioridadActual === 'informativo' ? 'selected' : '' ?>>Informativo</option>
-          </select>
-        </label>
+          <div class="campo-grupo">
+            <span class="campo-grupo-label">Prioridad</span>
+            <div class="pill-radio-group" role="radiogroup" aria-label="Prioridad">
+              <label class="pill-radio">
+                <input type="radio" name="prioridad" value="informativo" <?= $prioridadActual === 'informativo' ? 'checked' : '' ?> />
+                <span>Informativo</span>
+              </label>
+              <label class="pill-radio">
+                <input type="radio" name="prioridad" value="importante" <?= $prioridadActual === 'importante' ? 'checked' : '' ?> />
+                <span>Importante</span>
+              </label>
+              <label class="pill-radio">
+                <input type="radio" name="prioridad" value="urgente" <?= $prioridadActual === 'urgente' ? 'checked' : '' ?> />
+                <span>Urgente</span>
+              </label>
+            </div>
+          </div>
 
-        <label>
-          Título
-          <input type="text" name="titulo" value="<?= $esEdicion ? htmlspecialchars($publicacionEditada['titulo']) : '' ?>" placeholder="ej. Estado financiero — agosto 2026" required />
-        </label>
+          <label>
+            Texto del aviso
+            <textarea name="cuerpo" rows="6" placeholder="Redacte el aviso: qué ocurre, a quién afecta, fecha y horario, qué debe hacer el propietario y a quién dirigirse." required><?= $esEdicion ? htmlspecialchars($publicacionEditada['cuerpo']) : '' ?></textarea>
+          </label>
 
-        <?php if ($esEdicion): ?>
-          <p class="form-nota">
-            Fecha de publicación: <strong><?= htmlspecialchars($publicacionEditada['fecha']) ?></strong> (no se puede cambiar).
-          </p>
-        <?php else: ?>
-          <p class="form-nota">
-            Se publicará con la fecha de hoy: <strong><?= date('d/m/Y') ?></strong>.
-          </p>
-        <?php endif; ?>
+          <?php if ($esEdicion): ?>
+            <p class="form-nota">
+              Fecha de publicación: <strong><?= htmlspecialchars($publicacionEditada['fecha']) ?></strong> (no se puede cambiar).
+            </p>
+          <?php else: ?>
+            <p class="form-nota">
+              Se publicará con la fecha de hoy: <strong><?= date('d/m/Y') ?></strong>.
+            </p>
+          <?php endif; ?>
 
-        <label>
-          Contenido
-          <textarea name="cuerpo" rows="6" placeholder="Escribe el contenido de la publicación..." required><?= $esEdicion ? htmlspecialchars($publicacionEditada['cuerpo']) : '' ?></textarea>
-        </label>
+          <div class="campo-grupo">
+            <span class="campo-grupo-label">Archivos adjuntos</span>
+            <label class="dropzone" id="dropzone">
+              <input type="file" name="archivos[]" id="archivos-input" accept=".pdf,.jpg,.jpeg,.png" multiple class="dropzone-input" />
+              <span class="dropzone-icon" aria-hidden="true">⬆</span>
+              <span class="dropzone-text">
+                Arrastra aquí circulares, planos o fotografías
+                <small>PDF, JPG o PNG — <?= $esEdicion ? 'se agregan a los ya existentes' : 'hasta 5 archivos' ?></small>
+              </span>
+              <span class="btn btn-ghost-light dropzone-btn" aria-hidden="true">Seleccionar</span>
+            </label>
+            <p class="dropzone-filenames" id="dropzone-filenames"></p>
+          </div>
+        </div>
 
-        <label>
-          <?= $esEdicion ? 'Agregar más archivos (opcional — PDF o imagen)' : 'Archivos adjuntos (opcional — PDF o imagen, hasta 5)' ?>
-          <input type="file" name="archivos[]" accept=".pdf,.jpg,.jpeg,.png" multiple />
-        </label>
+        <div class="form-card" data-reveal>
+          <span class="form-card-numero">2 · Destinatarios</span>
 
-        <label class="campo-checkbox">
-          <input type="checkbox" name="destacado" <?= $esEdicion && !empty($publicacionEditada['destacado']) ? 'checked' : '' ?> />
-          Marcar como destacado (aparece primero en Avisos y en el Panel)
-        </label>
+          <div class="campo-grupo">
+            <span class="campo-grupo-label">Dirigido a</span>
+            <div class="pill-radio-group" role="radiogroup" aria-label="Dirigido a">
+              <label class="pill-radio pill-radio--grande">
+                <input type="radio" name="audiencia" value="todos" <?= $audienciaActual === 'todos' ? 'checked' : '' ?> />
+                <span>Todos los propietarios</span>
+              </label>
+              <label class="pill-radio pill-radio--grande">
+                <input type="radio" name="audiencia" value="comite" <?= $audienciaActual === 'comite' ? 'checked' : '' ?> />
+                <span>Comité de Administración</span>
+              </label>
+            </div>
+            <p class="form-nota">Si eliges "Comité de Administración", los propietarios no podrán ver esta publicación.</p>
+          </div>
 
-        <label class="campo-checkbox">
-          <?php $publicadoActual = $esEdicion ? (bool) $publicacionEditada['publicado'] : true; ?>
-          <input type="checkbox" name="publicado" <?= $publicadoActual ? 'checked' : '' ?> />
-          Publicar ahora (si lo desmarcas, se guarda como borrador — solo lo ve el comité)
-        </label>
+          <label class="campo-checkbox">
+            <input type="checkbox" name="destacado" <?= $esEdicion && !empty($publicacionEditada['destacado']) ? 'checked' : '' ?> />
+            Marcar como destacado (aparece primero en Avisos y en el Panel)
+          </label>
+
+          <label class="campo-checkbox">
+            <input type="checkbox" name="publicado" <?= $publicadoActual ? 'checked' : '' ?> />
+            Publicar ahora (si lo desmarcas, se guarda como borrador — solo lo ve el comité)
+          </label>
+        </div>
 
         <button type="submit" class="btn btn-primary"><?= $esEdicion ? 'Guardar cambios' : 'Publicar' ?></button>
       </form>

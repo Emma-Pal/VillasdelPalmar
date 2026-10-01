@@ -175,21 +175,6 @@ if (tipoSelect && campoCargo) {
   tipoSelect.addEventListener('change', actualizarCampos);
 }
 
-// ===== Formulario de publicaciones: el campo de texto libre solo aplica
-// cuando se elige "Otra (especificar)" en Categoría =====
-const categoriaSelect = document.getElementById('categoria-select');
-const campoCategoriaOtra = document.getElementById('campo-categoria-otra');
-const campoFechaEvento = document.getElementById('campo-fecha-evento');
-
-if (categoriaSelect && (campoCategoriaOtra || campoFechaEvento)) {
-  const actualizarCampoCategoria = () => {
-    if (campoCategoriaOtra) campoCategoriaOtra.hidden = categoriaSelect.value !== '__otra__';
-    if (campoFechaEvento) campoFechaEvento.hidden = categoriaSelect.value !== 'convocatoria';
-  };
-  actualizarCampoCategoria();
-  categoriaSelect.addEventListener('change', actualizarCampoCategoria);
-}
-
 // ===== Campos de fecha: que toda la casilla abra el calendario, no solo
 // el iconito (el navegador por sí solo a veces solo lo abre ahí) =====
 document.querySelectorAll('input[type="date"]').forEach((campo) => {
@@ -229,6 +214,44 @@ document.querySelectorAll('.fecha-wrap').forEach((envoltura) => {
   real.addEventListener('input', actualizarTexto);
   real.addEventListener('change', actualizarTexto);
 });
+
+// ===== Zona de "arrastrar y soltar" para archivos adjuntos (formulario de
+// avisos) — el <input type="file"> real va dentro del <label> (así que un
+// clic normal ya abre el selector solo); esto solo le suma soltar archivos
+// arrastrados y mostrar sus nombres. =====
+const dropzone = document.getElementById('dropzone');
+const dropzoneInput = document.getElementById('archivos-input');
+const dropzoneFilenames = document.getElementById('dropzone-filenames');
+
+if (dropzone && dropzoneInput && dropzoneFilenames) {
+  const actualizarNombres = () => {
+    const nombres = Array.from(dropzoneInput.files).map((archivo) => archivo.name);
+    dropzoneFilenames.textContent = nombres.join(', ');
+  };
+
+  dropzoneInput.addEventListener('change', actualizarNombres);
+
+  ['dragenter', 'dragover'].forEach((evento) => {
+    dropzone.addEventListener(evento, (event) => {
+      event.preventDefault();
+      dropzone.classList.add('is-dragover');
+    });
+  });
+
+  ['dragleave', 'drop'].forEach((evento) => {
+    dropzone.addEventListener(evento, (event) => {
+      event.preventDefault();
+      dropzone.classList.remove('is-dragover');
+    });
+  });
+
+  dropzone.addEventListener('drop', (event) => {
+    if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+      dropzoneInput.files = event.dataTransfer.files;
+      actualizarNombres();
+    }
+  });
+}
 
 // ===== Lightbox de imágenes en publicaciones =====
 // Al hacer clic en una imagen se abre en grande, con una animación de zoom

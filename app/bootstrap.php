@@ -29,5 +29,5 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $avisosNuevos = 0;
 if ($usuario) {
     $ultimaVisita = getUltimaVisitaAvisos($usuario['id']);
-    $avisosNuevos = contarPublicacionesDesde($ultimaVisita);
+    $avisosNuevos = contarPublicacionesDesde($ultimaVisita, $usuario['tipo'] === 'mesa');
 }

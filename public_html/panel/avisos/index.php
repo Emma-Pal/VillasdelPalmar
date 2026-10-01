@@ -91,6 +91,7 @@ $urlActual = $_SERVER['REQUEST_URI'];
                     <?= htmlspecialchars($pub['titulo']) ?>
                     <?php if (!empty($pub['destacado'])): ?><span class="publicacion-destacado">★</span><?php endif; ?>
                     <?php if (!empty($pub['esNueva'])): ?><span class="publicacion-nueva">Nuevo</span><?php endif; ?>
+                    <?php if ($esMesa && $pub['audiencia'] === 'comite'): ?><span class="badge badge--alerta">🔒 Solo comité</span><?php endif; ?>
                   </span>
                   <span class="tabla-subtexto">Publicó: <?= htmlspecialchars($pub['autor_nombre']) ?> · <?= htmlspecialchars($pub['autor_cargo']) ?></span>
                 </td>

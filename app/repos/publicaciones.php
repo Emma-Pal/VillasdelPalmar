@@ -19,20 +19,20 @@ const CATEGORIAS_ASAMBLEA = ['convocatoria', 'acta'];
 // propósito: con PDO::ATTR_EMULATE_PREPARES=false, MySQL rechaza LIMIT/OFFSET
 // si se bindean como texto (error típico "Incorrect arguments to
 // mysqld_stmt_execute").
-// $incluirBorradores: false para propietarios (solo ven publicado=1), true
-// para la mesa (ve también sus borradores sin publicar, para poder
-// administrarlos desde la misma tabla).
-function getPublicaciones(?string $categoria, int $limit = 10, int $offset = 0, bool $incluirBorradores = false): array
+// $esMesa: false para propietarios (solo ven publicado=1 y audiencia='todos'),
+// true para la mesa (ve también sus borradores y lo dirigido solo al
+// comité, para poder administrarlo todo desde la misma tabla).
+function getPublicaciones(?string $categoria, int $limit = 10, int $offset = 0, bool $esMesa = false): array
 {
     $base = 'SELECT p.*, u.nombre AS autor_nombre, u.cargo AS autor_cargo
               FROM publicaciones p
               JOIN usuarios u ON u.id = p.autor_id';
-    $filtroPublicado = $incluirBorradores ? '' : ' AND p.publicado = 1';
+    $filtroVisibilidad = $esMesa ? '' : " AND p.publicado = 1 AND p.audiencia = 'todos'";
 
     if ($categoria) {
-        $sql = "$base WHERE p.categoria = :categoria$filtroPublicado ORDER BY p.destacado DESC, p.fecha DESC, p.id DESC LIMIT :limit OFFSET :offset";
+        $sql = "$base WHERE p.categoria = :categoria$filtroVisibilidad ORDER BY p.destacado DESC, p.fecha DESC, p.id DESC LIMIT :limit OFFSET :offset";
     } else {
-        $sql = "$base WHERE p.categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')$filtroPublicado
+        $sql = "$base WHERE p.categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')$filtroVisibilidad
                 ORDER BY p.destacado DESC, p.fecha DESC, p.id DESC LIMIT :limit OFFSET :offset";
     }
 
@@ -63,15 +63,15 @@ function getCategoriasUsadas(): array
     return $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
-function contarPublicaciones(?string $categoria = null, bool $incluirBorradores = false): int
+function contarPublicaciones(?string $categoria = null, bool $esMesa = false): int
 {
-    $filtroPublicado = $incluirBorradores ? '' : ' AND publicado = 1';
+    $filtroVisibilidad = $esMesa ? '' : " AND publicado = 1 AND audiencia = 'todos'";
     if ($categoria) {
-        $stmt = db()->prepare("SELECT COUNT(*) FROM publicaciones WHERE categoria = ?$filtroPublicado");
+        $stmt = db()->prepare("SELECT COUNT(*) FROM publicaciones WHERE categoria = ?$filtroVisibilidad");
         $stmt->execute([$categoria]);
     } else {
         $stmt = db()->query(
-            "SELECT COUNT(*) FROM publicaciones WHERE categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')$filtroPublicado"
+            "SELECT COUNT(*) FROM publicaciones WHERE categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')$filtroVisibilidad"
         );
     }
     return (int) $stmt->fetchColumn();
@@ -134,15 +134,18 @@ function getPublicacionPorId($id): ?array
 }
 
 // Se compara por fecha de creación real (creado_en), no por la fecha
-// "editorial" (fecha), para saber qué publicaciones son nuevas para un usuario.
-function contarPublicacionesDesde(?string $fechaIso): int
+// "editorial" (fecha), para saber qué publicaciones son nuevas para un
+// usuario. $esMesa decide si cuentan también los borradores y lo dirigido
+// solo al comité (igual que en getPublicaciones/contarPublicaciones).
+function contarPublicacionesDesde(?string $fechaIso, bool $esMesa = false): int
 {
     if (!$fechaIso) {
-        return contarPublicaciones();
+        return contarPublicaciones(null, $esMesa);
     }
+    $filtroVisibilidad = $esMesa ? '' : " AND publicado = 1 AND audiencia = 'todos'";
     $stmt = db()->prepare(
         "SELECT COUNT(*) FROM publicaciones
-         WHERE creado_en > ? AND publicado = 1 AND categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')"
+         WHERE creado_en > ?$filtroVisibilidad AND categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')"
     );
     $stmt->execute([$fechaIso]);
     return (int) $stmt->fetchColumn();
@@ -157,13 +160,14 @@ function crearPublicacion(
     bool $destacado = false,
     ?string $fechaEvento = null,
     string $prioridad = 'informativo',
-    bool $publicado = true
+    bool $publicado = true,
+    string $audiencia = 'todos'
 ): string {
     $stmt = db()->prepare(
-        'INSERT INTO publicaciones (autor_id, categoria, prioridad, destacado, publicado, titulo, cuerpo, fecha, fecha_evento, creado_en)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO publicaciones (autor_id, categoria, prioridad, destacado, publicado, audiencia, titulo, cuerpo, fecha, fecha_evento, creado_en)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
-    $stmt->execute([$autorId, $categoria, $prioridad, $destacado ? 1 : 0, $publicado ? 1 : 0, $titulo, $cuerpo, $fecha, $fechaEvento, date('Y-m-d H:i:s')]);
+    $stmt->execute([$autorId, $categoria, $prioridad, $destacado ? 1 : 0, $publicado ? 1 : 0, $audiencia, $titulo, $cuerpo, $fecha, $fechaEvento, date('Y-m-d H:i:s')]);
     return db()->lastInsertId();
 }
 
@@ -178,12 +182,13 @@ function actualizarPublicacion(
     bool $destacado = false,
     ?string $fechaEvento = null,
     string $prioridad = 'informativo',
-    bool $publicado = true
+    bool $publicado = true,
+    string $audiencia = 'todos'
 ): void {
     $stmt = db()->prepare(
-        'UPDATE publicaciones SET categoria = ?, prioridad = ?, destacado = ?, publicado = ?, titulo = ?, cuerpo = ?, fecha_evento = ?, editado_en = ? WHERE id = ?'
+        'UPDATE publicaciones SET categoria = ?, prioridad = ?, destacado = ?, publicado = ?, audiencia = ?, titulo = ?, cuerpo = ?, fecha_evento = ?, editado_en = ? WHERE id = ?'
     );
-    $stmt->execute([$categoria, $prioridad, $destacado ? 1 : 0, $publicado ? 1 : 0, $titulo, $cuerpo, $fechaEvento, date('Y-m-d H:i:s'), $id]);
+    $stmt->execute([$categoria, $prioridad, $destacado ? 1 : 0, $publicado ? 1 : 0, $audiencia, $titulo, $cuerpo, $fechaEvento, date('Y-m-d H:i:s'), $id]);
 }
 
 // Alterna publicado/borrador desde la tabla de /panel/avisos, sin pasar por

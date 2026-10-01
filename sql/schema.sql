@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS publicaciones (
   prioridad ENUM('urgente','importante','informativo') NOT NULL DEFAULT 'informativo',
   destacado TINYINT(1) NOT NULL DEFAULT 0,  -- aparece primero en Avisos y en el Panel
   publicado TINYINT(1) NOT NULL DEFAULT 1,  -- 0 = borrador, solo visible para la mesa
+  audiencia ENUM('todos','comite') NOT NULL DEFAULT 'todos', -- 'comite' = invisible para propietarios
   titulo VARCHAR(255) NOT NULL,
   cuerpo TEXT NOT NULL,
   fecha DATE NOT NULL,                 -- fecha editorial; se fija sola al crear, nunca se edita
@@ -129,3 +130,7 @@ CREATE TABLE IF NOT EXISTS galeria_items (
 -- ALTER TABLE publicaciones
 --   ADD COLUMN prioridad ENUM('urgente','importante','informativo') NOT NULL DEFAULT 'informativo' AFTER categoria,
 --   ADD COLUMN publicado TINYINT(1) NOT NULL DEFAULT 1 AFTER destacado;
+
+-- ===== Migración 2026-10b: Destinatarios (Todos / Comité) =====
+-- ALTER TABLE publicaciones
+--   ADD COLUMN audiencia ENUM('todos','comite') NOT NULL DEFAULT 'todos' AFTER publicado;

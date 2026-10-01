@@ -41,6 +41,12 @@ function etiquetaPrioridad(string $prioridad): string
     return $etiquetas[$prioridad] ?? $prioridad;
 }
 
+// Etiqueta legible de a quién va dirigida una publicación.
+function etiquetaAudiencia(string $audiencia): string
+{
+    return $audiencia === 'comite' ? 'Comité' : 'Todos';
+}
+
 // Etiqueta legible de los estatus usados por acuerdos ('cumplido') y
 // solicitudes ('resuelto') — comparten pendiente/en_progreso, cada uno
 // agrega su propio estado final.
