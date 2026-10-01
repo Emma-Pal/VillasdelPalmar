@@ -39,6 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $titulo = trim($_POST['titulo'] ?? '');
     $cuerpo = trim($_POST['cuerpo'] ?? '');
     $destacado = isset($_POST['destacado']);
+    $publicado = isset($_POST['publicado']);
+    $prioridad = in_array($_POST['prioridad'] ?? '', ['urgente', 'importante', 'informativo'], true)
+        ? $_POST['prioridad']
+        : 'informativo';
     $fechaEvento = ($categoria === 'convocatoria' && !empty($_POST['fecha_evento'])) ? $_POST['fecha_evento'] : null;
 
     try {
@@ -52,12 +56,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($esEdicion) {
         // Sin fecha: la fecha editorial no se puede tocar al editar, solo se
         // registra que hubo una edición (actualizarPublicacion pone editado_en).
-        actualizarPublicacion($publicacionEditada['id'], $categoria, $titulo, $cuerpo, $destacado, $fechaEvento);
+        actualizarPublicacion($publicacionEditada['id'], $categoria, $titulo, $cuerpo, $destacado, $fechaEvento, $prioridad, $publicado);
         $idDestino = $publicacionEditada['id'];
     } else {
         // La fecha SIEMPRE es la de hoy, fijada aquí en el servidor — nunca
         // se confía en un valor que pudiera venir del formulario.
-        $idDestino = crearPublicacion($usuario['id'], $categoria, $titulo, $cuerpo, date('Y-m-d'), $destacado, $fechaEvento);
+        $idDestino = crearPublicacion($usuario['id'], $categoria, $titulo, $cuerpo, date('Y-m-d'), $destacado, $fechaEvento, $prioridad, $publicado);
     }
 
     // Los archivos nuevos se agregan a los que ya tenía (no los reemplazan);
@@ -196,6 +200,16 @@ $volverTexto = $esAsamblea ? '← Volver a asambleas' : '← Volver a avisos';
         </label>
 
         <label>
+          Prioridad
+          <select name="prioridad" required>
+            <?php $prioridadActual = $esEdicion ? $publicacionEditada['prioridad'] : 'informativo'; ?>
+            <option value="urgente" <?= $prioridadActual === 'urgente' ? 'selected' : '' ?>>Urgente</option>
+            <option value="importante" <?= $prioridadActual === 'importante' ? 'selected' : '' ?>>Importante</option>
+            <option value="informativo" <?= $prioridadActual === 'informativo' ? 'selected' : '' ?>>Informativo</option>
+          </select>
+        </label>
+
+        <label>
           Título
           <input type="text" name="titulo" value="<?= $esEdicion ? htmlspecialchars($publicacionEditada['titulo']) : '' ?>" placeholder="ej. Estado financiero — agosto 2026" required />
         </label>
@@ -223,6 +237,12 @@ $volverTexto = $esAsamblea ? '← Volver a asambleas' : '← Volver a avisos';
         <label class="campo-checkbox">
           <input type="checkbox" name="destacado" <?= $esEdicion && !empty($publicacionEditada['destacado']) ? 'checked' : '' ?> />
           Marcar como destacado (aparece primero en Avisos y en el Panel)
+        </label>
+
+        <label class="campo-checkbox">
+          <?php $publicadoActual = $esEdicion ? (bool) $publicacionEditada['publicado'] : true; ?>
+          <input type="checkbox" name="publicado" <?= $publicadoActual ? 'checked' : '' ?> />
+          Publicar ahora (si lo desmarcas, se guarda como borrador — solo lo ve el comité)
         </label>
 
         <button type="submit" class="btn btn-primary"><?= $esEdicion ? 'Guardar cambios' : 'Publicar' ?></button>

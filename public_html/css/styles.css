@@ -1539,6 +1539,77 @@ a.nav-user:hover {
   color: #2f6b45;
 }
 
+.badge--prioridad-urgente {
+  background: #fdeceb;
+  color: #b23b2e;
+}
+
+.badge--prioridad-importante {
+  background: #fdf3ec;
+  color: #a15a2e;
+}
+
+.badge--prioridad-informativo {
+  background: #eaf1f8;
+  color: #2f5f8a;
+}
+
+/* ===== Tabla de Avisos: cada fila abre el aviso completo en un modal
+   (ver .aviso-modal más abajo) en vez de redirigir a otra página. ===== */
+.tabla-fila-clic {
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.tabla-fila-clic:hover,
+.tabla-fila-clic:focus-visible {
+  background: var(--color-bg);
+}
+
+.tabla-fila-clic:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.tabla-aviso-titulo {
+  display: block;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.tabla-subtexto {
+  display: block;
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.tabla-avisos-archivos {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tabla-archivo-link {
+  font-size: 17px;
+  text-decoration: none;
+  display: inline-block;
+  transition: transform var(--transition);
+}
+
+.tabla-archivo-link:hover {
+  transform: scale(1.15);
+}
+
+.tabla-avisos th:first-child,
+.tabla-avisos td:first-child {
+  width: 38%;
+}
+
+.tabla-avisos td:nth-child(4) {
+  white-space: nowrap;
+}
+
 /* Formulario dentro de tarjeta (agregar movimiento / nueva publicación) */
 .form-card {
   background: var(--color-surface);
@@ -2562,6 +2633,65 @@ a.nav-user:hover {
 
 .lightbox-close:hover {
   background: rgba(255, 255, 255, 0.25);
+}
+
+/* ===== Modal de aviso: la publicación completa, abierta desde una fila de
+   la tabla de /panel/avisos, sin redirigir a otra página. ===== */
+.aviso-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 24px;
+  background: rgba(13, 24, 21, 0.6);
+  overflow-y: auto;
+}
+
+.aviso-modal-overlay[hidden] {
+  display: none;
+}
+
+.aviso-modal {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+}
+
+.aviso-modal .publicacion-card {
+  border: none;
+  border-radius: var(--radius);
+}
+
+.aviso-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1;
+  transition: background var(--transition);
+}
+
+.aviso-modal-close:hover {
+  background: var(--color-border);
+}
+
+@media (max-width: 700px) {
+  .aviso-modal-overlay {
+    padding: 24px 12px;
+  }
 }
 
 /* Archivos ya adjuntos, mostrados en el formulario de edición */

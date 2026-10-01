@@ -29,6 +29,18 @@ function etiquetaCategoria(string $categoria): string
     return $etiquetas[$categoria] ?? $categoria;
 }
 
+// Etiqueta legible de la prioridad de un aviso. Son solo 3 valores fijos
+// (columna ENUM), así que no hace falta un "slug" como el de categoría.
+function etiquetaPrioridad(string $prioridad): string
+{
+    $etiquetas = [
+        'urgente' => 'Urgente',
+        'importante' => 'Importante',
+        'informativo' => 'Informativo',
+    ];
+    return $etiquetas[$prioridad] ?? $prioridad;
+}
+
 // Etiqueta legible de los estatus usados por acuerdos ('cumplido') y
 // solicitudes ('resuelto') — comparten pendiente/en_progreso, cada uno
 // agrega su propio estado final.

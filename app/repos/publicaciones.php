@@ -19,16 +19,20 @@ const CATEGORIAS_ASAMBLEA = ['convocatoria', 'acta'];
 // propósito: con PDO::ATTR_EMULATE_PREPARES=false, MySQL rechaza LIMIT/OFFSET
 // si se bindean como texto (error típico "Incorrect arguments to
 // mysqld_stmt_execute").
-function getPublicaciones(?string $categoria, int $limit = 10, int $offset = 0): array
+// $incluirBorradores: false para propietarios (solo ven publicado=1), true
+// para la mesa (ve también sus borradores sin publicar, para poder
+// administrarlos desde la misma tabla).
+function getPublicaciones(?string $categoria, int $limit = 10, int $offset = 0, bool $incluirBorradores = false): array
 {
     $base = 'SELECT p.*, u.nombre AS autor_nombre, u.cargo AS autor_cargo
               FROM publicaciones p
               JOIN usuarios u ON u.id = p.autor_id';
+    $filtroPublicado = $incluirBorradores ? '' : ' AND p.publicado = 1';
 
     if ($categoria) {
-        $sql = "$base WHERE p.categoria = :categoria ORDER BY p.destacado DESC, p.fecha DESC, p.id DESC LIMIT :limit OFFSET :offset";
+        $sql = "$base WHERE p.categoria = :categoria$filtroPublicado ORDER BY p.destacado DESC, p.fecha DESC, p.id DESC LIMIT :limit OFFSET :offset";
     } else {
-        $sql = "$base WHERE p.categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')
+        $sql = "$base WHERE p.categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')$filtroPublicado
                 ORDER BY p.destacado DESC, p.fecha DESC, p.id DESC LIMIT :limit OFFSET :offset";
     }
 
@@ -59,14 +63,15 @@ function getCategoriasUsadas(): array
     return $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
-function contarPublicaciones(?string $categoria = null): int
+function contarPublicaciones(?string $categoria = null, bool $incluirBorradores = false): int
 {
+    $filtroPublicado = $incluirBorradores ? '' : ' AND publicado = 1';
     if ($categoria) {
-        $stmt = db()->prepare('SELECT COUNT(*) FROM publicaciones WHERE categoria = ?');
+        $stmt = db()->prepare("SELECT COUNT(*) FROM publicaciones WHERE categoria = ?$filtroPublicado");
         $stmt->execute([$categoria]);
     } else {
         $stmt = db()->query(
-            "SELECT COUNT(*) FROM publicaciones WHERE categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')"
+            "SELECT COUNT(*) FROM publicaciones WHERE categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')$filtroPublicado"
         );
     }
     return (int) $stmt->fetchColumn();
@@ -137,7 +142,7 @@ function contarPublicacionesDesde(?string $fechaIso): int
     }
     $stmt = db()->prepare(
         "SELECT COUNT(*) FROM publicaciones
-         WHERE creado_en > ? AND categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')"
+         WHERE creado_en > ? AND publicado = 1 AND categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')"
     );
     $stmt->execute([$fechaIso]);
     return (int) $stmt->fetchColumn();
@@ -150,13 +155,15 @@ function crearPublicacion(
     string $cuerpo,
     string $fecha,
     bool $destacado = false,
-    ?string $fechaEvento = null
+    ?string $fechaEvento = null,
+    string $prioridad = 'informativo',
+    bool $publicado = true
 ): string {
     $stmt = db()->prepare(
-        'INSERT INTO publicaciones (autor_id, categoria, destacado, titulo, cuerpo, fecha, fecha_evento, creado_en)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO publicaciones (autor_id, categoria, prioridad, destacado, publicado, titulo, cuerpo, fecha, fecha_evento, creado_en)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
-    $stmt->execute([$autorId, $categoria, $destacado ? 1 : 0, $titulo, $cuerpo, $fecha, $fechaEvento, date('Y-m-d H:i:s')]);
+    $stmt->execute([$autorId, $categoria, $prioridad, $destacado ? 1 : 0, $publicado ? 1 : 0, $titulo, $cuerpo, $fecha, $fechaEvento, date('Y-m-d H:i:s')]);
     return db()->lastInsertId();
 }
 
@@ -169,12 +176,14 @@ function actualizarPublicacion(
     string $titulo,
     string $cuerpo,
     bool $destacado = false,
-    ?string $fechaEvento = null
+    ?string $fechaEvento = null,
+    string $prioridad = 'informativo',
+    bool $publicado = true
 ): void {
     $stmt = db()->prepare(
-        'UPDATE publicaciones SET categoria = ?, destacado = ?, titulo = ?, cuerpo = ?, fecha_evento = ?, editado_en = ? WHERE id = ?'
+        'UPDATE publicaciones SET categoria = ?, prioridad = ?, destacado = ?, publicado = ?, titulo = ?, cuerpo = ?, fecha_evento = ?, editado_en = ? WHERE id = ?'
     );
-    $stmt->execute([$categoria, $destacado ? 1 : 0, $titulo, $cuerpo, $fechaEvento, date('Y-m-d H:i:s'), $id]);
+    $stmt->execute([$categoria, $prioridad, $destacado ? 1 : 0, $publicado ? 1 : 0, $titulo, $cuerpo, $fechaEvento, date('Y-m-d H:i:s'), $id]);
 }
 
 // Los registros de la tabla `archivos` se borran solos por el ON DELETE

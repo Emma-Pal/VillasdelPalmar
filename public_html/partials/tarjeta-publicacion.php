@@ -35,7 +35,7 @@
           data-lightbox-src="/panel/archivo?id=<?= (int) $archivo['id'] ?>"
           data-lightbox-nombre="<?= htmlspecialchars($archivo['archivo_nombre_original']) ?>"
         >
-          <img src="/panel/archivo?id=<?= (int) $archivo['id'] ?>" alt="<?= htmlspecialchars($archivo['archivo_nombre_original']) ?>" class="publicacion-imagen" />
+          <img src="/panel/archivo?id=<?= (int) $archivo['id'] ?>" alt="<?= htmlspecialchars($archivo['archivo_nombre_original']) ?>" class="publicacion-imagen" loading="lazy" />
         </button>
       <?php endforeach; ?>
     </div>

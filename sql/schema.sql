@@ -19,7 +19,9 @@ CREATE TABLE IF NOT EXISTS publicaciones (
   -- "acta" (con estilo y pestaña propios), la mesa directiva puede escribir
   -- una categoría libre ("Otra") — un ENUM no lo permitiría sin ALTER TABLE.
   categoria VARCHAR(50) NOT NULL,
+  prioridad ENUM('urgente','importante','informativo') NOT NULL DEFAULT 'informativo',
   destacado TINYINT(1) NOT NULL DEFAULT 0,  -- aparece primero en Avisos y en el Panel
+  publicado TINYINT(1) NOT NULL DEFAULT 1,  -- 0 = borrador, solo visible para la mesa
   titulo VARCHAR(255) NOT NULL,
   cuerpo TEXT NOT NULL,
   fecha DATE NOT NULL,                 -- fecha editorial; se fija sola al crear, nunca se edita
@@ -119,3 +121,11 @@ CREATE TABLE IF NOT EXISTS galeria_items (
   creado_en DATETIME NOT NULL,
   FOREIGN KEY (autor_id) REFERENCES usuarios(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ===== Migración 2026-10: Avisos en formato tabla (prioridad + publicado) =====
+-- Si la base de datos ya existe (instalación en producción), correr esto
+-- una sola vez en phpMyAdmin — ya está incluido arriba para instalaciones
+-- nuevas desde cero.
+-- ALTER TABLE publicaciones
+--   ADD COLUMN prioridad ENUM('urgente','importante','informativo') NOT NULL DEFAULT 'informativo' AFTER categoria,
+--   ADD COLUMN publicado TINYINT(1) NOT NULL DEFAULT 1 AFTER destacado;

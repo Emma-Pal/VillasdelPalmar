@@ -294,7 +294,11 @@ if (lightboxOverlay && lightboxImg && lightboxDownload && lightboxClose) {
       lightboxImg.style.transition = '';
       lightboxImg.style.transform = '';
       lightboxImg.style.opacity = '';
-      document.body.style.overflow = '';
+      // Si la imagen se abrió desde dentro de un modal de aviso (ver más
+      // abajo), ese modal sigue abierto detrás — no quitar el scroll
+      // bloqueado en ese caso.
+      const sigueAbiertoOtro = document.querySelector('.aviso-modal-overlay:not([hidden])');
+      if (!sigueAbiertoOtro) document.body.style.overflow = '';
     }, origenRect ? 220 : 0);
   };
 
@@ -314,4 +318,67 @@ if (lightboxOverlay && lightboxImg && lightboxDownload && lightboxClose) {
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !lightboxOverlay.hidden) cerrarLightbox();
   });
+}
+
+// ===== Modal de aviso: abrir la publicación completa (tabla de /panel/avisos)
+// sin salir de la página. Cada fila de la tabla tiene un modal propio, ya
+// renderizado y oculto (mismo partial que antes se mostraba en la lista),
+// identificado por data-modal-target. Un clic en la fila lo muestra; un
+// clic en la celda de "Acción" (los archivos adjuntos) NO debe abrirlo,
+// de ahí el data-no-row-click. =====
+const avisoModalOverlays = document.querySelectorAll('.aviso-modal-overlay');
+
+if (avisoModalOverlays.length > 0) {
+  const abrirModal = (overlay) => {
+    overlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+  };
+
+  const cerrarModal = (overlay) => {
+    overlay.hidden = true;
+    // Solo se quita el scroll bloqueado si no queda ningún otro overlay
+    // abierto (ej. el lightbox de una imagen, abierto desde dentro de este
+    // mismo modal).
+    const sigueAbiertoOtro = document.querySelector('.aviso-modal-overlay:not([hidden]), .lightbox-overlay:not([hidden])');
+    if (!sigueAbiertoOtro) document.body.style.overflow = '';
+  };
+
+  document.querySelectorAll('.tabla-fila-clic[data-modal-target]').forEach((fila) => {
+    const abrirDesdeEstaFila = (event) => {
+      if (event.target.closest('[data-no-row-click], a, button')) return;
+      const overlay = document.getElementById(fila.dataset.modalTarget);
+      if (overlay) abrirModal(overlay);
+    };
+    fila.addEventListener('click', abrirDesdeEstaFila);
+    fila.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        abrirDesdeEstaFila(event);
+      }
+    });
+  });
+
+  avisoModalOverlays.forEach((overlay) => {
+    overlay.querySelectorAll('[data-modal-close]').forEach((boton) => {
+      boton.addEventListener('click', () => cerrarModal(overlay));
+    });
+    overlay.addEventListener('click', (event) => {
+      if (event.target === overlay) cerrarModal(overlay);
+    });
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    const overlayAbierto = document.querySelector('.aviso-modal-overlay:not([hidden])');
+    if (overlayAbierto) cerrarModal(overlayAbierto);
+  });
+
+  // Deep link desde "Últimos avisos" del Panel (/panel/avisos#aviso-42):
+  // antes llevaba a una tarjeta visible en la lista; ahora esa tarjeta vive
+  // dentro de un modal oculto, así que hay que abrirlo directamente.
+  if (location.hash.startsWith('#aviso-')) {
+    const tarjeta = document.querySelector(location.hash);
+    const overlay = tarjeta ? tarjeta.closest('.aviso-modal-overlay') : null;
+    if (overlay) abrirModal(overlay);
+  }
 }
