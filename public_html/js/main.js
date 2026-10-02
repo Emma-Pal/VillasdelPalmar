@@ -178,6 +178,16 @@ if (tipoSelect && (campoCargo || campoVilla)) {
   tipoSelect.addEventListener('change', actualizarCampos);
 }
 
+// ===== Número de villa: solo dígitos, ni siquiera deja escribir una letra
+// (además del patrón HTML, que solo avisa hasta enviar el formulario) =====
+const villaInput = document.getElementById('villa-input');
+
+if (villaInput) {
+  villaInput.addEventListener('input', () => {
+    villaInput.value = villaInput.value.replace(/\D/g, '');
+  });
+}
+
 // ===== Campos de fecha: que toda la casilla abra el calendario, no solo
 // el iconito (el navegador por sí solo a veces solo lo abre ahí) =====
 document.querySelectorAll('input[type="date"]').forEach((campo) => {

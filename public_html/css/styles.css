@@ -514,6 +514,16 @@ section {
   color: var(--color-text-muted);
 }
 
+/* El [hidden] nativo del navegador es solo "display: none" en SU PROPIA hoja
+   de estilos (la del user agent), que siempre pierde contra cualquier regla
+   de display puesta aquí, en la hoja del sitio — sin importar especificidad.
+   Por eso un <label hidden> dentro de .contact-form seguía viéndose. Mismo
+   motivo por el que ya existía este patrón en .lightbox-overlay[hidden] /
+   .aviso-modal-overlay[hidden]. */
+.contact-form label[hidden] {
+  display: none;
+}
+
 .contact-form input,
 .contact-form textarea {
   font-family: var(--font-body);

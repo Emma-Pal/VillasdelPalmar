@@ -42,11 +42,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // El número de villa es obligatorio para una cuenta de propietario (y la
-    // columna además tiene UNIQUE en la base de datos — el catch de abajo
-    // cubre el caso de que dos personas lo manden al mismo tiempo).
-    if ($error === null && $tipo === 'propietario' && $villa === '') {
-        $error = 'El número de villa es obligatorio para una cuenta de propietario.';
+    // El número de villa es obligatorio para una cuenta de propietario y
+    // debe ser solo dígitos (el JS ya evita que se escriban letras, pero
+    // esto es lo que de verdad lo garantiza). La columna además tiene UNIQUE
+    // en la base de datos — el catch de abajo cubre el caso de que dos
+    // personas lo manden al mismo tiempo.
+    if ($error === null && $tipo === 'propietario') {
+        if ($villa === '') {
+            $error = 'El número de villa es obligatorio para una cuenta de propietario.';
+        } elseif (!ctype_digit($villa)) {
+            $error = 'El número de villa solo puede contener dígitos.';
+        }
     }
 
     if ($error === null) {
@@ -148,7 +154,17 @@ $accionFormulario = $esEdicion ? '/panel/usuarios/editar?id=' . (int) $usuarioEd
 
         <label id="campo-villa">
           Número de villa
-          <input type="text" name="villa" value="<?= htmlspecialchars($datosFormulario['villa'] ?? '') ?>" maxlength="20" required />
+          <input
+            type="text"
+            name="villa"
+            id="villa-input"
+            value="<?= htmlspecialchars($datosFormulario['villa'] ?? '') ?>"
+            inputmode="numeric"
+            pattern="[0-9]+"
+            title="Solo números"
+            maxlength="10"
+            required
+          />
         </label>
 
         <label>
