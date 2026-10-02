@@ -165,6 +165,7 @@ $accionFormulario = $esEdicion ? '/panel/usuarios/editar?id=' . (int) $usuarioEd
             maxlength="10"
             required
           />
+          <span class="campo-advertencia" id="villa-advertencia" hidden>Solo se permiten números, sin letras.</span>
         </label>
 
         <label>

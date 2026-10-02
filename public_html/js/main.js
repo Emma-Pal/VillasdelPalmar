@@ -179,12 +179,28 @@ if (tipoSelect && (campoCargo || campoVilla)) {
 }
 
 // ===== Número de villa: solo dígitos, ni siquiera deja escribir una letra
-// (además del patrón HTML, que solo avisa hasta enviar el formulario) =====
+// (además del patrón HTML, que solo avisa hasta enviar el formulario). Si lo
+// que se tecleó o pegó traía algo que no era número, se muestra un aviso
+// breve explicando por qué desapareció. =====
 const villaInput = document.getElementById('villa-input');
+const villaAdvertencia = document.getElementById('villa-advertencia');
 
 if (villaInput) {
+  let temporizadorAdvertenciaVilla = null;
+
   villaInput.addEventListener('input', () => {
-    villaInput.value = villaInput.value.replace(/\D/g, '');
+    const valorEscrito = villaInput.value;
+    const valorSoloNumeros = valorEscrito.replace(/\D/g, '');
+
+    if (villaAdvertencia && valorSoloNumeros !== valorEscrito) {
+      villaAdvertencia.hidden = false;
+      clearTimeout(temporizadorAdvertenciaVilla);
+      temporizadorAdvertenciaVilla = setTimeout(() => {
+        villaAdvertencia.hidden = true;
+      }, 2500);
+    }
+
+    villaInput.value = valorSoloNumeros;
   });
 }
 
