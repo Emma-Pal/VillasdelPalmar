@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'tipo' => $cuenta['tipo'],
             'nombre' => $cuenta['nombre'],
             'cargo' => $cuenta['cargo'],
+            'villa' => $cuenta['villa'],
         ];
         header('Location: /panel');
         exit;

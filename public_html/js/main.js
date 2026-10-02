@@ -163,13 +163,16 @@ if (loginPasswordInput && loginPasswordToggle) {
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-// ===== Formulario de usuario: el campo "Cargo" solo aplica al comité =====
+// ===== Formulario de usuario: "Cargo" solo aplica al comité, "Número de
+// villa" solo a un propietario (cada uno tiene su propia cuenta) =====
 const tipoSelect = document.getElementById('tipo-select');
 const campoCargo = document.getElementById('campo-cargo');
+const campoVilla = document.getElementById('campo-villa');
 
-if (tipoSelect && campoCargo) {
+if (tipoSelect && (campoCargo || campoVilla)) {
   const actualizarCampos = () => {
-    campoCargo.hidden = tipoSelect.value !== 'mesa';
+    if (campoCargo) campoCargo.hidden = tipoSelect.value !== 'mesa';
+    if (campoVilla) campoVilla.hidden = tipoSelect.value !== 'propietario';
   };
   actualizarCampos();
   tipoSelect.addEventListener('change', actualizarCampos);

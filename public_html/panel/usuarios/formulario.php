@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tipo = $_POST['tipo'] ?? 'propietario';
     $nombre = trim($_POST['nombre'] ?? '');
     $cargo = trim($_POST['cargo'] ?? '');
+    $villa = trim($_POST['villa'] ?? '');
     $usuarioLogin = trim($_POST['usuario'] ?? '');
     $password = $_POST['password'] ?? '';
     $passwordConfirmar = $_POST['passwordConfirmar'] ?? '';
@@ -41,12 +42,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // El número de villa es obligatorio para una cuenta de propietario (y la
+    // columna además tiene UNIQUE en la base de datos — el catch de abajo
+    // cubre el caso de que dos personas lo manden al mismo tiempo).
+    if ($error === null && $tipo === 'propietario' && $villa === '') {
+        $error = 'El número de villa es obligatorio para una cuenta de propietario.';
+    }
+
     if ($error === null) {
         try {
             if ($esEdicion) {
                 $id = $usuarioEditado['id'];
                 $passwordHash = $password !== '' ? password_hash($password, PASSWORD_BCRYPT) : null;
-                actualizarUsuario($id, $tipo, $nombre, $cargo, $usuarioLogin, $passwordHash);
+                actualizarUsuario($id, $tipo, $nombre, $cargo, $usuarioLogin, $passwordHash, $villa);
 
                 // Si el usuario se edita a sí mismo, se refresca la sesión
                 // para que el header muestre los datos correctos de inmediato.
@@ -56,24 +64,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'tipo' => $tipo,
                         'nombre' => $nombre,
                         'cargo' => $tipo === 'mesa' ? $cargo : null,
+                        'villa' => $tipo === 'propietario' ? $villa : null,
                     ];
                 }
             } else {
-                crearUsuario($tipo, $nombre, $cargo, $usuarioLogin, password_hash($password, PASSWORD_BCRYPT));
+                crearUsuario($tipo, $nombre, $cargo, $usuarioLogin, password_hash($password, PASSWORD_BCRYPT), $villa);
             }
             header('Location: /panel/usuarios');
             exit;
         } catch (PDOException $e) {
-            $error = stripos($e->getMessage(), 'Duplicate entry') !== false
-                ? 'Ese nombre de usuario ya existe. Elige otro.'
-                : ($esEdicion ? 'No se pudo guardar el cambio. Revisa los datos.' : 'No se pudo crear la cuenta. Revisa los datos.');
+            // MySQL nombra la restricción UNIQUE igual que la columna ("villa"),
+            // pero el formato exacto del mensaje cambia entre versiones (a veces
+            // "for key 'villa'", a veces "for key 'usuarios.villa'") — por eso
+            // se busca "villa" suelto y no la cadena con comillas exactas.
+            if (stripos($e->getMessage(), 'villa') !== false) {
+                $error = 'Ese número de villa ya está registrado con otra cuenta.';
+            } elseif (stripos($e->getMessage(), 'Duplicate entry') !== false) {
+                $error = 'Ese nombre de usuario ya existe. Elige otro.';
+            } else {
+                $error = $esEdicion ? 'No se pudo guardar el cambio. Revisa los datos.' : 'No se pudo crear la cuenta. Revisa los datos.';
+            }
         }
     }
 
     // Si hubo error, se conservan los datos capturados para no perderlos.
-    $datosFormulario = ['tipo' => $tipo, 'nombre' => $nombre, 'cargo' => $cargo, 'usuario' => $usuarioLogin];
+    $datosFormulario = ['tipo' => $tipo, 'nombre' => $nombre, 'cargo' => $cargo, 'villa' => $villa, 'usuario' => $usuarioLogin];
 } else {
-    $datosFormulario = $usuarioEditado ?: ['tipo' => 'propietario', 'nombre' => '', 'cargo' => '', 'usuario' => ''];
+    $datosFormulario = $usuarioEditado ?: ['tipo' => 'propietario', 'nombre' => '', 'cargo' => '', 'villa' => '', 'usuario' => ''];
 }
 
 $accionFormulario = $esEdicion ? '/panel/usuarios/editar?id=' . (int) $usuarioEditado['id'] : '/panel/usuarios/nuevo';
@@ -114,7 +131,7 @@ $accionFormulario = $esEdicion ? '/panel/usuarios/editar?id=' . (int) $usuarioEd
         <label>
           Tipo de cuenta
           <select name="tipo" id="tipo-select" required>
-            <option value="propietario" <?= $datosFormulario['tipo'] === 'propietario' ? 'selected' : '' ?>>Propietario (cuenta compartida)</option>
+            <option value="propietario" <?= $datosFormulario['tipo'] === 'propietario' ? 'selected' : '' ?>>Propietario</option>
             <option value="mesa" <?= $datosFormulario['tipo'] === 'mesa' ? 'selected' : '' ?>>Comité (privilegios de administrador)</option>
           </select>
         </label>
@@ -127,6 +144,11 @@ $accionFormulario = $esEdicion ? '/panel/usuarios/editar?id=' . (int) $usuarioEd
         <label id="campo-cargo">
           Cargo (ej. "Tesorero")
           <input type="text" name="cargo" value="<?= htmlspecialchars($datosFormulario['cargo'] ?? '') ?>" />
+        </label>
+
+        <label id="campo-villa">
+          Número de villa
+          <input type="text" name="villa" value="<?= htmlspecialchars($datosFormulario['villa'] ?? '') ?>" maxlength="20" required />
         </label>
 
         <label>

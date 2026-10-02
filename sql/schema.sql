@@ -7,6 +7,12 @@ CREATE TABLE IF NOT EXISTS usuarios (
   tipo ENUM('propietario','mesa') NOT NULL,
   nombre VARCHAR(150) NOT NULL,
   cargo VARCHAR(100) NULL,             -- solo aplica a mesa directiva (ej. "Tesorero")
+  -- Solo aplica a propietario (cada propietario tiene su propia cuenta y su
+  -- propia villa — ya no es una sola cuenta compartida). UNIQUE y no único
+  -- parte de una PK compuesta: en InnoDB, varios NULL sí pueden coexistir en
+  -- una columna UNIQUE (las cuentas de mesa, que no tienen villa), pero dos
+  -- filas nunca pueden compartir el mismo número de villa.
+  villa VARCHAR(20) NULL UNIQUE,
   usuario VARCHAR(100) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
   ultima_visita_avisos DATETIME NULL   -- para saber qué publicaciones son "nuevas" para este usuario
@@ -134,3 +140,7 @@ CREATE TABLE IF NOT EXISTS galeria_items (
 -- ===== Migración 2026-10b: Destinatarios (Todos / Comité) =====
 -- ALTER TABLE publicaciones
 --   ADD COLUMN audiencia ENUM('todos','comite') NOT NULL DEFAULT 'todos' AFTER publicado;
+
+-- ===== Migración 2026-10c: Cuenta individual por propietario (número de villa) =====
+-- ALTER TABLE usuarios
+--   ADD COLUMN villa VARCHAR(20) NULL UNIQUE AFTER cargo;

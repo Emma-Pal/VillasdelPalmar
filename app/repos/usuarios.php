@@ -27,31 +27,33 @@ function getUsuarios(): array
     return db()->query('SELECT * FROM usuarios ORDER BY tipo DESC, cargo, nombre')->fetchAll();
 }
 
-function crearUsuario(string $tipo, string $nombre, ?string $cargo, string $usuario, string $passwordHash): string
+function crearUsuario(string $tipo, string $nombre, ?string $cargo, string $usuario, string $passwordHash, ?string $villa = null): string
 {
     $cargoFinal = $tipo === 'mesa' ? ($cargo ?: null) : null;
+    $villaFinal = $tipo === 'propietario' ? ($villa ?: null) : null;
     $stmt = db()->prepare(
-        'INSERT INTO usuarios (tipo, nombre, cargo, usuario, password_hash) VALUES (?, ?, ?, ?, ?)'
+        'INSERT INTO usuarios (tipo, nombre, cargo, villa, usuario, password_hash) VALUES (?, ?, ?, ?, ?, ?)'
     );
-    $stmt->execute([$tipo, $nombre, $cargoFinal, $usuario, $passwordHash]);
+    $stmt->execute([$tipo, $nombre, $cargoFinal, $villaFinal, $usuario, $passwordHash]);
     return db()->lastInsertId();
 }
 
 // $passwordHash es opcional (null) — si no se manda, se conserva la actual
 // (así "editar" no obliga a resetear la clave).
-function actualizarUsuario($id, string $tipo, string $nombre, ?string $cargo, string $usuario, ?string $passwordHash = null): void
+function actualizarUsuario($id, string $tipo, string $nombre, ?string $cargo, string $usuario, ?string $passwordHash = null, ?string $villa = null): void
 {
     $cargoFinal = $tipo === 'mesa' ? ($cargo ?: null) : null;
+    $villaFinal = $tipo === 'propietario' ? ($villa ?: null) : null;
     if ($passwordHash) {
         $stmt = db()->prepare(
-            'UPDATE usuarios SET tipo = ?, nombre = ?, cargo = ?, usuario = ?, password_hash = ? WHERE id = ?'
+            'UPDATE usuarios SET tipo = ?, nombre = ?, cargo = ?, villa = ?, usuario = ?, password_hash = ? WHERE id = ?'
         );
-        $stmt->execute([$tipo, $nombre, $cargoFinal, $usuario, $passwordHash, $id]);
+        $stmt->execute([$tipo, $nombre, $cargoFinal, $villaFinal, $usuario, $passwordHash, $id]);
     } else {
         $stmt = db()->prepare(
-            'UPDATE usuarios SET tipo = ?, nombre = ?, cargo = ?, usuario = ? WHERE id = ?'
+            'UPDATE usuarios SET tipo = ?, nombre = ?, cargo = ?, villa = ?, usuario = ? WHERE id = ?'
         );
-        $stmt->execute([$tipo, $nombre, $cargoFinal, $usuario, $id]);
+        $stmt->execute([$tipo, $nombre, $cargoFinal, $villaFinal, $usuario, $id]);
     }
 }
 

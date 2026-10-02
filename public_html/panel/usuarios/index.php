@@ -34,7 +34,7 @@ $usuarios = getUsuarios();
           <tr>
             <th>Tipo</th>
             <th>Nombre</th>
-            <th>Cargo</th>
+            <th>Cargo / Villa</th>
             <th>Usuario</th>
             <th></th>
           </tr>
@@ -48,7 +48,7 @@ $usuarios = getUsuarios();
                 </span>
               </td>
               <td><?= htmlspecialchars($u['nombre']) ?></td>
-              <td><?= htmlspecialchars($u['cargo'] ?: '—') ?></td>
+              <td><?= $u['tipo'] === 'mesa' ? htmlspecialchars($u['cargo'] ?: '—') : ($u['villa'] ? 'Villa ' . htmlspecialchars($u['villa']) : '—') ?></td>
               <td><?= htmlspecialchars($u['usuario']) ?></td>
               <td class="tabla-acciones">
                 <a href="/panel/usuarios/editar?id=<?= (int) $u['id'] ?>" class="btn-editar">Editar</a>
