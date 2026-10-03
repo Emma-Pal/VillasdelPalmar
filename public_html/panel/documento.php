@@ -18,7 +18,10 @@ $nombreDescarga = $documento['archivo_nombre_original'];
 
 header('Content-Type: ' . $mime);
 header('Content-Length: ' . filesize($ruta));
-header('Content-Disposition: attachment; filename="' . addslashes($nombreDescarga) . '"; filename*=UTF-8\'\'' . rawurlencode($nombreDescarga));
+// "inline" y no "attachment": el botón de la Guía del propietario dice
+// "Ver PDF" — se abre en una pestaña nueva en vez de forzar la descarga
+// (el navegador igual deja descargarlo desde su propio visor de PDF).
+header('Content-Disposition: inline; filename="' . addslashes($nombreDescarga) . '"; filename*=UTF-8\'\'' . rawurlencode($nombreDescarga));
 header('Cache-Control: private');
 readfile($ruta);
 exit;

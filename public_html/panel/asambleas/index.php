@@ -37,8 +37,6 @@ $actas = array_values(array_filter($actasTodas, function ($a) use ($anioFiltro, 
     return true;
 }));
 
-$mesesCortos = ['', 'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
-
 // Para que las pestañas de Convocatorias no se lleven de encuentro los
 // filtros de Actas (y viceversa, vía el hidden de más abajo) al cambiar uno
 // de los dos grupos de filtros independientes de esta misma página.
@@ -90,7 +88,7 @@ if ($tipoActaFiltro) $sufijoActas .= '&tipo_acta=' . urlencode($tipoActaFiltro);
           <?php foreach ($convocatorias as $c): ?>
             <?php
             $esProxima = !empty($c['fecha_evento']) && $c['fecha_evento'] >= date('Y-m-d');
-            $mesCorto = !empty($c['fecha_evento']) ? $mesesCortos[(int) date('n', strtotime($c['fecha_evento']))] : '—';
+            $mesCorto = !empty($c['fecha_evento']) ? mesAbreviado((int) date('n', strtotime($c['fecha_evento']))) : '—';
             $diaNum = !empty($c['fecha_evento']) ? date('d', strtotime($c['fecha_evento'])) : '--';
             $anioNum = !empty($c['fecha_evento']) ? date('Y', strtotime($c['fecha_evento'])) : '----';
             $documento = $c['archivos'][0] ?? null;
@@ -146,7 +144,7 @@ if ($tipoActaFiltro) $sufijoActas .= '&tipo_acta=' . urlencode($tipoActaFiltro);
         <?php endif; ?>
       </div>
 
-      <form method="GET" action="/panel/asambleas#actas" class="asambleas-filtros">
+      <form method="GET" action="/panel/asambleas#actas" class="filtros-fila">
         <input type="hidden" name="tipo_convocatoria" value="<?= htmlspecialchars((string) $tipoConvocatoriaFiltro) ?>" />
         <label>
           Año

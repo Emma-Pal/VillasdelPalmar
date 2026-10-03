@@ -2382,15 +2382,15 @@ a.nav-user:hover {
   color: var(--color-text-muted);
 }
 
-/* ----- Filtros de Actas (Año / Tipo de asamblea) ----- */
-.asambleas-filtros {
+/* ----- Fila de filtros con selects (Actas en Asambleas, Guía del propietario) ----- */
+.filtros-fila {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
   margin-bottom: 20px;
 }
 
-.asambleas-filtros label {
+.filtros-fila label {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -2399,7 +2399,7 @@ a.nav-user:hover {
   color: var(--color-text-muted);
 }
 
-.asambleas-filtros select {
+.filtros-fila select {
   font-family: var(--font-body);
   font-size: 14px;
   padding: 9px 12px;
@@ -2408,6 +2408,68 @@ a.nav-user:hover {
   background: var(--color-surface);
   color: var(--color-text);
   min-width: 160px;
+}
+
+/* ----- Buscador (Guía del propietario) ----- */
+.buscador-wrap {
+  position: relative;
+}
+
+.buscador-wrap input {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 11px 14px 11px 42px;
+  border-radius: 10px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.buscador-wrap input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.buscador-icono {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+/* ----- Categorías de documento (Guía del propietario) ----- */
+.badge--doc-reglamento {
+  background: #eaf1ee;
+  color: var(--color-primary);
+}
+
+.badge--doc-politica {
+  background: #eaf1f8;
+  color: #2f5f8a;
+}
+
+.badge--doc-carta_formato {
+  background: #fbf1de;
+  color: #8a6a2f;
+}
+
+/* ----- "Versiones anteriores (archivadas)": <details> nativo, sin JS ----- */
+.versiones-anteriores summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-primary);
+  padding: 4px 0;
+}
+
+.versiones-anteriores summary:hover {
+  color: var(--color-accent);
+}
+
+.documento-fila--archivado {
+  opacity: 0.75;
 }
 
 /* ----- Botones Cancelar/Publicar al pie de los modales de captura ----- */
@@ -2494,16 +2556,6 @@ a.nav-user:hover {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 16px 20px;
-}
-
-.documento-link {
-  font-weight: 600;
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-.documento-link:hover .documento-titulo {
-  color: var(--color-accent);
 }
 
 .documento-descripcion {

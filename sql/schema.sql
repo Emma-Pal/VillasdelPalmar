@@ -61,11 +61,18 @@ CREATE TABLE IF NOT EXISTS archivos (
 -- Biblioteca de documentos (reglamento, escritura, políticas, formatos).
 -- Un documento = un archivo (a diferencia de publicaciones, que puede
 -- llevar varios) — por eso no reutiliza la tabla `archivos`.
+-- "Guía del propietario" (rediseño oct. 2026). vigente=0 es una versión
+-- archivada: se reemplazó por una más nueva con el mismo título (ver
+-- "Reemplaza una versión anterior" en el formulario), pero se conserva en
+-- vez de borrarse, para consultar versiones viejas si hace falta.
 CREATE TABLE IF NOT EXISTS documentos (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  categoria ENUM('reglamento','escritura','politica','formato') NOT NULL,
+  categoria ENUM('reglamento','politica','carta_formato') NOT NULL,
   titulo VARCHAR(255) NOT NULL,
   descripcion TEXT NULL,
+  fecha_documento DATE NOT NULL,       -- fecha del documento (editorial, no de captura) — define el orden de la lista
+  vigente_desde DATE NULL,             -- opcional: a partir de cuándo aplica
+  vigente TINYINT(1) NOT NULL DEFAULT 1,
   archivo VARCHAR(255) NOT NULL,
   archivo_nombre_original VARCHAR(255) NOT NULL,
   autor_id INT NOT NULL,
@@ -151,3 +158,18 @@ CREATE TABLE IF NOT EXISTS galeria_items (
 -- correr esto para que todo siga funcionando. Solo bórrala si de verdad no
 -- te interesa conservar los acuerdos que ya se hayan capturado.
 -- DROP TABLE IF EXISTS acuerdos;
+
+-- ===== Migración 2026-10f: "Guía del propietario" (antes "Documentos") =====
+-- 1) Ensanchar el ENUM para poder reacomodar los valores viejos sin perderlos:
+-- ALTER TABLE documentos MODIFY COLUMN categoria ENUM('reglamento','escritura','politica','formato','carta_formato') NOT NULL;
+-- 2) "Escritura constitutiva" y "Formatos" se consolidan en la nueva categoría única "Cartas y formatos":
+-- UPDATE documentos SET categoria = 'carta_formato' WHERE categoria IN ('escritura', 'formato');
+-- 3) Angostar el ENUM a las 3 categorías finales:
+-- ALTER TABLE documentos MODIFY COLUMN categoria ENUM('reglamento','politica','carta_formato') NOT NULL;
+-- 4) Columnas nuevas — fecha_documento se llena con creado_en de cada fila ya existente, como mejor valor de partida:
+-- ALTER TABLE documentos
+--   ADD COLUMN fecha_documento DATE NULL AFTER categoria,
+--   ADD COLUMN vigente_desde DATE NULL AFTER fecha_documento,
+--   ADD COLUMN vigente TINYINT(1) NOT NULL DEFAULT 1 AFTER vigente_desde;
+-- UPDATE documentos SET fecha_documento = DATE(creado_en) WHERE fecha_documento IS NULL;
+-- ALTER TABLE documentos MODIFY COLUMN fecha_documento DATE NOT NULL;

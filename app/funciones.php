@@ -33,6 +33,14 @@ function etiquetaTipoAsamblea(?string $tipo): string
     return $tipo === 'extraordinaria' ? 'Extraordinaria' : 'Ordinaria';
 }
 
+// Mes abreviado en mayúsculas (ENE, FEB, ...) para el "bloque de fecha" tipo
+// hoja de calendario — usado en Asambleas y en Guía del propietario.
+function mesAbreviado(int $numeroMes): string
+{
+    $meses = ['', 'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+    return $meses[$numeroMes] ?? '';
+}
+
 // Etiqueta legible de los estatus de una solicitud.
 function etiquetaEstatus(string $estatus): string
 {

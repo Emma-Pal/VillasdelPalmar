@@ -11,8 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($documento) {
         @unlink(rutaArchivoFisico($documento['archivo']));
         eliminarDocumento($id);
-        header('Location: /panel/documentos#categoria-' . $documento['categoria']);
-        exit;
     }
 }
 
