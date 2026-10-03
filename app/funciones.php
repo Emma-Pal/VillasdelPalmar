@@ -41,6 +41,12 @@ function etiquetaPrioridad(string $prioridad): string
     return $etiquetas[$prioridad] ?? $prioridad;
 }
 
+// Etiqueta legible del tipo de una convocatoria/acta.
+function etiquetaTipoAsamblea(?string $tipo): string
+{
+    return $tipo === 'extraordinaria' ? 'Extraordinaria' : 'Ordinaria';
+}
+
 // Etiqueta legible de a quién va dirigida una publicación.
 function etiquetaAudiencia(string $audiencia): string
 {

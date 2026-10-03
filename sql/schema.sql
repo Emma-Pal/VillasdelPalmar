@@ -32,7 +32,13 @@ CREATE TABLE IF NOT EXISTS publicaciones (
   titulo VARCHAR(255) NOT NULL,
   cuerpo TEXT NOT NULL,
   fecha DATE NOT NULL,                 -- fecha editorial; se fija sola al crear, nunca se edita
-  fecha_evento DATE NULL,              -- solo para categoria='convocatoria': fecha de la asamblea
+  fecha_evento DATE NULL,              -- fecha de la asamblea (convocatoria y, opcional, acta)
+  -- Las 4 columnas siguientes solo aplican a categoria IN ('convocatoria','acta') —
+  -- rediseño de /panel/asambleas, oct. 2026.
+  tipo_asamblea ENUM('ordinaria','extraordinaria') NULL,
+  hora_evento TIME NULL,               -- solo convocatoria: hora de la 1a convocatoria
+  lugar_evento VARCHAR(255) NULL,      -- solo convocatoria
+  anio_asamblea SMALLINT NULL,         -- solo acta: año al que corresponde (independiente de fecha_evento, que ahí es opcional)
   creado_en DATETIME NOT NULL,         -- fecha/hora real de creación
   editado_en DATETIME NULL,            -- se llena cada vez que se guarda una edición
   FOREIGN KEY (autor_id) REFERENCES usuarios(id)
@@ -144,3 +150,10 @@ CREATE TABLE IF NOT EXISTS galeria_items (
 -- ===== Migración 2026-10c: Cuenta individual por propietario (número de villa) =====
 -- ALTER TABLE usuarios
 --   ADD COLUMN villa VARCHAR(20) NULL UNIQUE AFTER cargo;
+
+-- ===== Migración 2026-10d: Rediseño de Asambleas (convocatorias y actas) =====
+-- ALTER TABLE publicaciones
+--   ADD COLUMN tipo_asamblea ENUM('ordinaria','extraordinaria') NULL AFTER fecha_evento,
+--   ADD COLUMN hora_evento TIME NULL AFTER tipo_asamblea,
+--   ADD COLUMN lugar_evento VARCHAR(255) NULL AFTER hora_evento,
+--   ADD COLUMN anio_asamblea SMALLINT NULL AFTER lugar_evento;

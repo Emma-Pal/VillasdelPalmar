@@ -2493,6 +2493,182 @@ a.nav-user:hover {
   flex-wrap: wrap;
 }
 
+.seccion-subtexto {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+/* ----- Convocatorias: fila con bloque de fecha tipo "hoja de calendario" ----- */
+.convocatorias-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.convocatoria-fila {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 22px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.fecha-bloque {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 68px;
+  padding: 10px 0;
+  border: 1.5px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg);
+}
+
+.fecha-bloque-mes {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-accent);
+}
+
+.fecha-bloque-dia {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-text);
+}
+
+.fecha-bloque-anio {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.convocatoria-info {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.convocatoria-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.convocatoria-info h3 {
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+
+.convocatoria-meta {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.convocatoria-mensaje {
+  font-size: 14px;
+  color: var(--color-text);
+  margin: 10px 0 0;
+}
+
+.convocatoria-pdf-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ----- Pastillas de tipo/estado de asamblea (convocatorias y actas) ----- */
+.badge--tipo-ordinaria {
+  background: #eaf1f8;
+  color: #2f5f8a;
+}
+
+.badge--tipo-extraordinaria {
+  background: #f1eef8;
+  color: #5b4a8a;
+}
+
+.badge--estado-proxima {
+  background: #f1f8f3;
+  color: #2f6b45;
+}
+
+.badge--estado-celebrada {
+  background: #eef0ee;
+  color: var(--color-text-muted);
+}
+
+/* ----- Filtros de Actas (Año / Tipo de asamblea) ----- */
+.asambleas-filtros {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.asambleas-filtros label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.asambleas-filtros select {
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  min-width: 160px;
+}
+
+/* ----- Botones Cancelar/Publicar al pie de los modales de captura ----- */
+.modal-botones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+@media (max-width: 700px) {
+  .convocatoria-fila {
+    flex-direction: column;
+  }
+
+  .fecha-bloque {
+    flex-direction: row;
+    width: auto;
+    gap: 6px;
+    padding: 6px 14px;
+  }
+
+  .convocatoria-pdf-btn {
+    align-self: stretch;
+    text-align: center;
+  }
+
+  .modal-botones {
+    flex-direction: column-reverse;
+  }
+
+  .modal-botones .btn {
+    width: 100%;
+  }
+}
+
 .acuerdos-lista {
   display: flex;
   flex-direction: column;

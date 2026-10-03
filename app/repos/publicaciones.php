@@ -191,6 +191,51 @@ function actualizarPublicacion(
     $stmt->execute([$categoria, $prioridad, $destacado ? 1 : 0, $publicado ? 1 : 0, $audiencia, $titulo, $cuerpo, $fechaEvento, date('Y-m-d H:i:s'), $id]);
 }
 
+// Crea/edita una convocatoria o acta (categoria IN CATEGORIAS_ASAMBLEA), con
+// sus propios campos (tipo de asamblea, hora/lugar o año) — a propósito
+// SEPARADO de crearPublicacion()/actualizarPublicacion(): así, editar un
+// aviso normal desde /panel/avisos nunca puede pisar estas columnas (que ese
+// formulario ni conoce), y viceversa. Las convocatorias/actas no usan
+// prioridad/destacado/borrador/audiencia (son documentos oficiales, siempre
+// visibles para todos), por eso van fijos aquí y no como parámetros.
+function crearAsamblea(
+    $autorId,
+    string $categoria,
+    string $titulo,
+    string $cuerpo,
+    string $tipoAsamblea,
+    ?string $fechaEvento = null,
+    ?string $horaEvento = null,
+    ?string $lugarEvento = null,
+    ?int $anioAsamblea = null
+): string {
+    $stmt = db()->prepare(
+        "INSERT INTO publicaciones
+            (autor_id, categoria, prioridad, destacado, publicado, audiencia, titulo, cuerpo, fecha, fecha_evento, tipo_asamblea, hora_evento, lugar_evento, anio_asamblea, creado_en)
+         VALUES (?, ?, 'informativo', 0, 1, 'todos', ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    );
+    $stmt->execute([$autorId, $categoria, $titulo, $cuerpo, date('Y-m-d'), $fechaEvento, $tipoAsamblea, $horaEvento, $lugarEvento, $anioAsamblea, date('Y-m-d H:i:s')]);
+    return db()->lastInsertId();
+}
+
+function actualizarAsamblea(
+    $id,
+    string $titulo,
+    string $cuerpo,
+    string $tipoAsamblea,
+    ?string $fechaEvento = null,
+    ?string $horaEvento = null,
+    ?string $lugarEvento = null,
+    ?int $anioAsamblea = null
+): void {
+    $stmt = db()->prepare(
+        'UPDATE publicaciones
+         SET titulo = ?, cuerpo = ?, tipo_asamblea = ?, fecha_evento = ?, hora_evento = ?, lugar_evento = ?, anio_asamblea = ?, editado_en = ?
+         WHERE id = ?'
+    );
+    $stmt->execute([$titulo, $cuerpo, $tipoAsamblea, $fechaEvento, $horaEvento, $lugarEvento, $anioAsamblea, date('Y-m-d H:i:s'), $id]);
+}
+
 // Alterna publicado/borrador desde la tabla de /panel/avisos, sin pasar por
 // el formulario completo de edición. No toca editado_en a propósito: esto
 // es un cambio de estado, no una edición de contenido.

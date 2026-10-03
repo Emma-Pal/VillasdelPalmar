@@ -220,6 +220,21 @@ document.querySelectorAll('input[type="date"]').forEach((campo) => {
   });
 });
 
+// ===== "Concepto del documento" (modal de acta, en Asambleas): el campo de
+// texto libre solo aplica cuando se elige "Otro (especificar)". Puede haber
+// varios en la página (un modal por acta a editar + el de "Nueva acta"),
+// por eso se busca dentro del <form> más cercano en vez de por id. =====
+document.querySelectorAll('.campo-concepto-select').forEach((select) => {
+  const campoOtro = select.closest('form')?.querySelector('.campo-concepto-otro');
+  if (!campoOtro) return;
+
+  const actualizarCampoOtro = () => {
+    campoOtro.hidden = select.value !== '__otro__';
+  };
+  actualizarCampoOtro();
+  select.addEventListener('change', actualizarCampoOtro);
+});
+
 // ===== Casilla de fecha "disfrazada" (.fecha-wrap): el <input type="date">
 // real queda invisible (para que nunca se vea su resaltado nativo) y este
 // texto propio, con los estilos del sitio, muestra el valor por encima. =====
@@ -244,15 +259,18 @@ document.querySelectorAll('.fecha-wrap').forEach((envoltura) => {
   real.addEventListener('change', actualizarTexto);
 });
 
-// ===== Zona de "arrastrar y soltar" para archivos adjuntos (formulario de
-// avisos) — el <input type="file"> real va dentro del <label> (así que un
-// clic normal ya abre el selector solo); esto solo le suma soltar archivos
-// arrastrados y mostrar sus nombres. =====
-const dropzone = document.getElementById('dropzone');
-const dropzoneInput = document.getElementById('archivos-input');
-const dropzoneFilenames = document.getElementById('dropzone-filenames');
+// ===== Zona(s) de "arrastrar y soltar" para archivos adjuntos (formulario
+// de avisos, modales de convocatoria/acta en Asambleas — puede haber varias
+// en la misma página, una por modal) — el <input type="file"> real va
+// dentro del <label> (así que un clic normal ya abre el selector solo);
+// esto solo le suma soltar archivos arrastrados y mostrar sus nombres. Todo
+// por estructura (siguiente hermano / descendiente), sin ids, para que
+// funcione sin importar cuántas haya en la página. =====
+document.querySelectorAll('.dropzone').forEach((dropzone) => {
+  const dropzoneInput = dropzone.querySelector('input[type="file"]');
+  const dropzoneFilenames = dropzone.nextElementSibling;
+  if (!dropzoneInput || !dropzoneFilenames || !dropzoneFilenames.classList.contains('dropzone-filenames')) return;
 
-if (dropzone && dropzoneInput && dropzoneFilenames) {
   const actualizarNombres = () => {
     const nombres = Array.from(dropzoneInput.files).map((archivo) => archivo.name);
     dropzoneFilenames.textContent = nombres.join(', ');
@@ -280,7 +298,7 @@ if (dropzone && dropzoneInput && dropzoneFilenames) {
       actualizarNombres();
     }
   });
-}
+});
 
 // ===== Lightbox de imágenes en publicaciones =====
 // Al hacer clic en una imagen se abre en grande, con una animación de zoom
@@ -416,6 +434,17 @@ if (avisoModalOverlays.length > 0) {
     });
     overlay.addEventListener('click', (event) => {
       if (event.target === overlay) cerrarModal(overlay);
+    });
+  });
+
+  // Disparador genérico: cualquier botón con data-modal-open="id-del-modal"
+  // lo abre directamente (ej. "+ Nueva convocatoria", "Editar" en una fila
+  // de Asambleas) — el modal destino ya vive renderizado y oculto en la
+  // página, igual que los de arriba.
+  document.querySelectorAll('[data-modal-open]').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      const overlay = document.getElementById(boton.dataset.modalOpen);
+      if (overlay) abrirModal(overlay);
     });
   });
 
