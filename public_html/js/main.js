@@ -64,21 +64,6 @@ const revealObserver = new IntersectionObserver(
 
 revealTargets.forEach((el) => revealObserver.observe(el));
 
-// ===== Formulario de contacto (aún sin backend real) =====
-// Solo existe en la página de inicio, por eso se revisa antes de usarlo
-// (este mismo archivo se comparte con las páginas de detalle).
-const form = document.getElementById('contact-form');
-const formNote = document.getElementById('form-note');
-
-if (form) {
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    // TODO: conectar con un endpoint en Express (ej. POST /api/contacto)
-    formNote.hidden = false;
-    form.reset();
-  });
-}
-
 // ===== Panel: carrusel de la galería (fotos reales del residencial) =====
 const galeriaMain = document.getElementById('galeria-main');
 const galeriaSlides = window.VP_GALERIA_SLIDES;

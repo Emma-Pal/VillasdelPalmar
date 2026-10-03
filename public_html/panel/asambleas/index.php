@@ -37,8 +37,6 @@ $actas = array_values(array_filter($actasTodas, function ($a) use ($anioFiltro, 
     return true;
 }));
 
-$acuerdos = getAcuerdos();
-
 $mesesCortos = ['', 'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
 
 // Para que las pestañas de Convocatorias no se lleven de encuentro los
@@ -211,46 +209,6 @@ if ($tipoActaFiltro) $sufijoActas .= '&tipo_acta=' . urlencode($tipoActaFiltro);
               <?php endforeach; ?>
             </tbody>
           </table>
-        </div>
-      <?php endif; ?>
-    </div>
-
-    <!-- ===== Acuerdos y seguimiento (sin cambios de formato) ===== -->
-    <div class="asambleas-seccion" id="acuerdos" data-reveal>
-      <div class="section-heading-fila">
-        <h2>Acuerdos y seguimiento</h2>
-        <?php if ($esMesa): ?>
-          <a href="/panel/asambleas/acuerdos/nuevo" class="btn btn-primary">+ Nuevo acuerdo</a>
-        <?php endif; ?>
-      </div>
-      <?php if (empty($acuerdos)): ?>
-        <p class="placeholder-note">Todavía no hay acuerdos registrados.</p>
-      <?php else: ?>
-        <div class="acuerdos-lista">
-          <?php foreach ($acuerdos as $a): ?>
-            <div class="acuerdo-card acuerdo-card--<?= htmlspecialchars($a['estatus']) ?>">
-              <span class="estatus-pill estatus-pill--<?= htmlspecialchars($a['estatus']) ?>"><?= htmlspecialchars(etiquetaEstatus($a['estatus'])) ?></span>
-              <p class="acuerdo-descripcion"><?= nl2brSeguro($a['descripcion']) ?></p>
-              <footer>
-                <span>
-                  <?= htmlspecialchars($a['autor_nombre']) ?>
-                  <?php if (!empty($a['fecha_limite'])): ?>
-                    · Fecha límite: <?= htmlspecialchars(date('d/m/Y', strtotime($a['fecha_limite']))) ?>
-                  <?php endif; ?>
-                </span>
-                <?php if ($esMesa): ?>
-                  <span class="publicacion-acciones">
-                    <a href="/panel/asambleas/acuerdos/editar?id=<?= (int) $a['id'] ?>" class="btn-editar">Editar</a>
-                    <form action="/panel/asambleas/acuerdos/eliminar?id=<?= (int) $a['id'] ?>" method="POST"
-                          onsubmit="return confirm('¿Eliminar este acuerdo?');">
-                      <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
-                      <button type="submit" class="btn-eliminar">Eliminar</button>
-                    </form>
-                  </span>
-                <?php endif; ?>
-              </footer>
-            </div>
-          <?php endforeach; ?>
         </div>
       <?php endif; ?>
     </div>

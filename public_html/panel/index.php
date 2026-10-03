@@ -4,7 +4,7 @@ requireAuth();
 
 $title = 'Panel — Villas del Palmar';
 $description = 'Panel de Villas del Palmar.';
-$ultimasPublicaciones = getPublicaciones(null, 10, 0);
+$ultimasPublicaciones = getPublicaciones(10, 0);
 $totalPublicaciones = contarPublicaciones();
 $proximaAsamblea = getProximaAsamblea();
 
@@ -140,9 +140,6 @@ $slidesGaleria = [
       <?php foreach ($ultimasPublicaciones as $pub): ?>
         <a href="/panel/avisos#aviso-<?= (int) $pub['id'] ?>" class="publicacion-card-link">
           <article class="publicacion-card">
-            <span class="publicacion-categoria publicacion-categoria--<?= categoriaSlug($pub['categoria']) ?>">
-              <?= htmlspecialchars(etiquetaCategoria($pub['categoria'])) ?>
-            </span>
             <?php if (!empty($pub['destacado'])): ?>
               <span class="publicacion-destacado">★ Destacado</span>
             <?php endif; ?>

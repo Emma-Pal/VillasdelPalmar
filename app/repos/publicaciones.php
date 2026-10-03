@@ -2,44 +2,31 @@
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/archivos.php';
 
-// Las 3 categorías "de fábrica", con pestaña y color propio en el diseño.
-// La mesa directiva puede además escribir una categoría libre ("Otra") al
-// crear/editar una publicación — se guarda tal cual y se le da una pestaña
-// dinámica en /panel/avisos (ver getCategoriasUsadas()).
-const CATEGORIAS_BASE = ['financiero', 'mejora', 'aviso'];
-
 // "Convocatoria" y "acta" también usan la tabla publicaciones (misma
 // mecánica de título/cuerpo/archivos/edición), pero viven en /panel/asambleas
-// en vez de /panel/avisos — por eso se excluyen del feed general de avisos,
-// de su contador de "nuevos" y de la lista de categorías libres.
+// en vez de /panel/avisos — por eso se excluyen del feed general de avisos y
+// de su contador de "nuevos".
 const CATEGORIAS_ASAMBLEA = ['convocatoria', 'acta'];
 
-// $categoria puede ser null (sin filtro, pero excluyendo las de asamblea —
-// ver CATEGORIAS_ASAMBLEA). $limit/$offset se bindean como enteros a
+// Desde el rediseño de oct. 2026, /panel/avisos ya no filtra por categoría
+// (el formulario de captura dejó de preguntarla — toda publicación nueva es
+// categoría 'aviso' fija). $limit/$offset se bindean como enteros a
 // propósito: con PDO::ATTR_EMULATE_PREPARES=false, MySQL rechaza LIMIT/OFFSET
 // si se bindean como texto (error típico "Incorrect arguments to
 // mysqld_stmt_execute").
 // $esMesa: false para propietarios (solo ven publicado=1 y audiencia='todos'),
 // true para la mesa (ve también sus borradores y lo dirigido solo al
 // comité, para poder administrarlo todo desde la misma tabla).
-function getPublicaciones(?string $categoria, int $limit = 10, int $offset = 0, bool $esMesa = false): array
+function getPublicaciones(int $limit = 10, int $offset = 0, bool $esMesa = false): array
 {
-    $base = 'SELECT p.*, u.nombre AS autor_nombre, u.cargo AS autor_cargo
-              FROM publicaciones p
-              JOIN usuarios u ON u.id = p.autor_id';
     $filtroVisibilidad = $esMesa ? '' : " AND p.publicado = 1 AND p.audiencia = 'todos'";
-
-    if ($categoria) {
-        $sql = "$base WHERE p.categoria = :categoria$filtroVisibilidad ORDER BY p.destacado DESC, p.fecha DESC, p.id DESC LIMIT :limit OFFSET :offset";
-    } else {
-        $sql = "$base WHERE p.categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')$filtroVisibilidad
-                ORDER BY p.destacado DESC, p.fecha DESC, p.id DESC LIMIT :limit OFFSET :offset";
-    }
-
-    $stmt = db()->prepare($sql);
-    if ($categoria) {
-        $stmt->bindValue(':categoria', $categoria, PDO::PARAM_STR);
-    }
+    $stmt = db()->prepare(
+        "SELECT p.*, u.nombre AS autor_nombre, u.cargo AS autor_cargo
+         FROM publicaciones p
+         JOIN usuarios u ON u.id = p.autor_id
+         WHERE p.categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')$filtroVisibilidad
+         ORDER BY p.destacado DESC, p.fecha DESC, p.id DESC LIMIT :limit OFFSET :offset"
+    );
     $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     $stmt->execute();
@@ -53,27 +40,12 @@ function getPublicaciones(?string $categoria, int $limit = 10, int $offset = 0, 
     return $filas;
 }
 
-// Todas las categorías que ya se han usado alguna vez (para poder ofrecer
-// pestaña de filtro también a las categorías "libres" que la mesa haya
-// escrito con "Otra", además de las 3 de fábrica). Incluye las de asamblea
-// a propósito — quien llame decide si las resta (ver avisos/index.php).
-function getCategoriasUsadas(): array
-{
-    $stmt = db()->query('SELECT DISTINCT categoria FROM publicaciones ORDER BY categoria');
-    return $stmt->fetchAll(PDO::FETCH_COLUMN);
-}
-
-function contarPublicaciones(?string $categoria = null, bool $esMesa = false): int
+function contarPublicaciones(bool $esMesa = false): int
 {
     $filtroVisibilidad = $esMesa ? '' : " AND publicado = 1 AND audiencia = 'todos'";
-    if ($categoria) {
-        $stmt = db()->prepare("SELECT COUNT(*) FROM publicaciones WHERE categoria = ?$filtroVisibilidad");
-        $stmt->execute([$categoria]);
-    } else {
-        $stmt = db()->query(
-            "SELECT COUNT(*) FROM publicaciones WHERE categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')$filtroVisibilidad"
-        );
-    }
+    $stmt = db()->query(
+        "SELECT COUNT(*) FROM publicaciones WHERE categoria NOT IN ('" . implode("','", CATEGORIAS_ASAMBLEA) . "')$filtroVisibilidad"
+    );
     return (int) $stmt->fetchColumn();
 }
 
@@ -140,7 +112,7 @@ function getPublicacionPorId($id): ?array
 function contarPublicacionesDesde(?string $fechaIso, bool $esMesa = false): int
 {
     if (!$fechaIso) {
-        return contarPublicaciones(null, $esMesa);
+        return contarPublicaciones($esMesa);
     }
     $filtroVisibilidad = $esMesa ? '' : " AND publicado = 1 AND audiencia = 'todos'";
     $stmt = db()->prepare(

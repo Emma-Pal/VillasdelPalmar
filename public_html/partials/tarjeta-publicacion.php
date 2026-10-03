@@ -1,14 +1,13 @@
 <?php
-// Tarjeta de una publicación (aviso, estado financiero, mejora, convocatoria
-// o acta). Compartida por panel/avisos/index.php y panel/asambleas/index.php
-// — recibe $pub (con ['archivos'] ya cargado) y usa las variables globales
-// $usuario/$csrfToken que ya pone app/bootstrap.php en cada página.
-// $pub['esNueva'] es opcional (solo avisos/index.php la calcula).
+// Tarjeta de una publicación (aviso). Usada por el modal de cada fila en
+// panel/avisos/index.php — recibe $pub (con ['archivos'] ya cargado) y usa
+// las variables globales $usuario/$csrfToken que ya pone app/bootstrap.php
+// en cada página. $pub['esNueva'] es opcional (solo avisos/index.php la
+// calcula). Ya no muestra la categoría: desde el rediseño de oct. 2026 todo
+// lo capturado aquí es categoría 'aviso' fija, así que ese badge siempre
+// hubiera dicho lo mismo en cada tarjeta.
 ?>
 <article class="publicacion-card" id="aviso-<?= (int) $pub['id'] ?>">
-  <span class="publicacion-categoria publicacion-categoria--<?= categoriaSlug($pub['categoria']) ?>">
-    <?= htmlspecialchars(etiquetaCategoria($pub['categoria'])) ?>
-  </span>
   <?php if (!empty($pub['destacado'])): ?>
     <span class="publicacion-destacado">★ Destacado</span>
   <?php endif; ?>

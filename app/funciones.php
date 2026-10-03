@@ -15,20 +15,6 @@ function esImagen(string $nombreArchivo): bool
     return (bool) preg_match('/\.(jpe?g|png)$/i', $nombreArchivo);
 }
 
-// Etiqueta legible de cada categoría de publicación. Las 3 de fábrica tienen
-// nombre bonito; una categoría libre ("Otra") se muestra tal cual se escribió.
-function etiquetaCategoria(string $categoria): string
-{
-    $etiquetas = [
-        'financiero' => 'Estado financiero',
-        'mejora' => 'Mejora',
-        'aviso' => 'Aviso',
-        'convocatoria' => 'Convocatoria',
-        'acta' => 'Acta',
-    ];
-    return $etiquetas[$categoria] ?? $categoria;
-}
-
 // Etiqueta legible de la prioridad de un aviso. Son solo 3 valores fijos
 // (columna ENUM), así que no hace falta un "slug" como el de categoría.
 function etiquetaPrioridad(string $prioridad): string
@@ -47,36 +33,15 @@ function etiquetaTipoAsamblea(?string $tipo): string
     return $tipo === 'extraordinaria' ? 'Extraordinaria' : 'Ordinaria';
 }
 
-// Etiqueta legible de a quién va dirigida una publicación.
-function etiquetaAudiencia(string $audiencia): string
-{
-    return $audiencia === 'comite' ? 'Comité' : 'Todos';
-}
-
-// Etiqueta legible de los estatus usados por acuerdos ('cumplido') y
-// solicitudes ('resuelto') — comparten pendiente/en_progreso, cada uno
-// agrega su propio estado final.
+// Etiqueta legible de los estatus de una solicitud.
 function etiquetaEstatus(string $estatus): string
 {
     $etiquetas = [
         'pendiente' => 'Pendiente',
         'en_progreso' => 'En progreso',
-        'cumplido' => 'Cumplido',
         'resuelto' => 'Resuelto',
     ];
     return $etiquetas[$estatus] ?? $estatus;
-}
-
-// Convierte cualquier categoría (incluida una libre, con espacios/acentos/
-// mayúsculas) en un sufijo seguro para usar en una clase CSS, ej.
-// "Reglamento interno" -> "reglamento-interno". Las 3 de fábrica ya son
-// seguras tal cual, así que esto no les cambia nada.
-function categoriaSlug(string $categoria): string
-{
-    $slug = strtolower($categoria);
-    $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
-    $slug = trim($slug, '-');
-    return $slug !== '' ? $slug : 'otra';
 }
 
 // Usadas por partials/portal-header.php para marcar la sección activa del

@@ -55,20 +55,8 @@ CREATE TABLE IF NOT EXISTS archivos (
 
 -- ===== Migración 2026-09: módulos del cliente (Asambleas, Documentos,
 -- Directorio, Solicitudes) =====
-
--- Acuerdos de asamblea, con seguimiento de estatus. No se ligan a una
--- convocatoria/acta específica a propósito (se mantiene simple); si aplica,
--- la referencia se menciona en la propia descripción.
-CREATE TABLE IF NOT EXISTS acuerdos (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  descripcion TEXT NOT NULL,
-  estatus ENUM('pendiente','en_progreso','cumplido') NOT NULL DEFAULT 'pendiente',
-  fecha_limite DATE NULL,
-  autor_id INT NOT NULL,
-  creado_en DATETIME NOT NULL,
-  actualizado_en DATETIME NULL,
-  FOREIGN KEY (autor_id) REFERENCES usuarios(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- (La tabla "acuerdos" que vivía aquí se quitó en el rediseño de Asambleas
+-- de oct. 2026 — ver la migración 2026-10e más abajo.)
 
 -- Biblioteca de documentos (reglamento, escritura, políticas, formatos).
 -- Un documento = un archivo (a diferencia de publicaciones, que puede
@@ -157,3 +145,9 @@ CREATE TABLE IF NOT EXISTS galeria_items (
 --   ADD COLUMN hora_evento TIME NULL AFTER tipo_asamblea,
 --   ADD COLUMN lugar_evento VARCHAR(255) NULL AFTER hora_evento,
 --   ADD COLUMN anio_asamblea SMALLINT NULL AFTER lugar_evento;
+
+-- ===== Migración 2026-10e: se quita "Acuerdos y seguimiento" de Asambleas =====
+-- Opcional — la app ya no usa esta tabla para nada, así que no es necesario
+-- correr esto para que todo siga funcionando. Solo bórrala si de verdad no
+-- te interesa conservar los acuerdos que ya se hayan capturado.
+-- DROP TABLE IF EXISTS acuerdos;

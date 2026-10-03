@@ -5,24 +5,22 @@ requireAuth();
 const POR_PAGINA = 10;
 
 $title = 'Avisos — Villas del Palmar';
-$description = 'Estados financieros, mejoras y avisos de Villas del Palmar.';
+$description = 'Avisos publicados por el comité administrativo de Villas del Palmar.';
 
-$categoriasUsadas = array_diff(getCategoriasUsadas(), CATEGORIAS_ASAMBLEA);
-$categoriaActual = in_array($_GET['categoria'] ?? '', $categoriasUsadas, true) ? $_GET['categoria'] : null;
-$categoriasLibres = array_diff($categoriasUsadas, CATEGORIAS_BASE);
 $paginaActual = max(1, (int) ($_GET['pagina'] ?? 1));
 
 // La mesa ve también sus borradores (publicado=0) para poder administrarlos;
-// un propietario nunca ve nada que no esté publicado.
+// un propietario nunca ve nada que no esté publicado. Ya no hay filtro de
+// categoría (el formulario de captura dejó de preguntarla — ver formulario.php).
 $esMesa = $usuario['tipo'] === 'mesa';
-$total = contarPublicaciones($categoriaActual, $esMesa);
+$total = contarPublicaciones($esMesa);
 $totalPaginas = max(1, (int) ceil($total / POR_PAGINA));
 
 // La fecha de "última visita" ANTES de actualizarla es la que sirve para
 // marcar qué publicaciones son nuevas en esta misma carga de la página.
 $ultimaVisitaAnterior = getUltimaVisitaAvisos($usuario['id']);
 
-$publicaciones = getPublicaciones($categoriaActual, POR_PAGINA, ($paginaActual - 1) * POR_PAGINA, $esMesa);
+$publicaciones = getPublicaciones(POR_PAGINA, ($paginaActual - 1) * POR_PAGINA, $esMesa);
 foreach ($publicaciones as &$p) {
     $p['esNueva'] = $ultimaVisitaAnterior ? $p['creado_en'] > $ultimaVisitaAnterior : true;
 }
@@ -30,9 +28,7 @@ unset($p);
 
 marcarVisitaAvisos($usuario['id'], date('Y-m-d H:i:s'));
 
-$sufijoQuery = $categoriaActual ? '&categoria=' . urlencode($categoriaActual) : '';
-
-// Para que el botón de "Estado" regrese a la misma categoría/página desde
+// Para que el botón de "Estado" regrese a la misma página desde
 // donde se alternó, no siempre al feed general sin filtros.
 $urlActual = $_SERVER['REQUEST_URI'];
 ?>
@@ -49,28 +45,19 @@ $urlActual = $_SERVER['REQUEST_URI'];
     <div class="page-banner-content">
       <span class="eyebrow">Comunicación</span>
       <h1>Avisos</h1>
-      <p class="page-banner-lead">Estados financieros, mejoras y avisos generales publicados por el comité administrativo.</p>
+      <p class="page-banner-lead">Avisos publicados por el comité administrativo.</p>
     </div>
   </section>
 
   <section class="detail-sections">
-    <div class="categoria-tabs" data-reveal>
-      <a href="/panel/avisos" class="categoria-tab <?= !$categoriaActual ? 'is-active' : '' ?>">Todos</a>
-      <a href="/panel/avisos?categoria=financiero" class="categoria-tab <?= $categoriaActual === 'financiero' ? 'is-active' : '' ?>">Estados financieros</a>
-      <a href="/panel/avisos?categoria=mejora" class="categoria-tab <?= $categoriaActual === 'mejora' ? 'is-active' : '' ?>">Mejoras</a>
-      <a href="/panel/avisos?categoria=aviso" class="categoria-tab <?= $categoriaActual === 'aviso' ? 'is-active' : '' ?>">Avisos generales</a>
-
-      <?php foreach ($categoriasLibres as $cat): ?>
-        <a href="/panel/avisos?categoria=<?= urlencode($cat) ?>" class="categoria-tab <?= $categoriaActual === $cat ? 'is-active' : '' ?>"><?= htmlspecialchars(etiquetaCategoria($cat)) ?></a>
-      <?php endforeach; ?>
-
-      <?php if ($usuario['tipo'] === 'mesa'): ?>
-        <a href="/panel/avisos/nueva" class="btn btn-primary categoria-tab-cta">+ Nueva publicación</a>
-      <?php endif; ?>
-    </div>
+    <?php if ($esMesa): ?>
+      <p style="text-align: right; margin-bottom: 16px;" data-reveal>
+        <a href="/panel/avisos/nueva" class="btn btn-primary">+ Nueva publicación</a>
+      </p>
+    <?php endif; ?>
 
     <?php if (empty($publicaciones)): ?>
-      <p class="placeholder-note" data-reveal>No hay publicaciones en esta categoría todavía.</p>
+      <p class="placeholder-note" data-reveal>No hay publicaciones todavía.</p>
     <?php else: ?>
       <div class="tabla-wrap" data-reveal>
         <table class="tabla-pagos tabla-avisos">
@@ -152,11 +139,11 @@ $urlActual = $_SERVER['REQUEST_URI'];
     <?php if ($totalPaginas > 1): ?>
       <nav class="paginacion" data-reveal>
         <?php if ($paginaActual > 1): ?>
-          <a href="/panel/avisos?pagina=<?= $paginaActual - 1 ?><?= $sufijoQuery ?>">← Anterior</a>
+          <a href="/panel/avisos?pagina=<?= $paginaActual - 1 ?>">← Anterior</a>
         <?php endif; ?>
         <span class="paginacion-actual">Página <?= $paginaActual ?> de <?= $totalPaginas ?></span>
         <?php if ($paginaActual < $totalPaginas): ?>
-          <a href="/panel/avisos?pagina=<?= $paginaActual + 1 ?><?= $sufijoQuery ?>">Siguiente →</a>
+          <a href="/panel/avisos?pagina=<?= $paginaActual + 1 ?>">Siguiente →</a>
         <?php endif; ?>
       </nav>
     <?php endif; ?>
