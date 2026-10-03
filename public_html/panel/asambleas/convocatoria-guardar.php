@@ -31,6 +31,10 @@ $cuerpo = trim($_POST['cuerpo'] ?? '');
 $error = null;
 if ($titulo === '' || $fechaEvento === '' || $horaEvento === '' || $lugarEvento === '') {
     $error = 'Faltan campos obligatorios de la convocatoria.';
+} elseif (!preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $horaEvento)) {
+    // El campo de captura (hora-input, en main.js) ya no deja escribir esto
+    // mal — este check es solo por si alguien manda el POST saltándose el JS.
+    $error = 'La hora de la convocatoria no es válida. Usa el formato HH:MM en 24 horas.';
 }
 
 if ($error === null) {

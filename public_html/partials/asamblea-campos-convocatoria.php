@@ -5,6 +5,8 @@
 // publicaciones (con 'archivos' ya cargado) para editar una existente.
 $tipoActual = $conv['tipo_asamblea'] ?? 'ordinaria';
 $documentoActual = $conv['archivos'][0] ?? null;
+// MySQL regresa la hora como "HH:MM:SS" — el campo de captura solo usa HH:MM.
+$horaActual = !empty($conv['hora_evento']) ? substr($conv['hora_evento'], 0, 5) : '';
 ?>
 <div class="campo-grupo">
   <span class="campo-grupo-label">Tipo de asamblea *</span>
@@ -32,7 +34,19 @@ $documentoActual = $conv['archivos'][0] ?? null;
   </label>
   <label style="flex: 1;">
     Hora (1.ª convocatoria) *
-    <input type="time" name="hora_evento" value="<?= htmlspecialchars($conv['hora_evento'] ?? '') ?>" required />
+    <input
+      type="text"
+      name="hora_evento"
+      class="hora-input"
+      value="<?= htmlspecialchars($horaActual) ?>"
+      inputmode="numeric"
+      pattern="^([01]\d|2[0-3]):[0-5]\d$"
+      placeholder="HH:MM"
+      maxlength="5"
+      title="Formato de 24 horas, ej. 14:30"
+      required
+    />
+    <span class="campo-advertencia" hidden>Solo números — usa formato HH:MM en 24 horas (ej. 14:30).</span>
   </label>
 </div>
 

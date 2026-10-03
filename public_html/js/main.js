@@ -204,6 +204,49 @@ if (villaInput) {
   });
 }
 
+// ===== Hora de convocatoria (.hora-input): se teclea directo en vez del
+// selector nativo de hora (tedioso de scrollear). Va formateando "HH:MM"
+// solo mientras se escribe, nunca deja pasar de 23 en horas ni de 59 en
+// minutos, y avisa cuando se intenta algo inválido (una letra, o un número
+// fuera de rango). Puede haber más de uno en la página (un modal por
+// convocatoria a editar + el de "Nueva convocatoria"), por eso querySelectorAll
+// en vez de un id fijo. =====
+document.querySelectorAll('.hora-input').forEach((horaInput) => {
+  const advertencia = horaInput.parentElement.querySelector('.campo-advertencia');
+  let temporizadorAdvertenciaHora = null;
+
+  const avisar = () => {
+    if (!advertencia) return;
+    advertencia.hidden = false;
+    clearTimeout(temporizadorAdvertenciaHora);
+    temporizadorAdvertenciaHora = setTimeout(() => {
+      advertencia.hidden = true;
+    }, 2500);
+  };
+
+  horaInput.addEventListener('input', () => {
+    const crudo = horaInput.value;
+    let huboRechazo = crudo.replace(/\D/g, '').length !== crudo.replace(/:/g, '').length;
+
+    let digitos = crudo.replace(/\D/g, '').slice(0, 4);
+    let horas = digitos.slice(0, 2);
+    let minutos = digitos.slice(2, 4);
+
+    if (horas.length === 2 && parseInt(horas, 10) > 23) {
+      horas = '23';
+      huboRechazo = true;
+    }
+    if (minutos.length === 2 && parseInt(minutos, 10) > 59) {
+      minutos = '59';
+      huboRechazo = true;
+    }
+
+    horaInput.value = horas.length === 2 ? `${horas}:${minutos}` : horas;
+
+    if (huboRechazo) avisar();
+  });
+});
+
 // ===== Campos de fecha: que toda la casilla abra el calendario, no solo
 // el iconito (el navegador por sí solo a veces solo lo abre ahí) =====
 document.querySelectorAll('input[type="date"]').forEach((campo) => {
