@@ -39,9 +39,17 @@ if (!$colaborador || !$nombreArchivo || !file_exists($ruta)) {
 $mime = function_exists('mime_content_type') ? (mime_content_type($ruta) ?: 'application/octet-stream') : 'application/octet-stream';
 $nombreDescarga = $campo === 'foto' ? $nombreArchivo : $colaborador[$columnaArchivo . '_nombre_original'];
 
+// Una imagen se ve en el visor flotante (<img src="...">, que ignora este
+// header de cualquier forma) y ahí mismo se puede "Descargar imagen" — para
+// que ese botón sí fuerce la descarga hace falta "attachment" (mismo
+// comportamiento que panel/archivo.php, que ya usa el mismo visor en
+// Avisos). Un PDF, en cambio, se abre en pestaña nueva para VERSE ahí
+// — por eso se queda "inline".
+$disposicion = esImagen($nombreDescarga) ? 'attachment' : 'inline';
+
 header('Content-Type: ' . $mime);
 header('Content-Length: ' . filesize($ruta));
-header('Content-Disposition: inline; filename="' . addslashes($nombreDescarga) . '"; filename*=UTF-8\'\'' . rawurlencode($nombreDescarga));
+header('Content-Disposition: ' . $disposicion . '; filename="' . addslashes($nombreDescarga) . '"; filename*=UTF-8\'\'' . rawurlencode($nombreDescarga));
 header('Cache-Control: private, no-store');
 readfile($ruta);
 exit;

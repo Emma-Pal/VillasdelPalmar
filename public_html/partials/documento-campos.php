@@ -53,7 +53,7 @@ $categoriaActualDoc = $doc['categoria'] ?? 'reglamento';
   </label>
   <p class="dropzone-filenames"></p>
   <?php if ($esEdicionCampos): ?>
-    <p class="form-nota">Archivo actual: <a href="/panel/documento?id=<?= (int) $doc['id'] ?>" target="_blank" rel="noopener">📎 <?= htmlspecialchars($doc['archivo_nombre_original']) ?></a></p>
+    <p class="form-nota">Archivo actual: <a href="/panel/documento?id=<?= (int) $doc['id'] ?>" target="_blank" rel="noopener" class="btn-editar">Ver</a></p>
   <?php endif; ?>
 </div>
 

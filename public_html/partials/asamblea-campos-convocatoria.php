@@ -68,7 +68,7 @@ $horaActual = !empty($conv['hora_evento']) ? substr($conv['hora_evento'], 0, 5) 
   </label>
   <p class="dropzone-filenames"></p>
   <?php if ($documentoActual): ?>
-    <p class="form-nota">Documento actual: <a href="/panel/archivo?id=<?= (int) $documentoActual['id'] ?>">📎 <?= htmlspecialchars($documentoActual['archivo_nombre_original']) ?></a></p>
+    <p class="form-nota">Documento actual: <a href="/panel/archivo?id=<?= (int) $documentoActual['id'] ?>" target="_blank" rel="noopener" class="btn-editar">Ver</a></p>
   <?php endif; ?>
 </div>
 

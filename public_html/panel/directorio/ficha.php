@@ -15,16 +15,23 @@ $description = 'Expediente de personal de Villas del Palmar.';
 $camposDocumento = ['ine_archivo', 'curp_archivo', 'rfc_archivo', 'nss_archivo', 'domicilio_archivo', 'contrato_archivo'];
 $documentosCargados = count(array_filter($camposDocumento, fn($c) => !empty($col[$c])));
 
-// Helper para pintar "nombre_del_archivo.pdf · Ver", o "—" si no se subió.
+// Pinta un botón/link "Ver" (sin mostrar el nombre del archivo guardado),
+// o "—" si no se subió nada. Una imagen (jpg/png) abre en el visor flotante
+// ya usado en Avisos (data-lightbox-src — ver main.js); un PDF abre en una
+// pestaña nueva, que es como ya se ve en el resto del sitio.
 function filaDocumento(array $col, string $campo, string $etiquetaCorta): void
 {
     $nombre = $col[$campo . '_nombre_original'] ?? null;
     if (!$nombre) {
-        echo '<span class="form-nota">' . htmlspecialchars($etiquetaCorta) . ': —</span>';
+        echo '<span class="form-nota">—</span>';
         return;
     }
     $href = '/panel/colaborador-archivo?id=' . (int) $col['id'] . '&campo=' . explode('_', $campo)[0];
-    echo '<p><a href="' . htmlspecialchars($href) . '" target="_blank" rel="noopener">📄 ' . htmlspecialchars($nombre) . ' · Ver</a></p>';
+    if (esImagen($nombre)) {
+        echo '<button type="button" class="btn-editar" data-lightbox-src="' . htmlspecialchars($href) . '" data-lightbox-nombre="' . htmlspecialchars($etiquetaCorta) . '">Ver</button>';
+    } else {
+        echo '<a href="' . htmlspecialchars($href) . '" target="_blank" rel="noopener" class="btn-editar">Ver</a>';
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -144,6 +151,15 @@ function filaDocumento(array $col, string $campo, string $etiquetaCorta): void
           </div>
         </form>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== Lightbox: ver una imagen del expediente sin salir de la página ===== -->
+  <div class="lightbox-overlay" id="lightbox-overlay" hidden>
+    <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Cerrar">&times;</button>
+    <div class="lightbox-content">
+      <img src="" alt="" id="lightbox-img" class="lightbox-img" />
+      <a href="#" id="lightbox-download" class="btn btn-primary">Descargar imagen</a>
     </div>
   </div>
 

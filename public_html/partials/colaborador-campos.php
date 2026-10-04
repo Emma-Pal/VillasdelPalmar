@@ -7,12 +7,18 @@
 $esEdicionCol = !empty($col);
 
 // Para cada documento: si ya existe, el <input file> deja de ser
-// obligatorio y se muestra un link "Ver" al archivo actual.
-$documentoActual = function (string $campo) use ($col) {
+// obligatorio y se muestra un botón "Ver" al archivo actual — sin mostrar
+// el nombre del archivo guardado. Una imagen abre el visor flotante (como
+// en Avisos); un PDF abre en pestaña nueva.
+$archivoActual = function (string $campo, string $etiqueta) use ($col) {
     $nombre = $col[$campo . '_archivo_nombre_original'] ?? null;
     $id = $col['id'] ?? null;
-    if (!$nombre || !$id) return null;
-    return ['nombre' => $nombre, 'href' => '/panel/colaborador-archivo?id=' . (int) $id . '&campo=' . explode('_', $campo)[0]];
+    if (!$nombre || !$id) return '';
+    $href = '/panel/colaborador-archivo?id=' . (int) $id . '&campo=' . explode('_', $campo)[0];
+    if (esImagen($nombre)) {
+        return '<p class="form-nota">Actual: <button type="button" class="btn-editar" data-lightbox-src="' . htmlspecialchars($href) . '" data-lightbox-nombre="' . htmlspecialchars($etiqueta) . '">Ver</button></p>';
+    }
+    return '<p class="form-nota">Actual: <a href="' . htmlspecialchars($href) . '" target="_blank" rel="noopener" class="btn-editar">Ver</a></p>';
 };
 ?>
 <span class="form-card-numero">1 · Datos generales</span>
@@ -54,7 +60,7 @@ $documentoActual = function (string $campo) use ($col) {
 <label>
   INE (frente y reverso) <?= $esEdicionCol ? '' : '*' ?>
   <input type="file" name="ine_archivo" accept=".pdf,.jpg,.jpeg,.png" <?= $esEdicionCol ? '' : 'required' ?> />
-  <?php if ($doc = $documentoActual('ine')): ?><span class="form-nota">Actual: <a href="<?= htmlspecialchars($doc['href']) ?>" target="_blank" rel="noopener">📎 <?= htmlspecialchars($doc['nombre']) ?></a></span><?php endif; ?>
+  <?= $archivoActual('ine', 'INE') ?>
 </label>
 
 <div style="display: flex; gap: 16px;">
@@ -65,7 +71,7 @@ $documentoActual = function (string $campo) use ($col) {
   <label style="flex: 1;">
     Documento CURP <?= $esEdicionCol ? '' : '*' ?>
     <input type="file" name="curp_archivo" accept=".pdf,.jpg,.jpeg,.png" <?= $esEdicionCol ? '' : 'required' ?> />
-    <?php if ($doc = $documentoActual('curp')): ?><span class="form-nota">Actual: <a href="<?= htmlspecialchars($doc['href']) ?>" target="_blank" rel="noopener">📎 Ver</a></span><?php endif; ?>
+    <?= $archivoActual('curp', 'CURP') ?>
   </label>
 </div>
 
@@ -77,7 +83,7 @@ $documentoActual = function (string $campo) use ($col) {
   <label style="flex: 1;">
     Constancia de situación fiscal (RFC) <?= $esEdicionCol ? '' : '*' ?>
     <input type="file" name="rfc_archivo" accept=".pdf,.jpg,.jpeg,.png" <?= $esEdicionCol ? '' : 'required' ?> />
-    <?php if ($doc = $documentoActual('rfc')): ?><span class="form-nota">Actual: <a href="<?= htmlspecialchars($doc['href']) ?>" target="_blank" rel="noopener">📎 Ver</a></span><?php endif; ?>
+    <?= $archivoActual('rfc', 'Constancia RFC') ?>
   </label>
 </div>
 
@@ -89,7 +95,7 @@ $documentoActual = function (string $campo) use ($col) {
   <label style="flex: 1;">
     Comprobante NSS / alta IMSS <?= $esEdicionCol ? '' : '*' ?>
     <input type="file" name="nss_archivo" accept=".pdf,.jpg,.jpeg,.png" <?= $esEdicionCol ? '' : 'required' ?> />
-    <?php if ($doc = $documentoActual('nss')): ?><span class="form-nota">Actual: <a href="<?= htmlspecialchars($doc['href']) ?>" target="_blank" rel="noopener">📎 Ver</a></span><?php endif; ?>
+    <?= $archivoActual('nss', 'Comprobante NSS') ?>
   </label>
 </div>
 
@@ -142,7 +148,7 @@ $documentoActual = function (string $campo) use ($col) {
 <label>
   Comprobante de domicilio
   <input type="file" name="domicilio_archivo" accept=".pdf,.jpg,.jpeg,.png" />
-  <?php if ($doc = $documentoActual('domicilio')): ?><span class="form-nota">Actual: <a href="<?= htmlspecialchars($doc['href']) ?>" target="_blank" rel="noopener">📎 <?= htmlspecialchars($doc['nombre']) ?></a></span><?php endif; ?>
+  <?= $archivoActual('domicilio', 'Comprobante de domicilio') ?>
 </label>
 
 <hr class="form-separador" />
@@ -168,7 +174,7 @@ $documentoActual = function (string $campo) use ($col) {
   <label style="flex: 1;">
     Contrato laboral firmado <?= $esEdicionCol ? '' : '*' ?>
     <input type="file" name="contrato_archivo" accept=".pdf,.jpg,.jpeg,.png" <?= $esEdicionCol ? '' : 'required' ?> />
-    <?php if ($doc = $documentoActual('contrato')): ?><span class="form-nota">Actual: <a href="<?= htmlspecialchars($doc['href']) ?>" target="_blank" rel="noopener">📎 <?= htmlspecialchars($doc['nombre']) ?></a></span><?php endif; ?>
+    <?= $archivoActual('contrato', 'Contrato laboral') ?>
   </label>
   <label style="flex: 1;">
     Estatus
