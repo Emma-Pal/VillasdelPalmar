@@ -15,6 +15,19 @@ function esImagen(string $nombreArchivo): bool
     return (bool) preg_match('/\.(jpe?g|png)$/i', $nombreArchivo);
 }
 
+// Iniciales para un avatar circular (primera letra del nombre + primera del
+// segundo "token", si existe — ej. "Carlos Aguilar" -> "CA"). Usada por el
+// Directorio (lista de colaboradores/comité y la ficha de expediente).
+function iniciales(string $nombre): string
+{
+    $partes = preg_split('/\s+/', trim($nombre));
+    $ini = mb_strtoupper(mb_substr($partes[0] ?? '', 0, 1));
+    if (!empty($partes[1])) {
+        $ini .= mb_strtoupper(mb_substr($partes[1], 0, 1));
+    }
+    return $ini;
+}
+
 // Etiqueta legible de la prioridad de un aviso. Son solo 3 valores fijos
 // (columna ENUM), así que no hace falta un "slug" como el de categoría.
 function etiquetaPrioridad(string $prioridad): string

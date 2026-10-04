@@ -81,17 +81,86 @@ CREATE TABLE IF NOT EXISTS documentos (
   FOREIGN KEY (autor_id) REFERENCES usuarios(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Directorio de contactos (administración, seguridad, mantenimiento,
--- emergencias, proveedores autorizados).
-CREATE TABLE IF NOT EXISTS contactos (
+-- ===== Directorio (rediseño oct. 2026) =====
+-- Reemplaza a la antigua tabla "contactos" (ver migración 2026-10g más
+-- abajo) con dos listas separadas: personal del condominio (colaboradores,
+-- con expediente restringido al comité) e integrantes del comité (público
+-- para todos los propietarios).
+
+-- Personal del condominio. Los campos de "Datos generales" (foto, nombre,
+-- puesto, area, fecha_ingreso, estatus) los ve cualquier propietario; todo
+-- lo demás (identificación oficial, datos personales, laborales y contacto
+-- de emergencia) solo lo consultan comité/administración — por eso esos
+-- archivos se sirven por panel/colaborador-archivo.php, que exige
+-- requireMesa() y nunca panel/archivo.php. A propósito NO se guarda salario
+-- (dato sensible que no hace falta en este directorio).
+CREATE TABLE IF NOT EXISTS colaboradores (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  categoria ENUM('administracion','seguridad','mantenimiento','emergencia','proveedor') NOT NULL,
+  -- Datos generales
+  foto VARCHAR(255) NULL,
   nombre VARCHAR(150) NOT NULL,
-  puesto VARCHAR(150) NULL,
+  puesto VARCHAR(150) NOT NULL,
+  area ENUM('administracion','seguridad','mantenimiento','jardineria','limpieza') NOT NULL,
+  fecha_ingreso DATE NOT NULL,
+  estatus ENUM('activo','baja') NOT NULL DEFAULT 'activo',
+  -- Identificación oficial (solo comité)
+  ine_archivo VARCHAR(255) NULL,
+  ine_archivo_nombre_original VARCHAR(255) NULL,
+  curp_numero VARCHAR(18) NULL,
+  curp_archivo VARCHAR(255) NULL,
+  curp_archivo_nombre_original VARCHAR(255) NULL,
+  rfc_numero VARCHAR(13) NULL,
+  rfc_archivo VARCHAR(255) NULL,
+  rfc_archivo_nombre_original VARCHAR(255) NULL,
+  nss_numero VARCHAR(20) NULL,
+  nss_archivo VARCHAR(255) NULL,
+  nss_archivo_nombre_original VARCHAR(255) NULL,
+  -- Datos personales (solo comité)
+  fecha_nacimiento DATE NULL,
+  lugar_nacimiento VARCHAR(150) NULL,
+  nacionalidad VARCHAR(100) NULL,
+  estado_civil VARCHAR(50) NULL,
   telefono VARCHAR(50) NULL,
   correo VARCHAR(150) NULL,
-  notas TEXT NULL,
-  creado_en DATETIME NOT NULL
+  domicilio VARCHAR(255) NULL,
+  domicilio_archivo VARCHAR(255) NULL,
+  domicilio_archivo_nombre_original VARCHAR(255) NULL,
+  -- Datos laborales y contrato (solo comité — sin salario, a propósito)
+  tipo_contrato VARCHAR(100) NULL,
+  turno_horario VARCHAR(150) NULL,
+  contrato_archivo VARCHAR(255) NULL,
+  contrato_archivo_nombre_original VARCHAR(255) NULL,
+  -- Contacto de emergencia (solo comité)
+  emergencia_nombre VARCHAR(150) NULL,
+  emergencia_parentesco VARCHAR(100) NULL,
+  emergencia_telefono1 VARCHAR(50) NULL,
+  emergencia_telefono2 VARCHAR(50) NULL,
+  emergencia_domicilio VARCHAR(255) NULL,
+  autor_id INT NOT NULL,
+  creado_en DATETIME NOT NULL,
+  actualizado_en DATETIME NULL,
+  FOREIGN KEY (autor_id) REFERENCES usuarios(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Integrantes del Comité de Administración / Comité de Vigilancia /
+-- Contraloría. A diferencia de "colaboradores", este directorio es público
+-- para todos los propietarios (nombre, cargo, correo y teléfono del comité
+-- es información que cualquier propietario debe poder consultar).
+CREATE TABLE IF NOT EXISTS comite_miembros (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  departamento ENUM('comite_administracion','comite_vigilancia','contraloria') NOT NULL,
+  titular_suplente ENUM('titular','suplente') NOT NULL DEFAULT 'titular',
+  nombre VARCHAR(150) NOT NULL,
+  villa VARCHAR(20) NULL,
+  cargo VARCHAR(100) NOT NULL,
+  correo VARCHAR(150) NULL,
+  telefono VARCHAR(50) NULL,
+  periodo_inicio DATE NULL,
+  periodo_fin DATE NULL,
+  autor_id INT NOT NULL,
+  creado_en DATETIME NOT NULL,
+  actualizado_en DATETIME NULL,
+  FOREIGN KEY (autor_id) REFERENCES usuarios(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Solicitudes de propietarios (quejas/fallas/sugerencias). El folio que se
@@ -173,3 +242,12 @@ CREATE TABLE IF NOT EXISTS galeria_items (
 --   ADD COLUMN vigente TINYINT(1) NOT NULL DEFAULT 1 AFTER vigente_desde;
 -- UPDATE documentos SET fecha_documento = DATE(creado_en) WHERE fecha_documento IS NULL;
 -- ALTER TABLE documentos MODIFY COLUMN fecha_documento DATE NOT NULL;
+
+-- ===== Migración 2026-10g: rediseño de Directorio (Personal + Comité) =====
+-- Las dos tablas nuevas (colaboradores, comite_miembros) ya están arriba
+-- para instalaciones nuevas. Para una base de datos existente, créalas con
+-- ese mismo CREATE TABLE. La tabla vieja "contactos" ya no la usa la app
+-- para nada — bórrala solo si no te interesa conservar esos contactos
+-- (no hay forma automática de convertirlos a colaborador o integrante del
+-- comité, son conceptos distintos):
+-- DROP TABLE IF EXISTS contactos;

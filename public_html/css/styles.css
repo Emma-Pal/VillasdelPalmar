@@ -2472,6 +2472,147 @@ a.nav-user:hover {
   opacity: 0.75;
 }
 
+/* ----- Directorio: contador en las pestañas, fila persona con avatar ----- */
+.tab-contador {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 11px;
+}
+
+.categoria-tab.is-active .tab-contador {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.directorio-persona {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.directorio-avatar {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #eaf1ee;
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Aviso de nivel de acceso arriba de una lista (🔒 solo comité / público) */
+.candado-aviso {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fbf1de;
+  color: #8a6a2f;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  margin-bottom: 20px;
+}
+
+.candado-aviso--publico {
+  background: #eaf1ee;
+  color: var(--color-primary);
+}
+
+/* Candados dentro de los formularios (junto a un encabezado de sección o un
+   campo restringido) — puramente informativos: solo la mesa llega a ver
+   estos formularios en primer lugar. */
+.candado-comite {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #a15a2e;
+  background: #fdf3ec;
+  padding: 2px 8px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.candado-sugerido {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  padding: 1px 7px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+/* ----- Ficha de colaborador (expediente completo) ----- */
+.ficha-encabezado {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.ficha-avatar {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #eaf1ee;
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.ficha-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ficha-encabezado-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.ficha-encabezado-info h2 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.ficha-expediente-contador {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.ficha-expediente-contador .fecha-bloque-dia {
+  font-size: 20px;
+}
+
+.ficha-expediente-contador .fecha-bloque-anio {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
 /* ----- Botones Cancelar/Publicar al pie de los modales de captura ----- */
 .modal-botones {
   display: flex;
@@ -2577,56 +2718,6 @@ a.nav-user:hover {
   align-items: center;
   gap: 14px;
   margin-top: 16px;
-}
-
-/* ----- Directorio ----- */
-.directorio-grupo {
-  margin-bottom: 40px;
-}
-
-.directorio-grupo h2 {
-  font-size: 22px;
-  margin-bottom: 16px;
-}
-
-.directorio-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
-}
-
-.directorio-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  padding: 20px;
-}
-
-.directorio-card h3 {
-  font-size: 17px;
-  margin-bottom: 2px;
-}
-
-.directorio-puesto {
-  color: var(--color-text-muted);
-  font-size: 13px;
-  margin-bottom: 8px;
-}
-
-.directorio-card p {
-  margin: 4px 0;
-  font-size: 14px;
-}
-
-.directorio-notas {
-  color: var(--color-text-muted);
-}
-
-.directorio-acciones {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 12px;
 }
 
 /* ----- Solicitudes: confirmación de folio ----- */

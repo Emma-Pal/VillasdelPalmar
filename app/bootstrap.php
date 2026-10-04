@@ -16,7 +16,7 @@ require_once __DIR__ . '/repos/usuarios.php';
 require_once __DIR__ . '/repos/publicaciones.php';
 require_once __DIR__ . '/repos/archivos.php';
 require_once __DIR__ . '/repos/documentos.php';
-require_once __DIR__ . '/repos/contactos.php';
+require_once __DIR__ . '/repos/directorio.php';
 require_once __DIR__ . '/repos/solicitudes.php';
 require_once __DIR__ . '/repos/galeria.php';
 
