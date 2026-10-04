@@ -146,7 +146,7 @@ $cargosSugeridos = array_unique(getCargosComiteSugeridos());
         <?php endforeach; ?>
       </div>
 
-      <p class="candado-aviso candado-aviso--publico">Datos visibles para todos los propietarios.</p>
+      <p class="candado-aviso candado-aviso--publico">Departamento, cargo, villa y nombre son visibles para todos los propietarios. Correo y teléfono son solo para Comité y Administración.</p>
 
       <?php if (empty($miembros)): ?>
         <p class="placeholder-note">No hay integrantes que coincidan.</p>
@@ -160,8 +160,7 @@ $cargosSugeridos = array_unique(getCargosComiteSugeridos());
                 <th>Nombre</th>
                 <th>Villa</th>
                 <th>Cargo</th>
-                <th>Correo electrónico</th>
-                <th>Teléfono</th>
+                <?php if ($esMesa): ?><th>Correo electrónico 🔒</th><th>Teléfono 🔒</th><?php endif; ?>
                 <?php if ($esMesa): ?><th></th><?php endif; ?>
               </tr>
             </thead>
@@ -178,8 +177,10 @@ $cargosSugeridos = array_unique(getCargosComiteSugeridos());
                   </td>
                   <td><?= htmlspecialchars($m['villa'] ?: '—') ?></td>
                   <td><?= htmlspecialchars($m['cargo']) ?></td>
-                  <td><?php if (!empty($m['correo'])): ?><a href="mailto:<?= htmlspecialchars($m['correo']) ?>"><?= htmlspecialchars($m['correo']) ?></a><?php else: ?>—<?php endif; ?></td>
-                  <td><?= htmlspecialchars($m['telefono'] ?: '—') ?></td>
+                  <?php if ($esMesa): ?>
+                    <td><?php if (!empty($m['correo'])): ?><a href="mailto:<?= htmlspecialchars($m['correo']) ?>"><?= htmlspecialchars($m['correo']) ?></a><?php else: ?>—<?php endif; ?></td>
+                    <td><?= htmlspecialchars($m['telefono'] ?: '—') ?></td>
+                  <?php endif; ?>
                   <?php if ($esMesa): ?>
                     <td class="tabla-acciones">
                       <button type="button" class="btn-editar" data-modal-open="modal-editar-comite-<?= (int) $m['id'] ?>">Editar</button>
