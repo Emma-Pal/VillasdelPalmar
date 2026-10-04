@@ -74,7 +74,7 @@ $cargosSugeridos = array_unique(getCargosComiteSugeridos());
       </div>
 
       <?php if ($esMesa): ?>
-        <p class="candado-aviso">🔒 Vista de Comité y Administración. Los propietarios solo ven nombre, puesto, área y fecha de ingreso. El teléfono, la ficha completa y los documentos están restringidos.</p>
+        <p class="candado-aviso">🔒 Vista de Administración. Los propietarios solo ven nombre, puesto, área y fecha de ingreso. El teléfono, la ficha completa y los documentos están restringidos.</p>
       <?php endif; ?>
 
       <?php if (empty($colaboradores)): ?>
@@ -146,7 +146,7 @@ $cargosSugeridos = array_unique(getCargosComiteSugeridos());
         <?php endforeach; ?>
       </div>
 
-      <p class="candado-aviso candado-aviso--publico">Departamento, cargo, villa y nombre son visibles para todos los propietarios. Correo y teléfono son solo para Comité y Administración.</p>
+      <p class="candado-aviso candado-aviso--publico">Departamento, cargo, villa y nombre son visibles para todos los propietarios. Correo y teléfono son solo para Administración.</p>
 
       <?php if (empty($miembros)): ?>
         <p class="placeholder-note">No hay integrantes que coincidan.</p>

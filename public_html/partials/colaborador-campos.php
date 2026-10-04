@@ -55,7 +55,7 @@ $archivoActual = function (string $campo, string $etiqueta) use ($col) {
 </div>
 
 <hr class="form-separador" />
-<span class="form-card-numero">2 · Identificación oficial <span class="candado-comite">🔒 Solo comité</span></span>
+<span class="form-card-numero">2 · Identificación oficial <span class="candado-comite">🔒 Solo administración</span></span>
 
 <label>
   INE (frente y reverso) <?= $esEdicionCol ? '' : '*' ?>
@@ -100,7 +100,7 @@ $archivoActual = function (string $campo, string $etiqueta) use ($col) {
 </div>
 
 <hr class="form-separador" />
-<span class="form-card-numero">3 · Datos personales <span class="candado-comite">🔒 Solo comité</span></span>
+<span class="form-card-numero">3 · Datos personales <span class="candado-comite">🔒 Solo administración</span></span>
 
 <div style="display: flex; gap: 16px;">
   <label style="flex: 1;">
@@ -152,7 +152,7 @@ $archivoActual = function (string $campo, string $etiqueta) use ($col) {
 </label>
 
 <hr class="form-separador" />
-<span class="form-card-numero">4 · Datos laborales y contrato <span class="candado-comite">🔒 Solo comité</span></span>
+<span class="form-card-numero">4 · Datos laborales y contrato <span class="candado-comite">🔒 Solo administración</span></span>
 
 <div style="display: flex; gap: 16px;">
   <label style="flex: 1;">
@@ -186,7 +186,7 @@ $archivoActual = function (string $campo, string $etiqueta) use ($col) {
 </div>
 
 <hr class="form-separador" />
-<span class="form-card-numero">5 · Contacto de emergencia <span class="candado-comite">🔒 Solo comité</span></span>
+<span class="form-card-numero">5 · Contacto de emergencia <span class="candado-comite">🔒 Solo administración</span></span>
 
 <div style="display: flex; gap: 16px;">
   <label style="flex: 1;">

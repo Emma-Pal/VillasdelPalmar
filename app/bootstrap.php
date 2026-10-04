@@ -13,6 +13,7 @@ require_once __DIR__ . '/funciones.php';
 require_once __DIR__ . '/validacion.php';
 require_once __DIR__ . '/subida.php';
 require_once __DIR__ . '/repos/usuarios.php';
+require_once __DIR__ . '/repos/titulares.php';
 require_once __DIR__ . '/repos/publicaciones.php';
 require_once __DIR__ . '/repos/archivos.php';
 require_once __DIR__ . '/repos/documentos.php';

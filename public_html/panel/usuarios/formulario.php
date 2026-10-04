@@ -1,5 +1,7 @@
 <?php
-// Compartido por nuevo.php y editar.php.
+// Compartido por nuevo.php y editar.php — SOLO cuentas de Administración
+// (tipo='mesa'). Las cuentas de villa/propietario se dan de alta aparte, en
+// el modal "Alta de villa" de index.php (ver villa-guardar.php).
 
 $esEdicion = isset($_GET['id']);
 $usuarioEditado = null;
@@ -7,22 +9,20 @@ $error = null;
 
 if ($esEdicion) {
     $usuarioEditado = getUsuarioPorId((int) $_GET['id']);
-    if (!$usuarioEditado) {
+    if (!$usuarioEditado || $usuarioEditado['tipo'] !== 'mesa') {
         header('Location: /panel/usuarios');
         exit;
     }
 }
 
-$title = ($esEdicion ? 'Editar usuario' : 'Nuevo usuario') . ' — Villas del Palmar';
+$title = ($esEdicion ? 'Editar administrador' : 'Nuevo administrador') . ' — Villas del Palmar';
 $description = 'Administración de cuentas de Villas del Palmar.';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verificarCsrf();
 
-    $tipo = $_POST['tipo'] ?? 'propietario';
     $nombre = trim($_POST['nombre'] ?? '');
     $cargo = trim($_POST['cargo'] ?? '');
-    $villa = trim($_POST['villa'] ?? '');
     $usuarioLogin = trim($_POST['usuario'] ?? '');
     $password = $_POST['password'] ?? '';
     $passwordConfirmar = $_POST['passwordConfirmar'] ?? '';
@@ -42,61 +42,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // El número de villa es obligatorio para una cuenta de propietario y
-    // debe ser solo dígitos (el JS ya evita que se escriban letras, pero
-    // esto es lo que de verdad lo garantiza). La columna además tiene UNIQUE
-    // en la base de datos — el catch de abajo cubre el caso de que dos
-    // personas lo manden al mismo tiempo.
-    if ($error === null && $tipo === 'propietario') {
-        if ($villa === '') {
-            $error = 'El número de villa es obligatorio para una cuenta de propietario.';
-        } elseif (!ctype_digit($villa)) {
-            $error = 'El número de villa solo puede contener dígitos.';
-        }
-    }
-
     if ($error === null) {
         try {
             if ($esEdicion) {
                 $id = $usuarioEditado['id'];
                 $passwordHash = $password !== '' ? password_hash($password, PASSWORD_BCRYPT) : null;
-                actualizarUsuario($id, $tipo, $nombre, $cargo, $usuarioLogin, $passwordHash, $villa);
+                actualizarUsuario($id, 'mesa', $nombre, $cargo, $usuarioLogin, $passwordHash);
 
                 // Si el usuario se edita a sí mismo, se refresca la sesión
                 // para que el header muestre los datos correctos de inmediato.
                 if ((int) $_SESSION['usuario']['id'] === (int) $id) {
-                    $_SESSION['usuario'] = [
-                        'id' => $id,
-                        'tipo' => $tipo,
-                        'nombre' => $nombre,
-                        'cargo' => $tipo === 'mesa' ? $cargo : null,
-                        'villa' => $tipo === 'propietario' ? $villa : null,
-                    ];
+                    $_SESSION['usuario'] = ['id' => $id, 'tipo' => 'mesa', 'nombre' => $nombre, 'cargo' => $cargo];
                 }
             } else {
-                crearUsuario($tipo, $nombre, $cargo, $usuarioLogin, password_hash($password, PASSWORD_BCRYPT), $villa);
+                crearUsuario('mesa', $nombre, $cargo, $usuarioLogin, password_hash($password, PASSWORD_BCRYPT));
             }
             header('Location: /panel/usuarios');
             exit;
         } catch (PDOException $e) {
-            // MySQL nombra la restricción UNIQUE igual que la columna ("villa"),
-            // pero el formato exacto del mensaje cambia entre versiones (a veces
-            // "for key 'villa'", a veces "for key 'usuarios.villa'") — por eso
-            // se busca "villa" suelto y no la cadena con comillas exactas.
-            if (stripos($e->getMessage(), 'villa') !== false) {
-                $error = 'Ese número de villa ya está registrado con otra cuenta.';
-            } elseif (stripos($e->getMessage(), 'Duplicate entry') !== false) {
-                $error = 'Ese nombre de usuario ya existe. Elige otro.';
-            } else {
-                $error = $esEdicion ? 'No se pudo guardar el cambio. Revisa los datos.' : 'No se pudo crear la cuenta. Revisa los datos.';
-            }
+            $error = stripos($e->getMessage(), 'Duplicate entry') !== false
+                ? 'Ese nombre de usuario ya existe. Elige otro.'
+                : ($esEdicion ? 'No se pudo guardar el cambio. Revisa los datos.' : 'No se pudo crear la cuenta. Revisa los datos.');
         }
     }
 
     // Si hubo error, se conservan los datos capturados para no perderlos.
-    $datosFormulario = ['tipo' => $tipo, 'nombre' => $nombre, 'cargo' => $cargo, 'villa' => $villa, 'usuario' => $usuarioLogin];
+    $datosFormulario = ['nombre' => $nombre, 'cargo' => $cargo, 'usuario' => $usuarioLogin];
 } else {
-    $datosFormulario = $usuarioEditado ?: ['tipo' => 'propietario', 'nombre' => '', 'cargo' => '', 'villa' => '', 'usuario' => ''];
+    $datosFormulario = $usuarioEditado ?: ['nombre' => '', 'cargo' => '', 'usuario' => ''];
 }
 
 $accionFormulario = $esEdicion ? '/panel/usuarios/editar?id=' . (int) $usuarioEditado['id'] : '/panel/usuarios/nuevo';
@@ -113,11 +86,9 @@ $accionFormulario = $esEdicion ? '/panel/usuarios/editar?id=' . (int) $usuarioEd
   <section class="page-banner page-banner--plain">
     <div class="page-banner-content">
       <a href="/panel/usuarios" class="back-link">← Volver a usuarios</a>
-      <span class="eyebrow">Comité</span>
-      <h1><?= $esEdicion ? 'Editar usuario' : 'Nuevo usuario' ?></h1>
-      <?php if ($esEdicion): ?>
-        <p class="page-banner-lead">Cambiar aquí el "Tipo" da o quita privilegios de comité.</p>
-      <?php endif; ?>
+      <span class="eyebrow">Administración</span>
+      <h1><?= $esEdicion ? 'Editar administrador' : 'Nuevo administrador' ?></h1>
+      <p class="page-banner-lead">Cuentas con privilegios de administrador (acceso a todo el panel de gestión).</p>
     </div>
   </section>
 
@@ -135,37 +106,13 @@ $accionFormulario = $esEdicion ? '/panel/usuarios/editar?id=' . (int) $usuarioEd
         <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
 
         <label>
-          Tipo de cuenta
-          <select name="tipo" id="tipo-select" required>
-            <option value="propietario" <?= $datosFormulario['tipo'] === 'propietario' ? 'selected' : '' ?>>Propietario</option>
-            <option value="mesa" <?= $datosFormulario['tipo'] === 'mesa' ? 'selected' : '' ?>>Comité (privilegios de administrador)</option>
-          </select>
-        </label>
-
-        <label>
           Nombre completo
           <input type="text" name="nombre" value="<?= htmlspecialchars($datosFormulario['nombre']) ?>" required />
         </label>
 
-        <label id="campo-cargo">
+        <label>
           Cargo (ej. "Tesorero")
-          <input type="text" name="cargo" value="<?= htmlspecialchars($datosFormulario['cargo'] ?? '') ?>" />
-        </label>
-
-        <label id="campo-villa">
-          Número de villa
-          <input
-            type="text"
-            name="villa"
-            id="villa-input"
-            value="<?= htmlspecialchars($datosFormulario['villa'] ?? '') ?>"
-            inputmode="numeric"
-            pattern="[0-9]+"
-            title="Solo números"
-            maxlength="10"
-            required
-          />
-          <span class="campo-advertencia" id="villa-advertencia" hidden>Solo se permiten números, sin letras.</span>
+          <input type="text" name="cargo" value="<?= htmlspecialchars($datosFormulario['cargo'] ?? '') ?>" required />
         </label>
 
         <label>
@@ -184,7 +131,7 @@ $accionFormulario = $esEdicion ? '/panel/usuarios/editar?id=' . (int) $usuarioEd
         </label>
 
         <button type="submit" class="btn btn-primary">
-          <?= $esEdicion ? 'Guardar cambios' : 'Crear usuario' ?>
+          <?= $esEdicion ? 'Guardar cambios' : 'Crear administrador' ?>
         </button>
       </form>
     </div>

@@ -230,10 +230,10 @@ $volverTexto = $esAsamblea ? '← Volver a asambleas' : '← Volver a avisos';
               </label>
               <label class="pill-radio pill-radio--grande">
                 <input type="radio" name="audiencia" value="comite" <?= $audienciaActual === 'comite' ? 'checked' : '' ?> />
-                <span>Comité de Administración</span>
+                <span>Solo Administración</span>
               </label>
             </div>
-            <p class="form-nota">Si eliges "Comité de Administración", los propietarios no podrán ver esta publicación.</p>
+            <p class="form-nota">Si eliges "Solo Administración", los propietarios no podrán ver esta publicación.</p>
           </div>
 
           <label class="campo-checkbox">
@@ -243,7 +243,7 @@ $volverTexto = $esAsamblea ? '← Volver a asambleas' : '← Volver a avisos';
 
           <label class="campo-checkbox">
             <input type="checkbox" name="publicado" <?= $publicadoActual ? 'checked' : '' ?> />
-            Publicar ahora (si lo desmarcas, se guarda como borrador — solo lo ve el comité)
+            Publicar ahora (si lo desmarcas, se guarda como borrador — solo lo ve Administración)
           </label>
         </div>
 

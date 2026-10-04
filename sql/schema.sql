@@ -15,7 +15,38 @@ CREATE TABLE IF NOT EXISTS usuarios (
   villa VARCHAR(20) NULL UNIQUE,
   usuario VARCHAR(100) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
-  ultima_visita_avisos DATETIME NULL   -- para saber qué publicaciones son "nuevas" para este usuario
+  ultima_visita_avisos DATETIME NULL,  -- para saber qué publicaciones son "nuevas" para este usuario
+  -- Lo siguiente solo aplica a una cuenta de villa (tipo='propietario'),
+  -- capturado en el alta de "Villas y departamentos". Todo NULL para una
+  -- cuenta de comité/administración.
+  recamaras_registradas SMALLINT NULL,
+  recamaras_fisicas SMALLINT NULL,
+  capacidad_ocupacion SMALLINT NULL,
+  escritura_archivo VARCHAR(255) NULL,
+  escritura_archivo_nombre_original VARCHAR(255) NULL,
+  relacion_copropietarios_archivo VARCHAR(255) NULL,
+  relacion_copropietarios_archivo_nombre_original VARCHAR(255) NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Titulares (propietario + copropietarios) de una cuenta de villa. El
+-- primer titular de cada villa siempre es 'propietario'; los demás pueden
+-- ser 'propietario' (copropiedad sin un titular principal único) o
+-- 'copropietario'. Sus documentos (CURP, INE) son más sensibles que los
+-- datos de la villa misma, por eso viven en su propia fila.
+CREATE TABLE IF NOT EXISTS titulares (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id INT NOT NULL,
+  nombre VARCHAR(150) NOT NULL,
+  caracter ENUM('propietario','copropietario') NOT NULL DEFAULT 'copropietario',
+  curp VARCHAR(18) NOT NULL,
+  ine_frente_archivo VARCHAR(255) NULL,
+  ine_frente_archivo_nombre_original VARCHAR(255) NULL,
+  ine_reverso_archivo VARCHAR(255) NULL,
+  ine_reverso_archivo_nombre_original VARCHAR(255) NULL,
+  telefono VARCHAR(50) NULL,
+  correo VARCHAR(150) NULL,
+  creado_en DATETIME NOT NULL,
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS publicaciones (
@@ -251,3 +282,29 @@ CREATE TABLE IF NOT EXISTS galeria_items (
 -- (no hay forma automática de convertirlos a colaborador o integrante del
 -- comité, son conceptos distintos):
 -- DROP TABLE IF EXISTS contactos;
+
+-- ===== Migración 2026-10h: rediseño de Usuarios ("Villas y departamentos") =====
+-- ALTER TABLE usuarios
+--   ADD COLUMN recamaras_registradas SMALLINT NULL,
+--   ADD COLUMN recamaras_fisicas SMALLINT NULL,
+--   ADD COLUMN capacidad_ocupacion SMALLINT NULL,
+--   ADD COLUMN escritura_archivo VARCHAR(255) NULL,
+--   ADD COLUMN escritura_archivo_nombre_original VARCHAR(255) NULL,
+--   ADD COLUMN relacion_copropietarios_archivo VARCHAR(255) NULL,
+--   ADD COLUMN relacion_copropietarios_archivo_nombre_original VARCHAR(255) NULL;
+--
+-- CREATE TABLE titulares (
+--   id INT AUTO_INCREMENT PRIMARY KEY,
+--   usuario_id INT NOT NULL,
+--   nombre VARCHAR(150) NOT NULL,
+--   caracter ENUM('propietario','copropietario') NOT NULL DEFAULT 'copropietario',
+--   curp VARCHAR(18) NOT NULL,
+--   ine_frente_archivo VARCHAR(255) NULL,
+--   ine_frente_archivo_nombre_original VARCHAR(255) NULL,
+--   ine_reverso_archivo VARCHAR(255) NULL,
+--   ine_reverso_archivo_nombre_original VARCHAR(255) NULL,
+--   telefono VARCHAR(50) NULL,
+--   correo VARCHAR(150) NULL,
+--   creado_en DATETIME NOT NULL,
+--   FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -86,7 +86,7 @@ function filaDocumento(array $col, string $campo, string $etiquetaCorta): void
       </div>
     </div>
 
-    <p class="candado-aviso">🔒 Información confidencial. Los datos de esta página solo los consultan el Comité y la Administración.</p>
+    <p class="candado-aviso">🔒 Información confidencial. Los datos de esta página solo los consulta la Administración.</p>
 
     <div class="form-card" data-reveal>
       <span class="form-card-numero">Identificación oficial</span>

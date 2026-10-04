@@ -148,46 +148,30 @@ if (loginPasswordInput && loginPasswordToggle) {
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-// ===== Formulario de usuario: "Cargo" solo aplica al comité, "Número de
-// villa" solo a un propietario (cada uno tiene su propia cuenta) =====
-const tipoSelect = document.getElementById('tipo-select');
-const campoCargo = document.getElementById('campo-cargo');
-const campoVilla = document.getElementById('campo-villa');
+// ===== Campos "solo dígitos" (.solo-digitos): ni siquiera deja escribir una
+// letra (además del patrón HTML, que solo avisa hasta enviar el formulario).
+// Puede haber varios en la página (ej. "Villa núm." en varios modales de
+// Usuarios), por eso es por clase y no por id — cada uno busca su propio
+// aviso ".campo-advertencia" hermano dentro del mismo <label>. =====
+document.querySelectorAll('.solo-digitos').forEach((campo) => {
+  const advertencia = campo.parentElement.querySelector('.campo-advertencia');
+  let temporizadorAdvertencia = null;
 
-if (tipoSelect && (campoCargo || campoVilla)) {
-  const actualizarCampos = () => {
-    if (campoCargo) campoCargo.hidden = tipoSelect.value !== 'mesa';
-    if (campoVilla) campoVilla.hidden = tipoSelect.value !== 'propietario';
-  };
-  actualizarCampos();
-  tipoSelect.addEventListener('change', actualizarCampos);
-}
-
-// ===== Número de villa: solo dígitos, ni siquiera deja escribir una letra
-// (además del patrón HTML, que solo avisa hasta enviar el formulario). Si lo
-// que se tecleó o pegó traía algo que no era número, se muestra un aviso
-// breve explicando por qué desapareció. =====
-const villaInput = document.getElementById('villa-input');
-const villaAdvertencia = document.getElementById('villa-advertencia');
-
-if (villaInput) {
-  let temporizadorAdvertenciaVilla = null;
-
-  villaInput.addEventListener('input', () => {
-    const valorEscrito = villaInput.value;
+  campo.addEventListener('input', () => {
+    const valorEscrito = campo.value;
     const valorSoloNumeros = valorEscrito.replace(/\D/g, '');
 
-    if (villaAdvertencia && valorSoloNumeros !== valorEscrito) {
-      villaAdvertencia.hidden = false;
-      clearTimeout(temporizadorAdvertenciaVilla);
-      temporizadorAdvertenciaVilla = setTimeout(() => {
-        villaAdvertencia.hidden = true;
+    if (advertencia && valorSoloNumeros !== valorEscrito) {
+      advertencia.hidden = false;
+      clearTimeout(temporizadorAdvertencia);
+      temporizadorAdvertencia = setTimeout(() => {
+        advertencia.hidden = true;
       }, 2500);
     }
 
-    villaInput.value = valorSoloNumeros;
+    campo.value = valorSoloNumeros;
   });
-}
+});
 
 // ===== Hora de convocatoria (.hora-input): se teclea directo en vez del
 // selector nativo de hora (tedioso de scrollear). Va formateando "HH:MM"
@@ -288,13 +272,16 @@ document.querySelectorAll('.fecha-wrap').forEach((envoltura) => {
 });
 
 // ===== Zona(s) de "arrastrar y soltar" para archivos adjuntos (formulario
-// de avisos, modales de convocatoria/acta en Asambleas — puede haber varias
-// en la misma página, una por modal) — el <input type="file"> real va
-// dentro del <label> (así que un clic normal ya abre el selector solo);
-// esto solo le suma soltar archivos arrastrados y mostrar sus nombres. Todo
-// por estructura (siguiente hermano / descendiente), sin ids, para que
-// funcione sin importar cuántas haya en la página. =====
-document.querySelectorAll('.dropzone').forEach((dropzone) => {
+// de avisos, modales de convocatoria/acta en Asambleas, titulares de una
+// villa en Usuarios — puede haber varias en la misma página) — el <input
+// type="file"> real va dentro del <label> (así que un clic normal ya abre
+// el selector solo); esto solo le suma soltar archivos arrastrados y
+// mostrar sus nombres. Todo por estructura (siguiente hermano /
+// descendiente), sin ids, para que funcione sin importar cuántas haya en la
+// página. inicializarDropzone() se expone aparte porque los bloques de
+// titular que se agregan dinámicamente (ver más abajo) necesitan llamarla
+// de nuevo sobre el nodo recién clonado. =====
+function inicializarDropzone(dropzone) {
   const dropzoneInput = dropzone.querySelector('input[type="file"]');
   const dropzoneFilenames = dropzone.nextElementSibling;
   if (!dropzoneInput || !dropzoneFilenames || !dropzoneFilenames.classList.contains('dropzone-filenames')) return;
@@ -326,6 +313,84 @@ document.querySelectorAll('.dropzone').forEach((dropzone) => {
       actualizarNombres();
     }
   });
+}
+
+document.querySelectorAll('.dropzone').forEach(inicializarDropzone);
+
+// ===== Titulares de una villa (/panel/usuarios, modal "Alta de villa" /
+// "Editar villa"): "+ Agregar titular" clona la <template> del bloque,
+// renumerando sus name="titular_campo_0" a "_N" (0 es solo el marcador de
+// la plantilla) y activando su dropzone y su botón de quitar. El titular 1
+// no tiene botón de quitar — siempre es el propietario. =====
+document.querySelectorAll('[data-titulares-wrap]').forEach((wrap) => {
+  const lista = wrap.querySelector('[data-titulares-lista]');
+  const plantilla = wrap.querySelector('template[data-titular-template]');
+  const botonAgregar = wrap.querySelector('[data-titular-agregar]');
+  if (!lista || !plantilla || !botonAgregar) return;
+
+  let contador = lista.querySelectorAll('.titular-card').length;
+
+  const activarQuitar = (tarjeta) => {
+    const boton = tarjeta.querySelector('[data-titular-quitar]');
+    if (boton) boton.addEventListener('click', () => tarjeta.remove());
+  };
+
+  lista.querySelectorAll('.titular-card').forEach(activarQuitar);
+
+  botonAgregar.addEventListener('click', () => {
+    contador++;
+    const fragmento = plantilla.content.cloneNode(true);
+    fragmento.querySelectorAll('[name]').forEach((campo) => {
+      campo.name = campo.name.replace(/_0$/, '_' + contador);
+    });
+    fragmento.querySelectorAll('.titular-card-numero').forEach((span) => {
+      span.textContent = 'Titular ' + contador;
+    });
+    const tarjeta = fragmento.querySelector('.titular-card');
+    lista.appendChild(tarjeta);
+    tarjeta.querySelectorAll('.dropzone').forEach(inicializarDropzone);
+    activarQuitar(tarjeta);
+  });
+});
+
+// ===== Botón "Generar" de la contraseña asignada a una villa (/panel/usuarios):
+// rellena el campo con "Palmar-{villa}-XXXX" (4 caracteres alfanuméricos al
+// azar) — el propietario la cambia en su primer ingreso, así que no hace
+// falta que sea memorable, solo fácil de dictar/copiar una vez. =====
+document.querySelectorAll('[data-generar-password]').forEach((boton) => {
+  boton.addEventListener('click', () => {
+    const campoPassword = document.getElementById(boton.dataset.passwordTarget);
+    const campoVilla = document.getElementById(boton.dataset.villaTarget);
+    if (!campoPassword) return;
+
+    const alfabeto = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let sufijo = '';
+    for (let i = 0; i < 4; i++) {
+      sufijo += alfabeto[Math.floor(Math.random() * alfabeto.length)];
+    }
+    const villa = (campoVilla && campoVilla.value.trim()) || '0';
+    campoPassword.value = `Palmar-${villa}-${sufijo}`;
+  });
+});
+
+// ===== Advertencia de "recámaras físicas > registradas" (modal de villa en
+// Usuarios): aviso inmediato mientras se captura, antes de guardar — el
+// mismo criterio se vuelve a validar en el servidor. =====
+document.querySelectorAll('[data-recamaras-registradas]').forEach((campoRegistradas) => {
+  const tarjeta = campoRegistradas.closest('.form-card');
+  const campoFisicas = tarjeta ? tarjeta.querySelector('[data-recamaras-fisicas]') : null;
+  const advertencia = tarjeta ? tarjeta.querySelector('[data-recamaras-advertencia]') : null;
+  if (!campoFisicas || !advertencia) return;
+
+  const revisar = () => {
+    const registradas = parseInt(campoRegistradas.value, 10) || 0;
+    const fisicas = parseInt(campoFisicas.value, 10) || 0;
+    advertencia.hidden = fisicas <= registradas;
+  };
+
+  campoRegistradas.addEventListener('input', revisar);
+  campoFisicas.addEventListener('input', revisar);
+  revisar();
 });
 
 // ===== Lightbox de imágenes en publicaciones =====
