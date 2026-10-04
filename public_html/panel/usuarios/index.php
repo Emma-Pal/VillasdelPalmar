@@ -132,7 +132,7 @@ unset($v);
 
     <div class="section-heading-fila">
       <h2 style="margin: 0;">Administradores</h2>
-      <a href="/panel/usuarios/nuevo" class="btn btn-primary">+ Nuevo administrador</a>
+      <button type="button" class="btn btn-primary" data-modal-open="modal-nuevo-administrador">+ Nuevo administrador</button>
     </div>
 
     <div class="tabla-wrap" data-reveal>
@@ -152,7 +152,7 @@ unset($v);
               <td><?= htmlspecialchars($a['cargo'] ?: '—') ?></td>
               <td><?= htmlspecialchars($a['usuario']) ?></td>
               <td class="tabla-acciones">
-                <a href="/panel/usuarios/editar?id=<?= (int) $a['id'] ?>" class="btn-editar">Editar</a>
+                <button type="button" class="btn-editar" data-modal-open="modal-editar-administrador-<?= (int) $a['id'] ?>">Editar</button>
                 <?php if ((int) $a['id'] !== (int) $usuario['id']): ?>
                   <form action="/panel/usuarios/eliminar?id=<?= (int) $a['id'] ?>" method="POST"
                         onsubmit="return confirm('¿Eliminar la cuenta de <?= htmlspecialchars(str_replace("'", '', $a['nombre'])) ?>? Esto no se puede deshacer.');">
@@ -167,6 +167,48 @@ unset($v);
       </table>
     </div>
   </section>
+
+  <!-- ===== Modal: Nuevo administrador ===== -->
+  <div class="aviso-modal-overlay" id="modal-nuevo-administrador" hidden>
+    <div class="aviso-modal">
+      <button type="button" class="aviso-modal-close" data-modal-close aria-label="Cerrar">&times;</button>
+      <div class="form-card">
+        <span class="eyebrow">Usuarios · Administradores</span>
+        <h2>Nuevo administrador</h2>
+        <p class="form-nota" style="margin-bottom: 16px;">Cuenta con privilegios de administrador (acceso a todo el panel de gestión).</p>
+        <form action="/panel/usuarios/administrador-guardar" method="POST" class="contact-form">
+          <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
+          <?php $admin = []; include __DIR__ . '/../../partials/administrador-campos.php'; ?>
+          <div class="modal-botones">
+            <button type="button" class="btn btn-ghost-light" data-modal-close>Cancelar</button>
+            <button type="submit" class="btn btn-primary">Crear administrador</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Modales: Editar administrador (uno por administrador) ===== -->
+  <?php foreach ($administradores as $a): ?>
+    <div class="aviso-modal-overlay" id="modal-editar-administrador-<?= (int) $a['id'] ?>" hidden>
+      <div class="aviso-modal">
+        <button type="button" class="aviso-modal-close" data-modal-close aria-label="Cerrar">&times;</button>
+        <div class="form-card">
+          <span class="eyebrow">Usuarios · Administradores</span>
+          <h2>Editar administrador</h2>
+          <form action="/panel/usuarios/administrador-guardar" method="POST" class="contact-form">
+            <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
+            <input type="hidden" name="id" value="<?= (int) $a['id'] ?>" />
+            <?php $admin = $a; include __DIR__ . '/../../partials/administrador-campos.php'; ?>
+            <div class="modal-botones">
+              <button type="button" class="btn btn-ghost-light" data-modal-close>Cancelar</button>
+              <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  <?php endforeach; ?>
 
   <!-- ===== Modal: Alta de villa ===== -->
   <div class="aviso-modal-overlay" id="modal-nueva-villa" hidden>
