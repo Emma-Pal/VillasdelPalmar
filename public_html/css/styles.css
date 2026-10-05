@@ -2520,6 +2520,14 @@ a.nav-user:hover {
   margin-bottom: 20px;
 }
 
+/* Mismo motivo que .contact-form label[hidden] / .campo-advertencia[hidden]
+   arriba: display:flex propio le gana al [hidden] nativo del navegador sin
+   esto. Lo necesita la advertencia de "recámaras físicas > registradas"
+   (ver main.js), que reusa esta misma clase y empieza oculta. */
+.candado-aviso[hidden] {
+  display: none;
+}
+
 .candado-aviso--publico {
   background: #eaf1ee;
   color: var(--color-primary);
@@ -3028,6 +3036,12 @@ a.nav-user:hover {
   color: var(--color-text-muted);
 }
 
+.form-row-flex {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 /* ===== Usuarios — Villas y departamentos (rediseño oct. 2026) ===== */
 
 /* Modal más ancho que el genérico .aviso-modal (680px) — el de "Alta de
@@ -3044,14 +3058,16 @@ a.nav-user:hover {
   border-left: 3px solid #c0772e;
 }
 
-.titulares-card [data-titulares-lista] {
+/* ===== Bloques repetibles genéricos (titulares de una villa; acompañantes
+   y vehículos de un Registro de estancia) — ver main.js, data-repetible-*. ===== */
+[data-repetible-lista] {
   display: flex;
   flex-direction: column;
   gap: 18px;
   margin: 12px 0 16px;
 }
 
-.titular-card {
+.bloque-repetible {
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -3061,19 +3077,19 @@ a.nav-user:hover {
   background: var(--color-bg);
 }
 
-.titular-card-encabezado {
+.bloque-repetible-encabezado {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
 
-.titular-card-numero {
+.bloque-repetible-encabezado [data-repetible-numero] {
   font-weight: 700;
   color: var(--color-primary);
 }
 
-.titular-quitar {
+.bloque-repetible-quitar {
   border: none;
   background: none;
   color: var(--color-text-muted);
@@ -3084,7 +3100,7 @@ a.nav-user:hover {
   transition: background var(--transition), color var(--transition);
 }
 
-.titular-quitar:hover {
+.bloque-repetible-quitar:hover {
   background: #fbeceb;
   color: #b3372c;
 }
@@ -3114,4 +3130,159 @@ a.nav-user:hover {
   display: block;
   font-size: 13px;
   color: var(--color-text-muted);
+}
+
+/* ===== Registro de estancia (nuevo módulo oct. 2026) ===== */
+
+.bloque-repetible--compacto {
+  padding: 16px;
+  gap: 10px;
+}
+
+.estatus-pill--en_revision {
+  background: #fbf1de;
+  color: #8a6a2f;
+}
+
+.estatus-pill--confirmado {
+  background: #eaf6ee;
+  color: #2f8a53;
+}
+
+.estatus-pill--concluido {
+  background: #eef0f1;
+  color: var(--color-text-muted);
+}
+
+/* Steppers (+/-) de Adultos / Menores / Infantes */
+.campo-stepper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.campo-stepper-control {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.campo-stepper-control input {
+  width: 48px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 16px;
+  border: none;
+  background: none;
+  padding: 0;
+  -moz-appearance: textfield;
+}
+
+.campo-stepper-control input::-webkit-outer-spin-button,
+.campo-stepper-control input::-webkit-inner-spin-button {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.campo-stepper-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.campo-stepper-btn:hover {
+  background: var(--color-accent);
+}
+
+/* Barra de "Ocupación: X de Y equivalentes" */
+.ocupacion-barra-wrap {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin: 20px 0;
+}
+
+.ocupacion-barra-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.ocupacion-barra-encabezado span {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.ocupacion-barra {
+  display: flex;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--color-border);
+}
+
+.ocupacion-barra-dentro {
+  background: var(--color-primary);
+  height: 100%;
+  width: 0%;
+  transition: width var(--transition);
+}
+
+.ocupacion-barra-excedente {
+  background: #c0772e;
+  height: 100%;
+  width: 0%;
+  transition: width var(--transition);
+}
+
+.ocupacion-barra-wrap .form-nota {
+  margin: 10px 0 0;
+}
+
+/* Tarjetas de "Mis próximas estancias" */
+.estancia-card-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.estancia-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+}
+
+.estancia-card-encabezado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.estancia-card-datos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 14px;
+}
+
+@media (max-width: 640px) {
+  .estancia-card-datos {
+    grid-template-columns: 1fr;
+  }
 }

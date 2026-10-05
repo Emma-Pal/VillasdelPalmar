@@ -17,6 +17,7 @@
       </a>
       <a href="/panel/asambleas" class="<?= rutaActivaPrefijo('/panel/asambleas', $currentPath) ?>">Asambleas</a>
       <a href="/panel/documentos" class="<?= rutaActivaPrefijo('/panel/documentos', $currentPath) ?>">Guía del propietario</a>
+      <a href="/panel/registro-estancia" class="<?= rutaActivaPrefijo('/panel/registro-estancia', $currentPath) ?>">Registro de estancia</a>
       <a href="/panel/directorio" class="<?= rutaActivaPrefijo('/panel/directorio', $currentPath) ?>">Directorio</a>
       <a href="/panel/solicitudes" class="<?= rutaActivaPrefijo('/panel/solicitudes', $currentPath) ?>">Solicitudes</a>
       <a href="/panel/galeria" class="<?= rutaActivaPrefijo('/panel/galeria', $currentPath) ?>">Acerca de</a>

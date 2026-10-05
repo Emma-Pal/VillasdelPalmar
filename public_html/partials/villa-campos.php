@@ -48,14 +48,14 @@ $archivoTitularActual = function (array $t, string $campo, string $etiqueta) {
 $bloqueTitular = function (int $indice, array $t, bool $bloqueado) use ($archivoTitularActual) {
     $caracterActual = $t['caracter'] ?? 'copropietario';
     ?>
-    <div class="titular-card">
-      <div class="titular-card-encabezado">
-        <span class="titular-card-numero">Titular <?= $indice ?></span>
+    <div class="bloque-repetible">
+      <div class="bloque-repetible-encabezado">
+        <span data-repetible-numero>Titular <?= $indice ?></span>
         <?php if ($bloqueado): ?>
           <span class="badge badge--ok">Propietario</span>
           <input type="hidden" name="titular_caracter_<?= $indice ?>" value="propietario" />
         <?php else: ?>
-          <button type="button" class="titular-quitar" data-titular-quitar aria-label="Quitar este titular">🗑</button>
+          <button type="button" class="bloque-repetible-quitar" data-repetible-quitar aria-label="Quitar este titular">🗑</button>
         <?php endif; ?>
       </div>
 
@@ -139,20 +139,20 @@ $bloqueTitular = function (int $indice, array $t, bool $bloqueado) use ($archivo
   <p class="form-nota">Contraseña inicial: el propietario la cambia en su primer ingreso.</p>
 </div>
 
-<div class="form-card titulares-card" data-reveal data-titulares-wrap>
+<div class="form-card" data-reveal data-repetible-wrap data-repetible-prefijo="Titular">
   <span class="form-card-numero">2 · Titulares de la villa</span>
   <p class="form-nota">Agrega a cada propietario o copropietario. Sus documentos solo los consulta la Administración.</p>
 
-  <div data-titulares-lista>
+  <div data-repetible-lista>
     <?php $bloqueTitular(1, $titular1, true); ?>
     <?php foreach ($titularesAdicionales as $i => $t): $bloqueTitular($i + 2, $t, false); ?><?php endforeach; ?>
   </div>
 
-  <template data-titular-template>
+  <template data-repetible-template>
     <?php $bloqueTitular(0, [], false); ?>
   </template>
 
-  <button type="button" class="btn btn-ghost-light" data-titular-agregar>+ Agregar titular</button>
+  <button type="button" class="btn btn-ghost-light" data-repetible-agregar>+ Agregar titular</button>
 </div>
 
 <div class="form-card" data-reveal>
@@ -167,13 +167,15 @@ $bloqueTitular = function (int $indice, array $t, bool $bloqueado) use ($archivo
       Recámaras físicas *
       <input type="number" name="recamaras_fisicas" min="0" max="20" data-recamaras-fisicas value="<?= htmlspecialchars((string) ($villa['recamaras_fisicas'] ?? '')) ?>" required />
     </label>
-    <label style="flex: 1; min-width: 140px;">
-      Capacidad de ocupación *
-      <input type="number" name="capacidad_ocupacion" min="0" max="60" value="<?= htmlspecialchars((string) ($villa['capacidad_ocupacion'] ?? '')) ?>" required />
-    </label>
   </div>
   <p class="candado-aviso" data-recamaras-advertencia hidden>⚠ Hay más recámaras físicas que registradas. Esta villa queda marcada para revisión de Administración.</p>
-  <p class="form-nota">La capacidad es el número máximo de ocupantes permitidos al mismo tiempo en la villa.</p>
+
+  <div class="campo-grupo">
+    <span class="campo-grupo-label">Capacidad de ocupación</span>
+    <p style="margin: 0;"><strong data-capacidad-texto><?= capacidadPorRecamaras((int) ($villa['recamaras_registradas'] ?? 0)) ?> ocupantes</strong></p>
+    <input type="hidden" name="capacidad_ocupacion" data-capacidad-valor value="<?= capacidadPorRecamaras((int) ($villa['recamaras_registradas'] ?? 0)) ?>" />
+  </div>
+  <p class="form-nota">Se calcula según las recámaras registradas: estudio (0) = 3 personas, 1 recámara = 4, 2 recámaras = 7, 3 recámaras = 10.</p>
 </div>
 
 <div class="form-card" data-reveal>

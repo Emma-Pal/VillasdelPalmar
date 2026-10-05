@@ -54,15 +54,32 @@ function mesAbreviado(int $numeroMes): string
     return $meses[$numeroMes] ?? '';
 }
 
-// Etiqueta legible de los estatus de una solicitud.
+// Etiqueta legible de los estatus de una solicitud o de un registro de
+// estancia (comparten el mismo componente visual .estatus-pill).
 function etiquetaEstatus(string $estatus): string
 {
     $etiquetas = [
         'pendiente' => 'Pendiente',
         'en_progreso' => 'En progreso',
         'resuelto' => 'Resuelto',
+        'en_revision' => 'En revisión',
+        'confirmado' => 'Confirmado',
+        'concluido' => 'Concluida',
     ];
     return $etiquetas[$estatus] ?? $estatus;
+}
+
+// Capacidad de ocupación de una villa según sus recámaras registradas —
+// tabla fija que dio Emmanuel (estudio = 3, y sube de ahí). Más allá de la
+// tabla (4+ recámaras) se extiende el mismo incremento de +3 por recámara
+// que ya trae de 2 a 3. Usada tanto para precargar el campo oculto en
+// villa-campos.php como, en espejo, por el mismo cálculo en main.js.
+function capacidadPorRecamaras(int $recamaras): int
+{
+    $tabla = [0 => 3, 1 => 4, 2 => 7, 3 => 10];
+    if (isset($tabla[$recamaras])) return $tabla[$recamaras];
+    if ($recamaras > 3) return 10 + ($recamaras - 3) * 3;
+    return 3;
 }
 
 // Usadas por partials/portal-header.php para marcar la sección activa del

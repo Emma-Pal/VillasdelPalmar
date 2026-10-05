@@ -19,6 +19,7 @@ require_once __DIR__ . '/repos/archivos.php';
 require_once __DIR__ . '/repos/documentos.php';
 require_once __DIR__ . '/repos/directorio.php';
 require_once __DIR__ . '/repos/solicitudes.php';
+require_once __DIR__ . '/repos/estancias.php';
 require_once __DIR__ . '/repos/galeria.php';
 
 // Disponibles en todas las vistas (equivalente a res.locals en Express).

@@ -317,25 +317,32 @@ function inicializarDropzone(dropzone) {
 
 document.querySelectorAll('.dropzone').forEach(inicializarDropzone);
 
-// ===== Titulares de una villa (/panel/usuarios, modal "Alta de villa" /
-// "Editar villa"): "+ Agregar titular" clona la <template> del bloque,
-// renumerando sus name="titular_campo_0" a "_N" (0 es solo el marcador de
-// la plantilla) y activando su dropzone y su botón de quitar. El titular 1
-// no tiene botón de quitar — siempre es el propietario. =====
-document.querySelectorAll('[data-titulares-wrap]').forEach((wrap) => {
-  const lista = wrap.querySelector('[data-titulares-lista]');
-  const plantilla = wrap.querySelector('template[data-titular-template]');
-  const botonAgregar = wrap.querySelector('[data-titular-agregar]');
+// ===== Bloques repetibles genéricos (titulares de una villa en Usuarios;
+// acompañantes y vehículos de un Registro de estancia): "+ Agregar..." clona
+// la <template> del bloque, renumerando sus name="campo_0" a "_N" (0 es
+// solo el marcador de la plantilla) y activando su dropzone (si trae) y su
+// botón de quitar. Puede haber más de un data-repetible-wrap en la misma
+// página/modal (ej. acompañantes Y vehículos en el mismo formulario), cada
+// uno con su propia lista/plantilla/botón — por eso todo se busca relativo
+// a "wrap", nunca por id. El primer bloque de una lista (ej. Titular 1, que
+// siempre es el propietario) puede no traer data-repetible-quitar — eso ya
+// lo decide el PHP que lo imprime, no este JS. =====
+document.querySelectorAll('[data-repetible-wrap]').forEach((wrap) => {
+  const lista = wrap.querySelector('[data-repetible-lista]');
+  const plantilla = wrap.querySelector('template[data-repetible-template]');
+  const botonAgregar = wrap.querySelector('[data-repetible-agregar]');
   if (!lista || !plantilla || !botonAgregar) return;
 
-  let contador = lista.querySelectorAll('.titular-card').length;
+  const prefijoNumero = wrap.dataset.repetiblePrefijo || '';
 
-  const activarQuitar = (tarjeta) => {
-    const boton = tarjeta.querySelector('[data-titular-quitar]');
-    if (boton) boton.addEventListener('click', () => tarjeta.remove());
+  let contador = lista.querySelectorAll('.bloque-repetible').length;
+
+  const activarQuitar = (bloque) => {
+    const boton = bloque.querySelector('[data-repetible-quitar]');
+    if (boton) boton.addEventListener('click', () => bloque.remove());
   };
 
-  lista.querySelectorAll('.titular-card').forEach(activarQuitar);
+  lista.querySelectorAll('.bloque-repetible').forEach(activarQuitar);
 
   botonAgregar.addEventListener('click', () => {
     contador++;
@@ -343,13 +350,13 @@ document.querySelectorAll('[data-titulares-wrap]').forEach((wrap) => {
     fragmento.querySelectorAll('[name]').forEach((campo) => {
       campo.name = campo.name.replace(/_0$/, '_' + contador);
     });
-    fragmento.querySelectorAll('.titular-card-numero').forEach((span) => {
-      span.textContent = 'Titular ' + contador;
+    fragmento.querySelectorAll('[data-repetible-numero]').forEach((span) => {
+      span.textContent = prefijoNumero + ' ' + contador;
     });
-    const tarjeta = fragmento.querySelector('.titular-card');
-    lista.appendChild(tarjeta);
-    tarjeta.querySelectorAll('.dropzone').forEach(inicializarDropzone);
-    activarQuitar(tarjeta);
+    const bloque = fragmento.querySelector('.bloque-repetible');
+    lista.appendChild(bloque);
+    bloque.querySelectorAll('.dropzone').forEach(inicializarDropzone);
+    activarQuitar(bloque);
   });
 });
 
@@ -373,24 +380,205 @@ document.querySelectorAll('[data-generar-password]').forEach((boton) => {
   });
 });
 
-// ===== Advertencia de "recámaras físicas > registradas" (modal de villa en
-// Usuarios): aviso inmediato mientras se captura, antes de guardar — el
-// mismo criterio se vuelve a validar en el servidor. =====
+// ===== Recámaras y capacidad (modal de villa en Usuarios) =====
+// - Advertencia inmediata si hay más recámaras físicas que registradas
+//   (el mismo criterio se vuelve a validar en el servidor).
+// - Capacidad de ocupación: ya no se captura a mano, se calcula sola según
+//   las recámaras registradas (tabla fija que dio Emmanuel). El <input>
+//   real es hidden; esto solo lo mantiene sincronizado con lo que se ve.
+//   Misma tabla que capacidadPorRecamaras() en app/funciones.php — si una
+//   cambia, la otra también.
+function capacidadPorRecamaras(recamaras) {
+  const tabla = { 0: 3, 1: 4, 2: 7, 3: 10 };
+  if (recamaras in tabla) return tabla[recamaras];
+  if (recamaras > 3) return 10 + (recamaras - 3) * 3;
+  return 3;
+}
+
 document.querySelectorAll('[data-recamaras-registradas]').forEach((campoRegistradas) => {
   const tarjeta = campoRegistradas.closest('.form-card');
   const campoFisicas = tarjeta ? tarjeta.querySelector('[data-recamaras-fisicas]') : null;
   const advertencia = tarjeta ? tarjeta.querySelector('[data-recamaras-advertencia]') : null;
+  const capacidadValor = tarjeta ? tarjeta.querySelector('[data-capacidad-valor]') : null;
+  const capacidadTexto = tarjeta ? tarjeta.querySelector('[data-capacidad-texto]') : null;
   if (!campoFisicas || !advertencia) return;
 
-  const revisar = () => {
+  const revisarDiferencia = () => {
     const registradas = parseInt(campoRegistradas.value, 10) || 0;
     const fisicas = parseInt(campoFisicas.value, 10) || 0;
     advertencia.hidden = fisicas <= registradas;
   };
 
-  campoRegistradas.addEventListener('input', revisar);
-  campoFisicas.addEventListener('input', revisar);
-  revisar();
+  const actualizarCapacidad = () => {
+    if (!capacidadValor || !capacidadTexto) return;
+    const registradas = parseInt(campoRegistradas.value, 10) || 0;
+    const capacidad = capacidadPorRecamaras(registradas);
+    capacidadValor.value = capacidad;
+    capacidadTexto.textContent = capacidad + ' ocupantes';
+  };
+
+  campoRegistradas.addEventListener('input', () => {
+    revisarDiferencia();
+    actualizarCapacidad();
+  });
+  campoFisicas.addEventListener('input', revisarDiferencia);
+
+  revisarDiferencia();
+  actualizarCapacidad();
+});
+
+// ===== Registro de estancia (/panel/registro-estancia): steppers +/-,
+// ocupación en vivo (equivalentes de adulto/menor), cuota por excedente y
+// mostrar/ocultar los bloques de vehículos/mascota. Mismo criterio de
+// reparto que calcularOcupacionEstancia() en app/repos/estancias.php — si
+// uno cambia, el otro también. =====
+function ocupacionEquivalenteEstancia(capacidad, adultos, menores) {
+  let adultosExcedentes = 0;
+  let menoresExcedentes = 0;
+  if (adultos > capacidad) {
+    adultosExcedentes = adultos - capacidad;
+    menoresExcedentes = menores;
+  } else {
+    const libres = capacidad - adultos;
+    menoresExcedentes = Math.max(0, menores - Math.floor(libres * 2));
+  }
+  return { ocupacionEquivalente: adultos + menores * 0.5, adultosExcedentes, menoresExcedentes };
+}
+
+function nochesEntreFechasEstancia(fechaLlegada, fechaSalida) {
+  if (!fechaLlegada || !fechaSalida) return 1;
+  const llegada = new Date(fechaLlegada + 'T00:00:00');
+  const salida = new Date(fechaSalida + 'T00:00:00');
+  const noches = Math.round((salida - llegada) / 86400000);
+  return Math.max(1, noches);
+}
+
+document.querySelectorAll('[data-ocupacion-adultos]').forEach((campoAdultos) => {
+  const form = campoAdultos.closest('form');
+  const resultado = form ? form.querySelector('[data-ocupacion-resultado]') : null;
+  const campoMenores = form ? form.querySelector('[data-ocupacion-menores]') : null;
+  const campoInfantes = form ? form.querySelector('[data-ocupacion-infantes]') : null;
+  if (!form || !resultado || !campoMenores || !campoInfantes) return;
+
+  const campoLlegada = form.querySelector('[data-fecha-llegada]');
+  const campoSalida = form.querySelector('[data-fecha-salida]');
+  const villaSelect = form.querySelector('[data-villa-select]');
+  const villaFija = form.querySelector('[data-villa-capacidad-fija]');
+  const textoEl = resultado.querySelector('[data-ocupacion-texto]');
+  const detalleEl = resultado.querySelector('[data-ocupacion-detalle]');
+  const barraDentro = resultado.querySelector('[data-ocupacion-barra-dentro]');
+  const barraExcedente = resultado.querySelector('[data-ocupacion-barra-excedente]');
+  const notaEl = resultado.querySelector('[data-ocupacion-nota]');
+  const excedenteBloque = form.querySelector('[data-excedente-bloque]');
+  const excedenteDetalle = form.querySelector('[data-excedente-detalle]');
+  const excedenteCheckbox = form.querySelector('[data-excedente-checkbox]');
+  const excedenteTextoCheckbox = form.querySelector('[data-excedente-texto-checkbox]');
+
+  const capacidadActual = () => {
+    if (villaSelect) {
+      const opcion = villaSelect.selectedOptions[0];
+      return opcion ? parseInt(opcion.dataset.capacidad, 10) || 0 : 0;
+    }
+    if (villaFija) return parseInt(villaFija.dataset.villaCapacidadFija, 10) || 0;
+    return 0;
+  };
+
+  const recalcular = () => {
+    const adultos = parseInt(campoAdultos.value, 10) || 0;
+    const menores = parseInt(campoMenores.value, 10) || 0;
+    const infantes = parseInt(campoInfantes.value, 10) || 0;
+    const capacidad = capacidadActual();
+    const { ocupacionEquivalente, adultosExcedentes, menoresExcedentes } = ocupacionEquivalenteEstancia(capacidad, adultos, menores);
+
+    if (textoEl) textoEl.textContent = `Ocupación: ${ocupacionEquivalente} de ${capacidad} equivalentes`;
+    if (detalleEl) detalleEl.textContent = `${adultos + menores + infantes} personas · ${Math.max(0, adultos - 1) + menores + infantes} acompañantes`;
+
+    if (barraDentro && barraExcedente) {
+      const porcentajeDentro = capacidad > 0 ? Math.min(100, (ocupacionEquivalente / capacidad) * 100) : 0;
+      const porcentajeExcedente = capacidad > 0 && ocupacionEquivalente > capacidad ? Math.min(100 - porcentajeDentro, ((ocupacionEquivalente - capacidad) / capacidad) * 100) : 0;
+      barraDentro.style.width = porcentajeDentro + '%';
+      barraExcedente.style.width = porcentajeExcedente + '%';
+    }
+
+    const hayExcedente = adultosExcedentes > 0 || menoresExcedentes > 0;
+    if (notaEl) {
+      const libres = capacidad - ocupacionEquivalente;
+      notaEl.textContent = !hayExcedente && libres > 0 ? `Aún caben ${libres}.` : '';
+    }
+
+    if (excedenteBloque) {
+      excedenteBloque.hidden = !hayExcedente;
+      if (hayExcedente) {
+        const noches = nochesEntreFechasEstancia(campoLlegada ? campoLlegada.value : '', campoSalida ? campoSalida.value : '');
+        const cuota = adultosExcedentes * 150 * noches + menoresExcedentes * 75 * noches;
+        if (excedenteDetalle) {
+          excedenteDetalle.textContent = `Adultos excedentes: ${adultosExcedentes} × $150.00 × ${noches} noche(s). Menores excedentes: ${menoresExcedentes} × $75.00 × ${noches} noche(s).`;
+        }
+        if (excedenteTextoCheckbox) {
+          excedenteTextoCheckbox.textContent = `Acepto el excedente de ocupación indicado y me comprometo a pagar la cuota de $${cuota.toFixed(2)} MXN a la Administración. *`;
+        }
+        if (excedenteCheckbox) excedenteCheckbox.required = true;
+      } else if (excedenteCheckbox) {
+        excedenteCheckbox.required = false;
+        excedenteCheckbox.checked = false;
+      }
+    }
+  };
+
+  campoAdultos.addEventListener('input', recalcular);
+  campoMenores.addEventListener('input', recalcular);
+  campoInfantes.addEventListener('input', recalcular);
+  if (campoLlegada) campoLlegada.addEventListener('input', recalcular);
+  if (campoSalida) campoSalida.addEventListener('input', recalcular);
+  if (villaSelect) villaSelect.addEventListener('change', recalcular);
+
+  recalcular();
+});
+
+// Steppers (+/-) de los campos numéricos de ocupantes — el <input> se deja
+// "readonly" (nunca de tipo oculto, porque sigue siendo el valor real que
+// se manda al servidor) para que solo se cambie con los botones, nunca
+// tecleando directo, y así nunca quede en blanco o con texto raro.
+document.querySelectorAll('.campo-stepper-control').forEach((control) => {
+  const input = control.querySelector('input[type="number"]');
+  const menos = control.querySelector('[data-stepper-menos]');
+  const mas = control.querySelector('[data-stepper-mas]');
+  if (!input) return;
+
+  const disparar = () => input.dispatchEvent(new Event('input', { bubbles: true }));
+
+  if (menos) {
+    menos.addEventListener('click', () => {
+      const min = parseInt(input.min, 10) || 0;
+      input.value = Math.max(min, (parseInt(input.value, 10) || 0) - 1);
+      disparar();
+    });
+  }
+  if (mas) {
+    mas.addEventListener('click', () => {
+      const max = parseInt(input.max, 10) || 99;
+      input.value = Math.min(max, (parseInt(input.value, 10) || 0) + 1);
+      disparar();
+    });
+  }
+});
+
+// ===== Mostrar/ocultar un bloque según un grupo de pill-radio (Vehículos /
+// Mascota en Registro de estancia). A propósito usa display directo (no el
+// atributo hidden): algunos de estos bloques ya traen su propio display
+// (ej. .form-row-flex) y un hidden de atributo pierde contra eso — mismo
+// motivo que .candado-aviso[hidden] más arriba, pero aquí es más simple
+// evitarlo del todo que ir agregando una excepción de CSS por cada bloque. =====
+document.querySelectorAll('[data-toggle-bloque]').forEach((radio) => {
+  const bloque = document.getElementById(radio.dataset.toggleBloque);
+  if (!bloque) return;
+  const displayVisible = bloque.dataset.mostrarDisplay || 'block';
+
+  const actualizar = () => {
+    if (radio.checked) bloque.style.display = radio.value === 'si' ? displayVisible : 'none';
+  };
+  radio.addEventListener('change', actualizar);
+  actualizar();
 });
 
 // ===== Lightbox de imágenes en publicaciones =====

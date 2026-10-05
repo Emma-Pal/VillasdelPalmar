@@ -211,6 +211,65 @@ CREATE TABLE IF NOT EXISTS solicitudes (
   FOREIGN KEY (autor_id) REFERENCES usuarios(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Registro de estancia: cada fila es una estadía futura que una villa avisa
+-- a Administración. El folio que ve el propietario es solo el id con
+-- prefijo (folioEstancia() en app/repos/estancias.php) — no se guarda
+-- aparte, mismo criterio que "solicitudes".
+CREATE TABLE IF NOT EXISTS estancias (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id INT NOT NULL,             -- la villa (cuenta tipo='propietario') dueña del registro
+  autor_id INT NOT NULL,               -- quién lo capturó (la villa misma, o Administración en su nombre)
+  responsable_nombre VARCHAR(150) NOT NULL,
+  responsable_telefono VARCHAR(50) NULL,
+  responsable_id_archivo VARCHAR(255) NOT NULL,
+  responsable_id_archivo_nombre_original VARCHAR(255) NOT NULL,
+  fecha_llegada DATE NOT NULL,
+  hora_llegada TIME NOT NULL,
+  fecha_salida DATE NOT NULL,
+  hora_salida TIME NOT NULL,
+  adultos SMALLINT NOT NULL DEFAULT 0,
+  menores SMALLINT NOT NULL DEFAULT 0,
+  infantes SMALLINT NOT NULL DEFAULT 0,
+  -- "Snapshot" de la capacidad/ocupación al momento del registro (si luego
+  -- cambian las recámaras registradas de la villa, este registro no se
+  -- reinterpreta solo — refleja lo que de verdad se calculó y se le cobró).
+  capacidad_villa SMALLINT NOT NULL,
+  ocupacion_equivalente DECIMAL(5,1) NOT NULL,
+  adultos_excedentes SMALLINT NOT NULL DEFAULT 0,
+  menores_excedentes SMALLINT NOT NULL DEFAULT 0,
+  cuota_excedente DECIMAL(10,2) NOT NULL DEFAULT 0,
+  mascota_tipo VARCHAR(50) NULL,
+  mascota_raza_tamano VARCHAR(100) NULL,
+  mascota_cantidad SMALLINT NULL,
+  reglamento_aceptado TINYINT(1) NOT NULL DEFAULT 0,
+  danos_aceptado TINYINT(1) NOT NULL DEFAULT 0,
+  multas_aceptado TINYINT(1) NOT NULL DEFAULT 0,
+  excedente_aceptado TINYINT(1) NOT NULL DEFAULT 0,
+  firma_nombre VARCHAR(150) NOT NULL,
+  comentarios TEXT NULL,
+  estatus ENUM('en_revision','confirmado','concluido') NOT NULL DEFAULT 'en_revision',
+  creado_en DATETIME NOT NULL,
+  actualizado_en DATETIME NULL,
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+  FOREIGN KEY (autor_id) REFERENCES usuarios(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS estancia_acompanantes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  estancia_id INT NOT NULL,
+  nombre VARCHAR(150) NOT NULL,
+  tipo ENUM('adulto','menor','infante') NOT NULL,
+  FOREIGN KEY (estancia_id) REFERENCES estancias(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS estancia_vehiculos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  estancia_id INT NOT NULL,
+  placas VARCHAR(20) NOT NULL,
+  tipo VARCHAR(50) NOT NULL,
+  FOREIGN KEY (estancia_id) REFERENCES estancias(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ===== Migración 2026-09b: Galería administrable =====
 -- Las 3 páginas de Galería (alberca, áreas verdes, departamentos) siguen
 -- teniendo sus bloques originales fijos en el código; esta tabla es para
@@ -307,4 +366,57 @@ CREATE TABLE IF NOT EXISTS galeria_items (
 --   correo VARCHAR(150) NULL,
 --   creado_en DATETIME NOT NULL,
 --   FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ===== Migración 2026-10i: "Registro de estancia" =====
+-- CREATE TABLE estancias (
+--   id INT AUTO_INCREMENT PRIMARY KEY,
+--   usuario_id INT NOT NULL,
+--   autor_id INT NOT NULL,
+--   responsable_nombre VARCHAR(150) NOT NULL,
+--   responsable_telefono VARCHAR(50) NULL,
+--   responsable_id_archivo VARCHAR(255) NOT NULL,
+--   responsable_id_archivo_nombre_original VARCHAR(255) NOT NULL,
+--   fecha_llegada DATE NOT NULL,
+--   hora_llegada TIME NOT NULL,
+--   fecha_salida DATE NOT NULL,
+--   hora_salida TIME NOT NULL,
+--   adultos SMALLINT NOT NULL DEFAULT 0,
+--   menores SMALLINT NOT NULL DEFAULT 0,
+--   infantes SMALLINT NOT NULL DEFAULT 0,
+--   capacidad_villa SMALLINT NOT NULL,
+--   ocupacion_equivalente DECIMAL(5,1) NOT NULL,
+--   adultos_excedentes SMALLINT NOT NULL DEFAULT 0,
+--   menores_excedentes SMALLINT NOT NULL DEFAULT 0,
+--   cuota_excedente DECIMAL(10,2) NOT NULL DEFAULT 0,
+--   mascota_tipo VARCHAR(50) NULL,
+--   mascota_raza_tamano VARCHAR(100) NULL,
+--   mascota_cantidad SMALLINT NULL,
+--   reglamento_aceptado TINYINT(1) NOT NULL DEFAULT 0,
+--   danos_aceptado TINYINT(1) NOT NULL DEFAULT 0,
+--   multas_aceptado TINYINT(1) NOT NULL DEFAULT 0,
+--   excedente_aceptado TINYINT(1) NOT NULL DEFAULT 0,
+--   firma_nombre VARCHAR(150) NOT NULL,
+--   comentarios TEXT NULL,
+--   estatus ENUM('en_revision','confirmado','concluido') NOT NULL DEFAULT 'en_revision',
+--   creado_en DATETIME NOT NULL,
+--   actualizado_en DATETIME NULL,
+--   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+--   FOREIGN KEY (autor_id) REFERENCES usuarios(id)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+--
+-- CREATE TABLE estancia_acompanantes (
+--   id INT AUTO_INCREMENT PRIMARY KEY,
+--   estancia_id INT NOT NULL,
+--   nombre VARCHAR(150) NOT NULL,
+--   tipo ENUM('adulto','menor','infante') NOT NULL,
+--   FOREIGN KEY (estancia_id) REFERENCES estancias(id) ON DELETE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+--
+-- CREATE TABLE estancia_vehiculos (
+--   id INT AUTO_INCREMENT PRIMARY KEY,
+--   estancia_id INT NOT NULL,
+--   placas VARCHAR(20) NOT NULL,
+--   tipo VARCHAR(50) NOT NULL,
+--   FOREIGN KEY (estancia_id) REFERENCES estancias(id) ON DELETE CASCADE
 -- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
