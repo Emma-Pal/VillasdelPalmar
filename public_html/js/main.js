@@ -427,6 +427,50 @@ document.querySelectorAll('[data-recamaras-registradas]').forEach((campoRegistra
   actualizarCapacidad();
 });
 
+// ===== Fecha de salida nunca antes que la de llegada (Registro de
+// estancia): el date picker de salida no deja seleccionar un día anterior
+// (min se actualiza solo), y si de todos modos llega un valor inválido
+// (tecleado a mano, pegado, o un navegador viejo que ignora "min") se
+// corrige solo al valor de llegada y se avisa brevemente. =====
+document.querySelectorAll('[data-fecha-llegada]').forEach((campoLlegada) => {
+  const form = campoLlegada.closest('form');
+  const campoSalida = form ? form.querySelector('[data-fecha-salida]') : null;
+  const advertencia = form ? form.querySelector('[data-fecha-salida-advertencia]') : null;
+  if (!campoSalida) return;
+
+  let temporizadorAdvertenciaFecha = null;
+  const avisar = () => {
+    if (!advertencia) return;
+    advertencia.hidden = false;
+    clearTimeout(temporizadorAdvertenciaFecha);
+    temporizadorAdvertenciaFecha = setTimeout(() => {
+      advertencia.hidden = true;
+    }, 3000);
+  };
+
+  const sincronizarMinimo = () => {
+    if (!campoLlegada.value) return;
+    campoSalida.min = campoLlegada.value;
+    if (campoSalida.value && campoSalida.value < campoLlegada.value) {
+      campoSalida.value = campoLlegada.value;
+      avisar();
+      campoSalida.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  };
+
+  campoLlegada.addEventListener('input', sincronizarMinimo);
+  campoLlegada.addEventListener('change', sincronizarMinimo);
+  campoSalida.addEventListener('change', () => {
+    if (campoLlegada.value && campoSalida.value && campoSalida.value < campoLlegada.value) {
+      campoSalida.value = campoLlegada.value;
+      avisar();
+      campoSalida.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  });
+
+  sincronizarMinimo();
+});
+
 // ===== Registro de estancia (/panel/registro-estancia): steppers +/-,
 // ocupación en vivo (equivalentes de adulto/menor), cuota por excedente y
 // mostrar/ocultar los bloques de vehículos/mascota. Mismo criterio de

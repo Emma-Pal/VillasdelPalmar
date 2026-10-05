@@ -100,6 +100,7 @@ $bloqueVehiculo = function (int $indice) {
     <label style="flex: 1; min-width: 160px;">
       Fecha de salida *
       <input type="date" name="fecha_salida" data-fecha-salida required />
+      <span class="campo-advertencia" data-fecha-salida-advertencia hidden>La salida no puede ser antes de la llegada — se ajustó automáticamente.</span>
     </label>
     <label style="flex: 1; min-width: 140px;">
       Hora estimada de salida *
