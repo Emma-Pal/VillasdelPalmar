@@ -568,14 +568,33 @@ document.querySelectorAll('.campo-stepper-control').forEach((control) => {
 // atributo hidden): algunos de estos bloques ya traen su propio display
 // (ej. .form-row-flex) y un hidden de atributo pierde contra eso — mismo
 // motivo que .candado-aviso[hidden] más arriba, pero aquí es más simple
-// evitarlo del todo que ir agregando una excepción de CSS por cada bloque. =====
+// evitarlo del todo que ir agregando una excepción de CSS por cada bloque.
+//
+// OJO: display:none NO basta para los campos "required" de adentro — la
+// spec dice que un campo oculto se excluye de la validación, pero Chrome en
+// la práctica solo bloquea el envío con "is not focusable" en vez de
+// excluirlo (pasa con un required vacío, ej. "Placas" sin escribir nada).
+// Por eso también se quita/regresa el atributo required de cada campo que
+// ya lo traía al cargar la página, según se oculte o se muestre el bloque. =====
 document.querySelectorAll('[data-toggle-bloque]').forEach((radio) => {
   const bloque = document.getElementById(radio.dataset.toggleBloque);
   if (!bloque) return;
   const displayVisible = bloque.dataset.mostrarDisplay || 'block';
 
+  if (!bloque.dataset.requeridosMarcados) {
+    bloque.querySelectorAll('[required]').forEach((campo) => {
+      campo.dataset.requeridoCondicional = '1';
+    });
+    bloque.dataset.requeridosMarcados = '1';
+  }
+
   const actualizar = () => {
-    if (radio.checked) bloque.style.display = radio.value === 'si' ? displayVisible : 'none';
+    if (!radio.checked) return;
+    const visible = radio.value === 'si';
+    bloque.style.display = visible ? displayVisible : 'none';
+    bloque.querySelectorAll('[data-requerido-condicional]').forEach((campo) => {
+      campo.required = visible;
+    });
   };
   radio.addEventListener('change', actualizar);
   actualizar();
