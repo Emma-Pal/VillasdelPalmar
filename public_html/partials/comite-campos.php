@@ -47,14 +47,16 @@
   </label>
 </div>
 
+<p class="form-nota" style="margin-top: -4px;">Correo o teléfono — al menos uno de los dos es obligatorio.</p>
+
 <label>
-  Correo electrónico *
-  <input type="email" name="correo" value="<?= htmlspecialchars($miembro['correo'] ?? '') ?>" required />
+  Correo electrónico
+  <input type="email" name="correo" value="<?= htmlspecialchars($miembro['correo'] ?? '') ?>" />
 </label>
 
 <label>
-  Teléfono *
-  <input type="tel" name="telefono" value="<?= htmlspecialchars($miembro['telefono'] ?? '') ?>" required />
+  Teléfono
+  <input type="tel" name="telefono" value="<?= htmlspecialchars($miembro['telefono'] ?? '') ?>" />
 </label>
 
 <div style="display: flex; gap: 16px;">

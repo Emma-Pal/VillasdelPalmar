@@ -29,9 +29,11 @@ $telefono = trim($_POST['telefono'] ?? '');
 $periodoInicio = trim($_POST['periodo_inicio'] ?? '') ?: null;
 $periodoFin = trim($_POST['periodo_fin'] ?? '') ?: null;
 
-if ($nombre === '' || $villa === '' || $cargo === '' || $correo === '' || $telefono === '' || !ctype_digit($villa)) {
+// Correo y teléfono: basta con uno de los dos (no los dos a la fuerza) —
+// mismo criterio que ahora pide el alta de villa en /panel/usuarios.
+if ($nombre === '' || $villa === '' || $cargo === '' || ($correo === '' && $telefono === '') || !ctype_digit($villa)) {
     http_response_code(400);
-    renderError('No se pudo completar — Villas del Palmar', 'Faltan datos.', 'Faltan campos obligatorios, o el número de villa no es válido.');
+    renderError('No se pudo completar — Villas del Palmar', 'Faltan datos.', 'Faltan campos obligatorios (o ni correo ni teléfono), o el número de villa no es válido.');
     exit;
 }
 

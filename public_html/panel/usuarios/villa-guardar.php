@@ -73,6 +73,10 @@ if ($error === null) {
                     $error = 'Falta el INE (frente) del titular 1 (propietario).';
                     break;
                 }
+                if (!$telefono && !$correo) {
+                    $error = 'Falta el teléfono o el correo del titular 1 (propietario) — se necesita al menos uno para poder contactarlo.';
+                    break;
+                }
             }
 
             $titularesData[] = [

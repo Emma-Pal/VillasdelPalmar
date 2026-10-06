@@ -270,8 +270,10 @@ unset($v);
   <?php endforeach; ?>
 
   <!-- ===== Modales: "+ Comité" desde un titular (uno por titular que aún
-       no tiene fila en comite_miembros) — prellena nombre/villa/correo/
-       teléfono y manda directo a /panel/directorio/comite-guardar. ===== -->
+       no tiene fila en comite_miembros) — nombre/villa/correo/teléfono
+       viajan ocultos (ya se capturaron al dar de alta la villa), solo se
+       pide el cargo. Si después se necesita afinar departamento, titular/
+       suplente o periodo, se edita desde /panel/directorio. ===== -->
   <?php foreach ($villas as $v): foreach ($v['titulares'] as $t): if ($t['_comiteMiembro']) continue; ?>
     <div class="aviso-modal-overlay" id="modal-comite-titular-<?= (int) $t['id'] ?>" hidden>
       <div class="aviso-modal">
@@ -279,7 +281,6 @@ unset($v);
         <div class="form-card">
           <span class="eyebrow">Usuarios · Agregar al Comité</span>
           <h2>Agregar a <?= htmlspecialchars($t['nombre']) ?> al Comité</h2>
-          <p class="form-nota" style="margin-bottom: 16px;">Se precargan sus datos de la villa — completa departamento y cargo.</p>
           <form action="/panel/directorio/comite-guardar" method="POST" class="contact-form">
             <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
             <?php
@@ -290,7 +291,7 @@ unset($v);
                 'correo' => $t['correo'] ?? '',
                 'telefono' => $t['telefono'] ?? '',
             ];
-            include __DIR__ . '/../../partials/comite-campos.php';
+            include __DIR__ . '/../../partials/comite-campos-rapido.php';
             ?>
             <div class="modal-botones">
               <button type="button" class="btn btn-ghost-light" data-modal-close>Cancelar</button>

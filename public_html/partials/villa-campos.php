@@ -106,13 +106,14 @@ $bloqueTitular = function (int $indice, array $t, bool $bloqueado) use ($archivo
         </div>
       </div>
 
+      <?php if ($bloqueado): ?><p class="form-nota" style="margin-top: -4px;">Teléfono o correo — al menos uno de los dos es obligatorio, para poder contactar al propietario.</p><?php endif; ?>
       <div style="display: flex; gap: 16px;">
         <label style="flex: 1;">
-          Teléfono (opcional)
+          Teléfono<?= $bloqueado ? '' : ' (opcional)' ?>
           <input type="text" name="titular_telefono_<?= $indice ?>" value="<?= htmlspecialchars($t['telefono'] ?? '') ?>" inputmode="numeric" placeholder="10 dígitos" maxlength="10" />
         </label>
         <label style="flex: 1;">
-          Correo electrónico (opcional)
+          Correo electrónico<?= $bloqueado ? '' : ' (opcional)' ?>
           <input type="email" name="titular_correo_<?= $indice ?>" value="<?= htmlspecialchars($t['correo'] ?? '') ?>" />
         </label>
       </div>
