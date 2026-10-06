@@ -8,11 +8,15 @@ $description = 'Villas y departamentos con sus titulares, y cuentas de Administr
 $buscar = trim($_GET['buscar'] ?? '');
 $villas = getVillas($buscar !== '' ? $buscar : null);
 $administradores = getMesa();
+$cargosComiteSugeridos = array_unique(getCargosComiteSugeridos());
 
 // Para cada villa: si hay más recámaras físicas que registradas, o falta
 // algún documento obligatorio (escritura siempre; relación de
 // copropietarios solo si hay más de un titular), la fila se resalta para
-// que Administración le dé seguimiento.
+// que Administración le dé seguimiento. De paso, para cada titular se
+// revisa si ya tiene una fila en comite_miembros — así su columna ofrece
+// "+ Comité" o "Ya es del Comité" según corresponda (ver
+// getComiteMiembroPorTitularId() en app/repos/directorio.php).
 foreach ($villas as &$v) {
     $totalTitulares = count($v['titulares']);
     $v['_recamarasDiferencia'] = $v['recamaras_registradas'] !== null && $v['recamaras_fisicas'] !== null
@@ -21,6 +25,11 @@ foreach ($villas as &$v) {
     $v['_escrituraFaltante'] = empty($v['escritura_archivo']);
     $v['_relacionFaltante'] = $v['_relacionRequerida'] && empty($v['relacion_copropietarios_archivo']);
     $v['_requiereRevision'] = $v['_recamarasDiferencia'] || $v['_escrituraFaltante'] || $v['_relacionFaltante'];
+
+    foreach ($v['titulares'] as &$t) {
+        $t['_comiteMiembro'] = getComiteMiembroPorTitularId($t['id']);
+    }
+    unset($t);
 }
 unset($v);
 ?>
@@ -82,7 +91,14 @@ unset($v);
                   <?php if ($titular1): ?>
                     <span class="villa-titulares-nombres">
                       <?php foreach ($titulares as $t): ?>
-                        <span><?= htmlspecialchars($t['nombre']) ?></span>
+                        <span class="villa-titular-fila">
+                          <?= htmlspecialchars($t['nombre']) ?>
+                          <?php if ($t['_comiteMiembro']): ?>
+                            <span class="badge badge--ok" title="<?= htmlspecialchars(etiquetaDepartamentoComite($t['_comiteMiembro']['departamento'])) ?> · <?= htmlspecialchars($t['_comiteMiembro']['cargo']) ?>">✓ Comité</span>
+                          <?php else: ?>
+                            <button type="button" class="btn-editar" data-modal-open="modal-comite-titular-<?= (int) $t['id'] ?>">+ Comité</button>
+                          <?php endif; ?>
+                        </span>
                       <?php endforeach; ?>
                     </span>
                     <span class="badge <?= count($titulares) > 1 ? 'badge--doc-reglamento' : '' ?>" style="margin-top: 4px; display: inline-block;">
@@ -252,6 +268,45 @@ unset($v);
       </div>
     </div>
   <?php endforeach; ?>
+
+  <!-- ===== Modales: "+ Comité" desde un titular (uno por titular que aún
+       no tiene fila en comite_miembros) — prellena nombre/villa/correo/
+       teléfono y manda directo a /panel/directorio/comite-guardar. ===== -->
+  <?php foreach ($villas as $v): foreach ($v['titulares'] as $t): if ($t['_comiteMiembro']) continue; ?>
+    <div class="aviso-modal-overlay" id="modal-comite-titular-<?= (int) $t['id'] ?>" hidden>
+      <div class="aviso-modal">
+        <button type="button" class="aviso-modal-close" data-modal-close aria-label="Cerrar">&times;</button>
+        <div class="form-card">
+          <span class="eyebrow">Usuarios · Agregar al Comité</span>
+          <h2>Agregar a <?= htmlspecialchars($t['nombre']) ?> al Comité</h2>
+          <p class="form-nota" style="margin-bottom: 16px;">Se precargan sus datos de la villa — completa departamento y cargo.</p>
+          <form action="/panel/directorio/comite-guardar" method="POST" class="contact-form">
+            <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
+            <?php
+            $miembro = [
+                'titular_id' => $t['id'],
+                'nombre' => $t['nombre'],
+                'villa' => $v['villa'],
+                'correo' => $t['correo'] ?? '',
+                'telefono' => $t['telefono'] ?? '',
+            ];
+            include __DIR__ . '/../../partials/comite-campos.php';
+            ?>
+            <div class="modal-botones">
+              <button type="button" class="btn btn-ghost-light" data-modal-close>Cancelar</button>
+              <button type="submit" class="btn btn-primary">Agregar al Comité</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  <?php endforeach; endforeach; ?>
+
+  <datalist id="cargos-comite-sugeridos">
+    <?php foreach ($cargosComiteSugeridos as $c): ?>
+      <option value="<?= htmlspecialchars($c) ?>"></option>
+    <?php endforeach; ?>
+  </datalist>
 
   <!-- ===== Lightbox: ver un documento sin salir de la página ===== -->
   <div class="lightbox-overlay" id="lightbox-overlay" hidden>

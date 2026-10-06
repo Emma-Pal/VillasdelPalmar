@@ -183,6 +183,14 @@ CREATE TABLE IF NOT EXISTS comite_miembros (
   titular_suplente ENUM('titular','suplente') NOT NULL DEFAULT 'titular',
   nombre VARCHAR(150) NOT NULL,
   villa VARCHAR(20) NULL,
+  -- Si este integrante se dio de alta desde "+ Comité" en un titular de
+  -- /panel/usuarios, aquí queda el titular de origen (para no ofrecer
+  -- agregarlo dos veces, y para que esa fila muestre "Ya es del Comité").
+  -- NULL cuando se capturó directo en Directorio, sin partir de un titular
+  -- — eso sigue siendo válido (el Comité puede tener gente que no es
+  -- propietaria). ON DELETE SET NULL: si se borra el titular, el
+  -- integrante del Comité no desaparece, solo pierde esa referencia.
+  titular_id INT NULL,
   cargo VARCHAR(100) NOT NULL,
   correo VARCHAR(150) NULL,
   telefono VARCHAR(50) NULL,
@@ -191,7 +199,8 @@ CREATE TABLE IF NOT EXISTS comite_miembros (
   autor_id INT NOT NULL,
   creado_en DATETIME NOT NULL,
   actualizado_en DATETIME NULL,
-  FOREIGN KEY (autor_id) REFERENCES usuarios(id)
+  FOREIGN KEY (autor_id) REFERENCES usuarios(id),
+  FOREIGN KEY (titular_id) REFERENCES titulares(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Solicitudes de propietarios (quejas/fallas/sugerencias). El folio que se
@@ -420,3 +429,8 @@ CREATE TABLE IF NOT EXISTS galeria_items (
 --   tipo VARCHAR(50) NOT NULL,
 --   FOREIGN KEY (estancia_id) REFERENCES estancias(id) ON DELETE CASCADE
 -- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ===== Migración 2026-10j: "+ Comité" desde un titular, en Usuarios =====
+-- ALTER TABLE comite_miembros
+--   ADD COLUMN titular_id INT NULL AFTER villa,
+--   ADD FOREIGN KEY (titular_id) REFERENCES titulares(id) ON DELETE SET NULL;

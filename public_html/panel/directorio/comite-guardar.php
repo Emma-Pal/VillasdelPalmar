@@ -38,7 +38,11 @@ if ($nombre === '' || $villa === '' || $cargo === '' || $correo === '' || $telef
 if ($esEdicion) {
     actualizarComiteMiembro($id, $departamento, $titularSuplente, $nombre, $villa, $cargo, $correo, $telefono, $periodoInicio, $periodoFin);
 } else {
-    crearComiteMiembro($usuario['id'], $departamento, $titularSuplente, $nombre, $villa, $cargo, $correo, $telefono, $periodoInicio, $periodoFin);
+    // Presente solo cuando se creó desde el botón "+ Comité" de un titular
+    // en /panel/usuarios (ver villa-campos / index.php) — vincula esta
+    // fila con su titular de origen.
+    $titularId = (int) ($_POST['titular_id'] ?? 0) ?: null;
+    crearComiteMiembro($usuario['id'], $departamento, $titularSuplente, $nombre, $villa, $cargo, $correo, $telefono, $periodoInicio, $periodoFin, $titularId);
 }
 
 header('Location: /panel/directorio#comite');

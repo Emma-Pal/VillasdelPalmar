@@ -158,6 +158,17 @@ function getComiteMiembroPorId($id): ?array
     return $fila ?: null;
 }
 
+// Usada por /panel/usuarios para saber, por cada titular de una villa, si
+// ya tiene una fila en comite_miembros — así esa fila muestra "Ya es del
+// Comité" en vez de ofrecer el botón "+ Comité" otra vez.
+function getComiteMiembroPorTitularId($titularId): ?array
+{
+    $stmt = db()->prepare('SELECT * FROM comite_miembros WHERE titular_id = ?');
+    $stmt->execute([$titularId]);
+    $fila = $stmt->fetch();
+    return $fila ?: null;
+}
+
 function crearComiteMiembro(
     $autorId,
     string $departamento,
@@ -168,13 +179,14 @@ function crearComiteMiembro(
     ?string $correo,
     ?string $telefono,
     ?string $periodoInicio,
-    ?string $periodoFin
+    ?string $periodoFin,
+    $titularId = null
 ): string {
     $stmt = db()->prepare(
-        'INSERT INTO comite_miembros (departamento, titular_suplente, nombre, villa, cargo, correo, telefono, periodo_inicio, periodo_fin, autor_id, creado_en)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO comite_miembros (departamento, titular_suplente, nombre, villa, titular_id, cargo, correo, telefono, periodo_inicio, periodo_fin, autor_id, creado_en)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
-    $stmt->execute([$departamento, $titularSuplente, $nombre, $villa, $cargo, $correo, $telefono, $periodoInicio, $periodoFin, $autorId, date('Y-m-d H:i:s')]);
+    $stmt->execute([$departamento, $titularSuplente, $nombre, $villa, $titularId ?: null, $cargo, $correo, $telefono, $periodoInicio, $periodoFin, $autorId, date('Y-m-d H:i:s')]);
     return db()->lastInsertId();
 }
 

@@ -4,7 +4,15 @@
 // /panel/directorio. Espera $miembro: [] para "nuevo", o la fila de
 // comite_miembros para editar uno existente. Este directorio es público
 // para todos los propietarios, a diferencia del de colaboradores.
+//
+// $miembro['titular_id'], cuando viene (desde el botón "+ Comité" de un
+// titular en /panel/usuarios), vincula el alta con su titular de origen —
+// ver comite-guardar.php. No se expone como campo editable, solo viaja
+// oculto en el alta nueva.
 ?>
+<?php if (!empty($miembro['titular_id'])): ?>
+  <input type="hidden" name="titular_id" value="<?= (int) $miembro['titular_id'] ?>" />
+<?php endif; ?>
 <div style="display: flex; gap: 16px;">
   <label style="flex: 1;">
     Departamento *
