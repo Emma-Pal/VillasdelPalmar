@@ -17,6 +17,13 @@ function getUsuarioPorId($id): ?array
     return $fila ?: null;
 }
 
+// Cuentas de Administración (acceso al panel de gestión) — NO es lo mismo
+// que ser del Comité. Alguien puede tener una de estas sin estar en el
+// Comité, o estar en el Comité sin tener cuenta aquí; "quién está en el
+// Comité" vive aparte, en comite_miembros (ver getComiteMiembros() en
+// app/repos/directorio.php). Esta función es solo para /panel/usuarios
+// (gestionar accesos) — para la lista pública de integrantes del Comité
+// usa getComiteMiembros().
 function getMesa(): array
 {
     return db()->query("SELECT * FROM usuarios WHERE tipo = 'mesa' ORDER BY cargo")->fetchAll();
