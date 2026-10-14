@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="folio-confirmacion">
           <span class="eyebrow">Solicitud recibida</span>
           <p class="folio-numero"><?= htmlspecialchars($folioGenerado) ?></p>
-          <p>Anota este folio — con él puedes <a href="/panel/solicitudes/consultar">consultar el estatus</a> más adelante.</p>
+          <p>La verás en "Mis solicitudes" junto con las demás que hayas levantado.</p>
           <a href="/panel/solicitudes" class="btn btn-primary">Volver a Solicitudes</a>
         </div>
       <?php else: ?>

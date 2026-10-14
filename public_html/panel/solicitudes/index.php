@@ -8,11 +8,14 @@ $description = 'Quejas, fallas o sugerencias de los propietarios de Villas del P
 $esMesa = $usuario['tipo'] === 'mesa';
 $estatusActual = null;
 $solicitudes = [];
+$misSolicitudes = [];
 
 if ($esMesa) {
     $estatusValidos = ['pendiente', 'en_progreso', 'resuelto'];
     $estatusActual = in_array($_GET['estatus'] ?? '', $estatusValidos, true) ? $_GET['estatus'] : null;
     $solicitudes = getSolicitudes($estatusActual);
+} else {
+    $misSolicitudes = getSolicitudesDeAutor($usuario['id']);
 }
 ?>
 <!DOCTYPE html>
@@ -35,20 +38,39 @@ if ($esMesa) {
   <section class="detail-sections">
 
     <?php if (!$esMesa): ?>
-      <div class="dashboard-grid" data-reveal>
-        <div class="dashboard-card">
-          <span class="eyebrow">Reportar algo</span>
-          <h2>Levantar una solicitud</h2>
-          <p>Reporta una queja, una falla en las instalaciones o una sugerencia. Al enviarla te damos un folio para dar seguimiento.</p>
-          <a href="/panel/solicitudes/nueva" class="btn btn-primary">Levantar una solicitud</a>
-        </div>
-        <div class="dashboard-card">
-          <span class="eyebrow">Dar seguimiento</span>
-          <h2>Consultar un folio</h2>
-          <p>Si ya levantaste una solicitud, aquí puedes ver su estatus con el folio que se te dio.</p>
-          <a href="/panel/solicitudes/consultar" class="btn btn-ghost-light">Consultar un folio</a>
-        </div>
+      <div class="section-heading-fila">
+        <h2 style="margin: 0;">Mis solicitudes</h2>
+        <a href="/panel/solicitudes/nueva" class="btn btn-primary">+ Levantar una solicitud</a>
       </div>
+
+      <?php if (empty($misSolicitudes)): ?>
+        <p class="placeholder-note">Todavía no has levantado ninguna solicitud.</p>
+      <?php else: ?>
+        <div class="estancia-card-lista" data-reveal>
+          <?php foreach ($misSolicitudes as $s): ?>
+            <div class="estancia-card">
+              <div class="estancia-card-encabezado">
+                <div class="convocatoria-tags" style="margin: 0;">
+                  <span class="estatus-pill estatus-pill--<?= htmlspecialchars($s['estatus']) ?>"><?= htmlspecialchars(etiquetaEstatus($s['estatus'])) ?></span>
+                  <span class="badge">Folio <?= htmlspecialchars(folioSolicitud($s['id'], $s['folio_token'])) ?></span>
+                  <span class="badge"><?= htmlspecialchars(etiquetaTipoSolicitud($s['tipo'])) ?></span>
+                </div>
+                <span class="convocatoria-meta"><?= htmlspecialchars(date('d/m/Y', strtotime($s['creado_en']))) ?></span>
+              </div>
+
+              <h3 style="margin: 10px 0 4px;"><?= htmlspecialchars($s['asunto']) ?></h3>
+              <?php if (!empty($s['ubicacion'])): ?><p class="convocatoria-meta">📍 <?= htmlspecialchars($s['ubicacion']) ?></p><?php endif; ?>
+              <p style="margin: 10px 0;"><?= nl2brSeguro($s['descripcion']) ?></p>
+
+              <?php if (!empty($s['respuesta'])): ?>
+                <p class="candado-aviso candado-aviso--publico" style="display: block;"><strong>Respuesta de Administración:</strong><br /><?= nl2brSeguro($s['respuesta']) ?></p>
+              <?php else: ?>
+                <p class="form-nota">Todavía no hay una respuesta registrada.</p>
+              <?php endif; ?>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
     <?php else: ?>
       <div class="categoria-tabs" data-reveal>
         <a href="/panel/solicitudes" class="categoria-tab <?= !$estatusActual ? 'is-active' : '' ?>">Todas</a>
