@@ -212,6 +212,10 @@ CREATE TABLE IF NOT EXISTS solicitudes (
   asunto VARCHAR(255) NOT NULL,
   descripcion TEXT NOT NULL,
   ubicacion VARCHAR(150) NULL,
+  -- 4 caracteres aleatorios que se agregan al folio (ej. "SOL-000042-K7Q4")
+  -- para que no se pueda "adivinar" una solicitud ajena solo subiendo el
+  -- número — ver getSolicitudPorFolio() en app/repos/solicitudes.php.
+  folio_token VARCHAR(8) NULL,
   estatus ENUM('pendiente','en_progreso','resuelto') NOT NULL DEFAULT 'pendiente',
   respuesta TEXT NULL,
   autor_id INT NOT NULL,
@@ -277,6 +281,16 @@ CREATE TABLE IF NOT EXISTS estancia_vehiculos (
   placas VARCHAR(20) NOT NULL,
   tipo VARCHAR(50) NOT NULL,
   FOREIGN KEY (estancia_id) REFERENCES estancias(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Límite de intentos de /login — una fila por IP. 3 fallos seguidos ponen
+-- bloqueado_hasta 1 minuto en el futuro y resetean el contador a 0 (para
+-- que al expirar el bloqueo arranque limpio). Ver app/repos/login_intentos.php.
+CREATE TABLE IF NOT EXISTS login_intentos (
+  ip VARCHAR(45) NOT NULL PRIMARY KEY,
+  intentos SMALLINT NOT NULL DEFAULT 0,
+  bloqueado_hasta DATETIME NULL,
+  actualizado_en DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ===== Migración 2026-09b: Galería administrable =====
@@ -434,3 +448,16 @@ CREATE TABLE IF NOT EXISTS galeria_items (
 -- ALTER TABLE comite_miembros
 --   ADD COLUMN titular_id INT NULL AFTER villa,
 --   ADD FOREIGN KEY (titular_id) REFERENCES titulares(id) ON DELETE SET NULL;
+
+-- ===== Migración 2026-10k: límite de intentos de login =====
+-- CREATE TABLE login_intentos (
+--   ip VARCHAR(45) NOT NULL PRIMARY KEY,
+--   intentos SMALLINT NOT NULL DEFAULT 0,
+--   bloqueado_hasta DATETIME NULL,
+--   actualizado_en DATETIME NOT NULL
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ===== Migración 2026-10l: folio con token en Solicitudes =====
+-- Los folios ya entregados (filas con folio_token NULL) se siguen aceptando
+-- sin sufijo — no hace falta rellenar nada para las solicitudes existentes.
+-- ALTER TABLE solicitudes ADD COLUMN folio_token VARCHAR(8) NULL AFTER ubicacion;

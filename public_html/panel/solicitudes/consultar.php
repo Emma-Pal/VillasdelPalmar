@@ -12,8 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verificarCsrf();
 
     $folioTexto = trim($_POST['folio'] ?? '');
-    $id = idDesdeFolio($folioTexto);
-    $solicitud = $id ? getSolicitudPorId($id) : null;
+    $solicitud = $folioTexto !== '' ? getSolicitudPorFolio($folioTexto) : null;
     $noEncontrada = !$solicitud;
 }
 ?>
@@ -44,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
         <label>
           Folio
-          <input type="text" name="folio" placeholder="ej. SOL-000042" value="<?= isset($_POST['folio']) ? htmlspecialchars($_POST['folio']) : '' ?>" required autofocus />
+          <input type="text" name="folio" placeholder="ej. SOL-000042-K7Q4" value="<?= isset($_POST['folio']) ? htmlspecialchars($_POST['folio']) : '' ?>" required autofocus />
         </label>
         <button type="submit" class="btn btn-primary">Consultar</button>
       </form>

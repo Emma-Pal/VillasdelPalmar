@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($asunto !== '' && $descripcion !== '') {
         $id = crearSolicitud($usuario['id'], $tipo, $asunto, $descripcion, $ubicacion);
-        $folioGenerado = folioSolicitud($id);
+        $folioGenerado = folioSolicitud($id, getSolicitudPorId($id)['folio_token']);
     }
 }
 ?>

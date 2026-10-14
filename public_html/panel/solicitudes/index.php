@@ -75,7 +75,7 @@ if ($esMesa) {
             <tbody>
               <?php foreach ($solicitudes as $s): ?>
                 <tr>
-                  <td><?= htmlspecialchars(folioSolicitud($s['id'])) ?></td>
+                  <td><?= htmlspecialchars(folioSolicitud($s['id'], $s['folio_token'])) ?></td>
                   <td><?= htmlspecialchars(etiquetaTipoSolicitud($s['tipo'])) ?></td>
                   <td><?= htmlspecialchars($s['asunto']) ?></td>
                   <td><span class="estatus-pill estatus-pill--<?= htmlspecialchars($s['estatus']) ?>"><?= htmlspecialchars(etiquetaEstatus($s['estatus'])) ?></span></td>

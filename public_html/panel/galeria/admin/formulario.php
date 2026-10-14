@@ -1,5 +1,11 @@
 <?php
 // Compartido por nuevo.php y editar.php (mismo patrón que documentos).
+// require_once + requireMesa() también aquí (no solo en nuevo.php/editar.php):
+// si alguien pidiera esta URL directamente, antes tronaba con error fatal por
+// falta de bootstrap (un "seguro" por accidente, no por diseño) — esto lo deja
+// explícito y correcto pase lo que pase.
+require_once __DIR__ . '/../../../../app/bootstrap.php';
+requireMesa();
 
 $esEdicion = isset($_GET['id']);
 $itemEditado = null;

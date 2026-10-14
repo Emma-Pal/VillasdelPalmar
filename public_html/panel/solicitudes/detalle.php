@@ -8,7 +8,7 @@ if (!$solicitud) {
     exit;
 }
 
-$title = 'Solicitud ' . folioSolicitud($solicitud['id']) . ' — Villas del Palmar';
+$title = 'Solicitud ' . folioSolicitud($solicitud['id'], $solicitud['folio_token']) . ' — Villas del Palmar';
 $description = 'Detalle de una solicitud de Villas del Palmar.';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="page-banner-content">
       <a href="/panel/solicitudes" class="back-link">← Volver a solicitudes</a>
       <span class="eyebrow"><?= htmlspecialchars(etiquetaTipoSolicitud($solicitud['tipo'])) ?></span>
-      <h1><?= htmlspecialchars(folioSolicitud($solicitud['id'])) ?></h1>
+      <h1><?= htmlspecialchars(folioSolicitud($solicitud['id'], $solicitud['folio_token'])) ?></h1>
     </div>
   </section>
 

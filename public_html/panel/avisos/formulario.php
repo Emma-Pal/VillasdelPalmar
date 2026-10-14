@@ -1,6 +1,10 @@
 <?php
-// Compartido por nueva.php y editar.php. Requiere que quien lo incluya ya
-// haya hecho requireMesa().
+// Compartido por nueva.php y editar.php. Lleva su propio require_once +
+// requireMesa() (no solo confía en que quien lo incluya ya lo haya hecho) —
+// así una visita directa a esta URL queda bloqueada por diseño, no porque
+// de casualidad truene por falta de bootstrap.
+require_once __DIR__ . '/../../../app/bootstrap.php';
+requireMesa();
 //
 // A partir del rediseño de oct. 2026 esta pantalla ya NO pregunta la
 // categoría (financiero/mejora/aviso/"otra"): toda publicación creada aquí

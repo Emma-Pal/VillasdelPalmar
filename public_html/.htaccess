@@ -1,8 +1,36 @@
+# ===== Endurecimiento básico =====
+# Sin esto, una carpeta sin index.php (ej. /css/, /js/, /uploads si alguna
+# vez quedara dentro del docroot) lista todos sus archivos a quien la pida
+# directo. "+FollowSymLinks" se deja explícito porque algunos hosts de
+# cPanel exigen que esta línea lo repita para que el RewriteEngine de abajo
+# funcione.
+Options -Indexes +FollowSymLinks
+
+<IfModule mod_headers.c>
+  # Clickjacking: esta página tiene un formulario de login — que nadie la
+  # pueda meter en un <iframe> de otro sitio para intentar engañar a
+  # alguien a escribir su contraseña ahí.
+  Header always set X-Frame-Options "SAMEORIGIN"
+  # Evita que el navegador "adivine" el tipo de un archivo distinto al que
+  # el servidor declaró (mitiga algunos trucos de XSS vía archivos subidos).
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
 # Permite usar las URLs sin ".php" (ej. /panel/avisos en vez de
 # /panel/avisos/index.php, o /panel/avisos/editar en vez de
 # /panel/avisos/editar.php) — regla estándar, funciona en cualquier
 # Apache con mod_rewrite (prácticamente todos los cPanel).
 RewriteEngine On
+
+# Forzar HTTPS siempre — el sitio tiene un formulario de login (usuario y
+# contraseña viajarían en texto plano por HTTP sin esto) y ya se confirmó
+# que el dominio siempre tiene SSL activo. %{HTTP:X-Forwarded-Proto} cubre
+# el caso de que cPanel entregue el tráfico a través de un proxy/balanceador
+# donde %{HTTPS} por sí solo no basta.
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Un archivo real (css, js, imágenes, etc.) se sirve tal cual.
 RewriteCond %{REQUEST_FILENAME} -f

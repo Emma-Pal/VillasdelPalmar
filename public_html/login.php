@@ -11,27 +11,43 @@ if ($usuario) {
 
 $error = false;
 
+// Límite de intentos por IP (no por cuenta): 3 fallos seguidos bloquean
+// esta IP por 1 minuto, sin importar qué "usuario" se haya escrito en cada
+// intento. $segundosBloqueado se calcula SIEMPRE, no solo al enviar el
+// formulario — así recargar la página o cerrar y volver a abrir el
+// navegador no resetea nada, porque lo que se recuerda es la IP, no la
+// sesión ni el formulario.
+$ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+$segundosBloqueado = segundosBloqueadoLogin($ip);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verificarCsrf();
 
-    $usuarioInput = trim($_POST['usuario'] ?? '');
-    $password = $_POST['password'] ?? '';
-    $cuenta = $usuarioInput !== '' ? getUsuarioPorLogin($usuarioInput) : null;
+    if ($segundosBloqueado > 0) {
+        $error = true;
+    } else {
+        $usuarioInput = trim($_POST['usuario'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $cuenta = $usuarioInput !== '' ? getUsuarioPorLogin($usuarioInput) : null;
 
-    if ($cuenta && password_verify($password, $cuenta['password_hash'])) {
-        // Solo lo necesario en sesión — nunca el password_hash.
-        $_SESSION['usuario'] = [
-            'id' => $cuenta['id'],
-            'tipo' => $cuenta['tipo'],
-            'nombre' => $cuenta['nombre'],
-            'cargo' => $cuenta['cargo'],
-            'villa' => $cuenta['villa'],
-        ];
-        header('Location: /panel');
-        exit;
+        if ($cuenta && password_verify($password, $cuenta['password_hash'])) {
+            limpiarIntentosLogin($ip);
+            // Solo lo necesario en sesión — nunca el password_hash.
+            $_SESSION['usuario'] = [
+                'id' => $cuenta['id'],
+                'tipo' => $cuenta['tipo'],
+                'nombre' => $cuenta['nombre'],
+                'cargo' => $cuenta['cargo'],
+                'villa' => $cuenta['villa'],
+            ];
+            header('Location: /panel');
+            exit;
+        }
+
+        registrarIntentoFallidoLogin($ip);
+        $segundosBloqueado = segundosBloqueadoLogin($ip);
+        $error = true;
     }
-
-    $error = true;
 }
 ?>
 <!DOCTYPE html>
@@ -66,7 +82,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2 class="login-title">Iniciar sesión</h2>
         <p class="login-sub">Ingresa tus datos para continuar</p>
 
-        <?php if ($error): ?>
+        <?php if ($segundosBloqueado > 0): ?>
+          <p class="login-error">Demasiados intentos fallidos. Espera <?= (int) $segundosBloqueado ?> segundo<?= $segundosBloqueado === 1 ? '' : 's' ?> antes de volver a intentar.</p>
+        <?php elseif ($error): ?>
           <p class="login-error">Usuario o contraseña incorrectos.</p>
         <?php endif; ?>
 
@@ -74,18 +92,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
           <label>
             Usuario
-            <input type="text" name="usuario" placeholder="ej. propietarios" required autofocus />
+            <input type="text" name="usuario" placeholder="ej. propietarios" required autofocus <?= $segundosBloqueado > 0 ? 'disabled' : '' ?> />
           </label>
           <label>
             Contraseña
             <span class="login-password-wrap">
-              <input type="password" name="password" id="login-password" placeholder="Tu contraseña" required />
+              <input type="password" name="password" id="login-password" placeholder="Tu contraseña" required <?= $segundosBloqueado > 0 ? 'disabled' : '' ?> />
               <button type="button" class="login-password-toggle" id="login-password-toggle" aria-label="Mostrar contraseña">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </span>
           </label>
-          <button type="submit" class="btn btn-primary login-submit">Ingresar al portal</button>
+          <button type="submit" class="btn btn-primary login-submit" <?= $segundosBloqueado > 0 ? 'disabled' : '' ?>>Ingresar al portal</button>
         </form>
       </div>
     </div>
