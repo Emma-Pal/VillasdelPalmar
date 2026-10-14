@@ -8,6 +8,13 @@ $ultimasPublicaciones = getPublicaciones(10, 0);
 $totalPublicaciones = contarPublicaciones();
 $proximaAsamblea = getProximaAsamblea();
 
+$proximasEstancias = 0;
+if ($usuario['tipo'] === 'propietario') {
+    foreach (getEstanciasDeVilla($usuario['id']) as $e) {
+        if ($e['estatus'] !== 'concluido') $proximasEstancias++;
+    }
+}
+
 // Fotos reales del residencial para el carrusel de la galería (todas ya
 // están en /images, copiadas de las que se usaban en el sitio público).
 $slidesGaleria = [
@@ -79,6 +86,13 @@ $slidesGaleria = [
         </h2>
         <p><?= (int) $totalPublicaciones ?> publicaciones en total entre estados financieros, mejoras y avisos.</p>
         <a href="/panel/avisos" class="btn btn-primary">Ver avisos</a>
+      </div>
+
+      <div class="dashboard-card">
+        <span class="eyebrow">Estancias</span>
+        <h2><?php if ($usuario['tipo'] === 'propietario' && $proximasEstancias > 0): ?><?= $proximasEstancias ?> próxima<?= $proximasEstancias === 1 ? '' : 's' ?><?php else: ?>Registra tu estancia<?php endif; ?></h2>
+        <p>Avisa a Administración cuándo llegas a tu villa, quiénes te acompañan y con qué vehículos y mascotas.</p>
+        <a href="/panel/registro-estancia" class="btn btn-ghost-light">Ir a Registro de estancia</a>
       </div>
 
       <?php if ($usuario['tipo'] === 'mesa'): ?>

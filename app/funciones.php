@@ -84,9 +84,14 @@ function capacidadPorRecamaras(int $recamaras): int
 
 // Usadas por partials/portal-header.php para marcar la sección activa del
 // nav. strpos() en vez de str_starts_with() para no depender de PHP 8.
+// rtrim() en vez de comparar tal cual: "Panel" usa esta función con '/panel'
+// y en la práctica se veía sin resaltar — casi seguro porque el navegador o
+// el servidor a veces entrega la ruta con "/" al final ("/panel/"), que con
+// "===" simplemente deja de coincidir. rutaActivaPrefijo() (el resto del
+// menú) nunca tuvo este problema porque strpos() en 0 sí tolera eso.
 function rutaActivaExacta(string $ruta, string $currentPath): string
 {
-    return $currentPath === $ruta ? 'is-active' : '';
+    return rtrim($currentPath, '/') === rtrim($ruta, '/') ? 'is-active' : '';
 }
 
 function rutaActivaPrefijo(string $prefijo, string $currentPath): string
