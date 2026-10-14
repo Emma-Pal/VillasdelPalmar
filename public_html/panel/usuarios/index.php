@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../../app/bootstrap.php';
 requireMesa();
 
 $title = 'Usuarios — Villas del Palmar';
-$description = 'Villas y departamentos con sus titulares, y cuentas de Administración.';
+$description = 'Villas con sus titulares, y cuentas de Administración.';
 
 $buscar = trim($_GET['buscar'] ?? '');
 $villas = getVillas($buscar !== '' ? $buscar : null);
@@ -15,7 +15,7 @@ $cargosComiteSugeridos = array_unique(getCargosComiteSugeridos());
 // copropietarios solo si hay más de un titular), la fila se resalta para
 // que Administración le dé seguimiento. De paso, para cada titular se
 // revisa si ya tiene una fila en comite_miembros — así su columna ofrece
-// "+ Comité" o "Ya es del Comité" según corresponda (ver
+// "+ Consejo" o "Ya es del Consejo" según corresponda (ver
 // getComiteMiembroPorTitularId() en app/repos/directorio.php).
 foreach ($villas as &$v) {
     $totalTitulares = count($v['titulares']);
@@ -46,7 +46,7 @@ unset($v);
     <div class="page-banner-content">
       <span class="eyebrow">Administración</span>
       <h1>Usuarios</h1>
-      <p class="page-banner-lead">Villas y departamentos con sus titulares, y cuentas de Administración.</p>
+      <p class="page-banner-lead">Villas con sus titulares, y cuentas de Administración.</p>
     </div>
   </section>
 
@@ -54,7 +54,7 @@ unset($v);
 
     <div class="section-heading-fila">
       <div>
-        <h2 style="margin-bottom: 4px;">Villas y departamentos</h2>
+        <h2 style="margin-bottom: 4px;">Villas</h2>
         <p class="form-nota" style="margin: 0;"><?= count($villas) ?> inmueble<?= count($villas) === 1 ? '' : 's' ?> dado<?= count($villas) === 1 ? '' : 's' ?> de alta.</p>
       </div>
     </div>
@@ -94,9 +94,9 @@ unset($v);
                         <span class="villa-titular-fila">
                           <?= htmlspecialchars($t['nombre']) ?>
                           <?php if ($t['_comiteMiembro']): ?>
-                            <span class="badge badge--ok" title="<?= htmlspecialchars(etiquetaDepartamentoComite($t['_comiteMiembro']['departamento'])) ?> · <?= htmlspecialchars($t['_comiteMiembro']['cargo']) ?>">✓ Comité</span>
+                            <span class="badge badge--ok" title="<?= htmlspecialchars(etiquetaDepartamentoComite($t['_comiteMiembro']['departamento'])) ?> · <?= htmlspecialchars($t['_comiteMiembro']['cargo']) ?>">✓ Consejo</span>
                           <?php else: ?>
-                            <button type="button" class="btn-editar" data-modal-open="modal-comite-titular-<?= (int) $t['id'] ?>">+ Comité</button>
+                            <button type="button" class="btn-editar" data-modal-open="modal-comite-titular-<?= (int) $t['id'] ?>">+ Consejo</button>
                           <?php endif; ?>
                         </span>
                       <?php endforeach; ?>
@@ -231,7 +231,7 @@ unset($v);
     <div class="aviso-modal aviso-modal--ancho">
       <button type="button" class="aviso-modal-close" data-modal-close aria-label="Cerrar">&times;</button>
       <div class="form-card">
-        <span class="eyebrow">Usuarios · Alta de villa o departamento</span>
+        <span class="eyebrow">Usuarios · Alta de villa</span>
         <h2>Alta de villa</h2>
         <p class="form-nota" style="margin-bottom: 16px;">Los campos con * son obligatorios.</p>
         <form action="/panel/usuarios/villa-guardar" method="POST" enctype="multipart/form-data" class="contact-form">
@@ -269,7 +269,7 @@ unset($v);
     </div>
   <?php endforeach; ?>
 
-  <!-- ===== Modales: "+ Comité" desde un titular (uno por titular que aún
+  <!-- ===== Modales: "+ Consejo" desde un titular (uno por titular que aún
        no tiene fila en comite_miembros) — nombre/villa/correo/teléfono
        viajan ocultos (ya se capturaron al dar de alta la villa), solo se
        pide el cargo. Si después se necesita afinar departamento, titular/
@@ -279,8 +279,8 @@ unset($v);
       <div class="aviso-modal">
         <button type="button" class="aviso-modal-close" data-modal-close aria-label="Cerrar">&times;</button>
         <div class="form-card">
-          <span class="eyebrow">Usuarios · Agregar al Comité</span>
-          <h2>Agregar a <?= htmlspecialchars($t['nombre']) ?> al Comité</h2>
+          <span class="eyebrow">Usuarios · Agregar al Consejo de Administración</span>
+          <h2>Agregar a <?= htmlspecialchars($t['nombre']) ?> al Consejo de Administración</h2>
           <form action="/panel/directorio/comite-guardar" method="POST" class="contact-form">
             <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
             <?php
@@ -295,7 +295,7 @@ unset($v);
             ?>
             <div class="modal-botones">
               <button type="button" class="btn btn-ghost-light" data-modal-close>Cancelar</button>
-              <button type="submit" class="btn btn-primary">Agregar al Comité</button>
+              <button type="submit" class="btn btn-primary">Agregar al Consejo</button>
             </div>
           </form>
         </div>

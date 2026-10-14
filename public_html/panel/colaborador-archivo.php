@@ -1,12 +1,18 @@
 <?php
 // Sirve los documentos del expediente de un colaborador (INE, CURP, RFC,
-// NSS, comprobante de domicilio, contrato laboral). A diferencia de
-// panel/archivo.php y panel/documento.php, aquí se exige requireMesa() y NO
-// requireAuth() — estos documentos son datos personales sensibles (INE,
-// CURP, RFC, NSS, domicilio — LFPDPPP) que ningún propietario debe poder
-// ver, ni siquiera adivinando la URL.
+// NSS, comprobante de domicilio, contrato laboral) y su foto. Los
+// documentos de identidad son datos personales sensibles (LFPDPPP) que
+// ningún propietario debe poder ver, ni adivinando la URL — por eso exigen
+// requireMesa(). La foto es la única excepción: es solo un retrato, se
+// muestra en el listado público de /panel/directorio, así que ahí basta
+// con requireAuth() (cualquier cuenta logueada, propietario o Administración).
 require_once __DIR__ . '/../../app/bootstrap.php';
-requireMesa();
+requireAuth();
+
+$campoSolicitado = $_GET['campo'] ?? '';
+if ($campoSolicitado !== 'foto') {
+    requireMesa();
+}
 
 // Cada "campo" mapea a una columna de la tabla colaboradores — lista fija
 // (no se arma con el valor de la URL) para no poder apuntar a cualquier

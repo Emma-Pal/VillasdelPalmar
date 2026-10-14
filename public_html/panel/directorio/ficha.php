@@ -47,7 +47,7 @@ function filaDocumento(array $col, string $campo, string $etiquetaCorta): void
     <div class="page-banner-content">
       <span class="eyebrow">Administración</span>
       <h1>Directorio</h1>
-      <p class="page-banner-lead">Personal del condominio e integrantes del Comité.</p>
+      <p class="page-banner-lead">Personal del condominio e integrantes del Consejo de Administración.</p>
     </div>
   </section>
 

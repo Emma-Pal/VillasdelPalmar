@@ -2505,6 +2505,13 @@ a.nav-user:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+
+.directorio-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Aviso de nivel de acceso arriba de una lista (🔒 solo comité / público) */

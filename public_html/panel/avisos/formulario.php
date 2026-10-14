@@ -106,7 +106,7 @@ $volverTexto = $esAsamblea ? '← Volver a asambleas' : '← Volver a avisos';
   <section class="page-banner page-banner--plain">
     <div class="page-banner-content">
       <a href="<?= htmlspecialchars($volverHref) ?>" class="back-link"><?= htmlspecialchars($volverTexto) ?></a>
-      <span class="eyebrow">Comité</span>
+      <span class="eyebrow">Administración</span>
       <h1><?= $esEdicion ? 'Editar publicación' : 'Capturar aviso' ?></h1>
       <?php if (!$esEdicion): ?>
         <p class="page-banner-lead">Se firmará como <?= htmlspecialchars($usuario['nombre']) ?> — <?= htmlspecialchars($usuario['cargo']) ?>.</p>

@@ -50,7 +50,7 @@ $description = 'La historia de Villas del Palmar y fotografías de sus instalaci
       <p>
         A lo largo de estas décadas, la organización interna se ha ido ajustando a lo que las circunstancias
         han exigido: se formalizó la administración, se estableció un servicio de vigilancia y los
-        propietarios, por medio de la Asamblea y del Comité de Administración, han participado en las
+        propietarios, por medio de la Asamblea y del Consejo de Administración, han participado en las
         decisiones sobre la conservación de las instalaciones.
       </p>
       <p>

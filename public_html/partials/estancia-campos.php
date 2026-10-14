@@ -67,7 +67,7 @@ $bloqueVehiculo = function (int $indice) {
 
   <?php if ($esMesa): ?>
     <label>
-      Villa o departamento *
+      Villa *
       <select name="villa_usuario_id" data-villa-select required>
         <option value="">Selecciona...</option>
         <?php foreach ($villas as $v): ?>
@@ -79,7 +79,7 @@ $bloqueVehiculo = function (int $indice) {
     </label>
   <?php else: ?>
     <label>
-      Villa o departamento
+      Villa
       <input type="text" value="Villa <?= htmlspecialchars($villaPropia['villa'] ?? '') ?> — <?= htmlspecialchars($villaPropia['nombre'] ?? '') ?>" disabled />
     </label>
     <input type="hidden" name="villa_usuario_id" value="<?= (int) $usuario['id'] ?>" data-villa-capacidad-fija="<?= $capacidadPropia ?>" />

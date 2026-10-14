@@ -21,7 +21,7 @@
       <a href="/panel/directorio" class="<?= rutaActivaPrefijo('/panel/directorio', $currentPath) ?>">Directorio</a>
       <a href="/panel/solicitudes" class="<?= rutaActivaPrefijo('/panel/solicitudes', $currentPath) ?>">Solicitudes</a>
       <a href="/panel/galeria" class="<?= rutaActivaPrefijo('/panel/galeria', $currentPath) ?>">Acerca de</a>
-      <a href="/panel/mesa" class="<?= rutaActivaExacta('/panel/mesa', $currentPath) ?>">Comité</a>
+      <a href="/panel/mesa" class="<?= rutaActivaExacta('/panel/mesa', $currentPath) ?>">Consejo</a>
       <?php if ($usuario['tipo'] === 'mesa'): ?>
         <a href="/panel/usuarios" class="<?= rutaActivaPrefijo('/panel/usuarios', $currentPath) ?>">Usuarios</a>
       <?php endif; ?>

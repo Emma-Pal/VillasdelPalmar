@@ -29,7 +29,7 @@ function getMesa(): array
     return db()->query("SELECT * FROM usuarios WHERE tipo = 'mesa' ORDER BY cargo")->fetchAll();
 }
 
-// Villas y departamentos (cuentas tipo='propietario'), cada una con su
+// Villas (cuentas tipo='propietario'), cada una con su
 // arreglo de titulares ya cargado — mismo patrón que getPublicaciones()
 // adjuntando 'archivos' con getArchivosDePublicacion() por fila.
 function getVillas(?string $buscar = null): array

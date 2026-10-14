@@ -2,7 +2,7 @@
 // Versión mínima de comite-campos.php, solo para el botón "+ Comité" de un
 // titular en /panel/usuarios: todo lo que ya se conoce de ese titular
 // (nombre, villa, correo, teléfono) viaja oculto, sin pedirlo de nuevo, y
-// de momento solo hay un Comité (no varios departamentos) — así que lo
+// de momento solo hay un Consejo de Administración (no varios departamentos) — así que lo
 // único que de verdad hace falta capturar aquí es el cargo. Si después
 // Administración quiere afinar departamento, titular/suplente o periodo,
 // lo edita desde /panel/directorio como cualquier otro integrante. Espera
@@ -17,6 +17,6 @@
 <input type="hidden" name="telefono" value="<?= htmlspecialchars($miembro['telefono']) ?>" />
 
 <label>
-  Cargo en el Comité *
+  Cargo en el Consejo de Administración *
   <input type="text" name="cargo" list="cargos-comite-sugeridos" placeholder="ej. Presidente" required autofocus />
 </label>

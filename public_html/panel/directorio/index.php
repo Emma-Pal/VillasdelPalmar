@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../../app/bootstrap.php';
 requireAuth();
 
 $title = 'Directorio — Villas del Palmar';
-$description = 'Personal del condominio e integrantes del Comité.';
+$description = 'Personal del condominio e integrantes del Consejo de Administración.';
 
 $esMesa = $usuario['tipo'] === 'mesa';
 $tab = ($_GET['tab'] ?? 'personal') === 'comite' ? 'comite' : 'personal';
@@ -15,7 +15,7 @@ $buscarPersonal = trim($_GET['buscar'] ?? '');
 $colaboradores = getColaboradores($areaFiltro, $estatusFiltro, $buscarPersonal !== '' ? $buscarPersonal : null);
 $totalPersonal = count(getColaboradores(null, null, null));
 
-// ===== Integrantes del Comité =====
+// ===== Integrantes del Consejo de Administración =====
 $departamentoFiltro = in_array($_GET['departamento'] ?? '', DEPARTAMENTOS_COMITE, true) ? $_GET['departamento'] : null;
 $buscarComite = trim($_GET['buscar_comite'] ?? '');
 $miembros = getComiteMiembros($departamentoFiltro, $buscarComite !== '' ? $buscarComite : null);
@@ -35,14 +35,14 @@ $cargosSugeridos = array_unique(getCargosComiteSugeridos());
     <div class="page-banner-content">
       <span class="eyebrow">Administración</span>
       <h1>Directorio</h1>
-      <p class="page-banner-lead">Personal del condominio e integrantes del Comité.</p>
+      <p class="page-banner-lead">Personal del condominio e integrantes del Consejo de Administración.</p>
     </div>
   </section>
 
   <section class="detail-sections">
     <div class="categoria-tabs">
       <a href="/panel/directorio?tab=personal" class="categoria-tab <?= $tab === 'personal' ? 'is-active' : '' ?>">Personal del condominio <span class="tab-contador"><?= $totalPersonal ?></span></a>
-      <a href="/panel/directorio?tab=comite" class="categoria-tab <?= $tab === 'comite' ? 'is-active' : '' ?>">Integrantes del Comité <span class="tab-contador"><?= $totalComite ?></span></a>
+      <a href="/panel/directorio?tab=comite" class="categoria-tab <?= $tab === 'comite' ? 'is-active' : '' ?>">Integrantes del Consejo <span class="tab-contador"><?= $totalComite ?></span></a>
     </div>
 
     <?php if ($tab === 'personal'): ?>
@@ -97,7 +97,13 @@ $cargosSugeridos = array_unique(getCargosComiteSugeridos());
                 <tr>
                   <td>
                     <span class="directorio-persona">
-                      <span class="directorio-avatar"><?= htmlspecialchars(iniciales($c['nombre'])) ?></span>
+                      <span class="directorio-avatar">
+                        <?php if (!empty($c['foto'])): ?>
+                          <img src="/panel/colaborador-archivo?id=<?= (int) $c['id'] ?>&campo=foto" alt="" />
+                        <?php else: ?>
+                          <?= htmlspecialchars(iniciales($c['nombre'])) ?>
+                        <?php endif; ?>
+                      </span>
                       <span>
                         <span class="tabla-aviso-titulo"><?= htmlspecialchars($c['nombre']) ?></span>
                         <span class="tabla-subtexto"><?= htmlspecialchars($c['puesto']) ?></span>
@@ -185,7 +191,7 @@ $cargosSugeridos = array_unique(getCargosComiteSugeridos());
                     <td class="tabla-acciones">
                       <button type="button" class="btn-editar" data-modal-open="modal-editar-comite-<?= (int) $m['id'] ?>">Editar</button>
                       <form action="/panel/directorio/comite-eliminar?id=<?= (int) $m['id'] ?>" method="POST"
-                            onsubmit="return confirm('¿Eliminar a <?= htmlspecialchars(str_replace("'", '', $m['nombre'])) ?> del directorio del Comité?');">
+                            onsubmit="return confirm('¿Eliminar a <?= htmlspecialchars(str_replace("'", '', $m['nombre'])) ?> del directorio del Consejo de Administración?');">
                         <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
                         <button type="submit" class="btn-eliminar">Eliminar</button>
                       </form>
@@ -221,12 +227,12 @@ $cargosSugeridos = array_unique(getCargosComiteSugeridos());
       </div>
     </div>
 
-    <!-- ===== Modal: Nuevo integrante del Comité ===== -->
+    <!-- ===== Modal: Nuevo integrante del Consejo de Administración ===== -->
     <div class="aviso-modal-overlay" id="modal-nuevo-comite" hidden>
       <div class="aviso-modal">
         <button type="button" class="aviso-modal-close" data-modal-close aria-label="Cerrar">&times;</button>
         <div class="form-card">
-          <span class="eyebrow">Directorio · Integrantes del Comité</span>
+          <span class="eyebrow">Directorio · Integrantes del Consejo de Administración</span>
           <h2>Nuevo integrante</h2>
           <form action="/panel/directorio/comite-guardar" method="POST" class="contact-form">
             <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
@@ -240,13 +246,13 @@ $cargosSugeridos = array_unique(getCargosComiteSugeridos());
       </div>
     </div>
 
-    <!-- ===== Modales: Editar integrante del Comité (uno por integrante) ===== -->
+    <!-- ===== Modales: Editar integrante del Consejo de Administración (uno por integrante) ===== -->
     <?php foreach ($miembros as $m): ?>
       <div class="aviso-modal-overlay" id="modal-editar-comite-<?= (int) $m['id'] ?>" hidden>
         <div class="aviso-modal">
           <button type="button" class="aviso-modal-close" data-modal-close aria-label="Cerrar">&times;</button>
           <div class="form-card">
-            <span class="eyebrow">Directorio · Integrantes del Comité</span>
+            <span class="eyebrow">Directorio · Integrantes del Consejo de Administración</span>
             <h2>Editar integrante</h2>
             <form action="/panel/directorio/comite-guardar" method="POST" class="contact-form">
               <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />

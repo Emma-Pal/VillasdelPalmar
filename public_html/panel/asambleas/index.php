@@ -55,7 +55,7 @@ if ($tipoActaFiltro) $sufijoActas .= '&tipo_acta=' . urlencode($tipoActaFiltro);
 
   <section class="page-banner page-banner--plain">
     <div class="page-banner-content">
-      <span class="eyebrow">Comité</span>
+      <span class="eyebrow">Administración</span>
       <h1>Asambleas</h1>
       <p class="page-banner-lead">Convocatorias y actas firmadas de las asambleas de propietarios.</p>
     </div>

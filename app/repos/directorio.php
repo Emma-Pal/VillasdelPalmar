@@ -112,7 +112,7 @@ const DEPARTAMENTOS_COMITE = ['comite_administracion', 'comite_vigilancia', 'con
 function etiquetaDepartamentoComite(string $departamento): string
 {
     $etiquetas = [
-        'comite_administracion' => 'Comité de Administración',
+        'comite_administracion' => 'Consejo de Administración',
         'comite_vigilancia' => 'Comité de Vigilancia',
         'contraloria' => 'Contraloría',
     ];

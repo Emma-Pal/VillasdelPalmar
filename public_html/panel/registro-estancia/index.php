@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../../app/bootstrap.php';
 requireAuth();
 
 $title = 'Registro de estancia — Villas del Palmar';
-$description = 'Registra ante la Administración cuándo llegas a tu villa o departamento, quiénes te acompañan y con qué vehículos y mascotas.';
+$description = 'Registra ante la Administración cuándo llegas a tu villa, quiénes te acompañan y con qué vehículos y mascotas.';
 
 $esMesa = $usuario['tipo'] === 'mesa';
 $villaPropia = null;
@@ -43,7 +43,7 @@ if ($esMesa) {
     <div class="page-banner-content">
       <span class="eyebrow">Propietarios</span>
       <h1>Registro de estancia</h1>
-      <p class="page-banner-lead">Registra ante la Administración cuándo llegas a tu villa o departamento, quiénes te acompañan y con qué vehículos y mascotas, para preparar tu acceso.</p>
+      <p class="page-banner-lead">Registra ante la Administración cuándo llegas a tu villa, quiénes te acompañan y con qué vehículos y mascotas, para preparar tu acceso.</p>
     </div>
   </section>
 

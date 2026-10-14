@@ -1,6 +1,6 @@
 <?php
 // Procesa el modal "Alta de villa" / "Editar villa" de /panel/usuarios
-// (Villas y departamentos). El login de una villa es su propio número — no
+// (Villas). El login de una villa es su propio número — no
 // hay un campo "usuario" aparte que capturar, así que "usuario" y "villa"
 // siempre se guardan iguales.
 require_once __DIR__ . '/../../../app/bootstrap.php';
@@ -26,9 +26,11 @@ if ($esEdicion && !$villaActual) {
 
 $villaNumero = trim($_POST['villa_numero'] ?? '');
 $password = trim($_POST['password_villa'] ?? '');
-$recamarasRegistradas = (int) ($_POST['recamaras_registradas'] ?? -1);
-$recamarasFisicas = (int) ($_POST['recamaras_fisicas'] ?? -1);
-$capacidadOcupacion = (int) ($_POST['capacidad_ocupacion'] ?? -1);
+// Recámaras/capacidad son opcionales — en blanco se guardan como 0 (el
+// mismo "Estudio" que ya usa capacidadPorRecamaras() como caso base).
+$recamarasRegistradas = max(0, (int) ($_POST['recamaras_registradas'] ?? 0));
+$recamarasFisicas = max(0, (int) ($_POST['recamaras_fisicas'] ?? 0));
+$capacidadOcupacion = max(0, (int) ($_POST['capacidad_ocupacion'] ?? 0));
 
 $error = null;
 
@@ -38,8 +40,6 @@ if ($villaNumero === '' || !ctype_digit($villaNumero)) {
     $error = 'La contraseña asignada es obligatoria para una villa nueva.';
 } elseif ($password !== '' && !passwordEsValida($password)) {
     $error = 'La contraseña debe tener al menos ' . MIN_LARGO_PASSWORD . ' caracteres.';
-} elseif ($recamarasRegistradas < 0 || $recamarasFisicas < 0 || $capacidadOcupacion < 0) {
-    $error = 'Recámaras registradas, recámaras físicas y capacidad son obligatorias.';
 }
 
 // ===== Titulares: campos planos indexados titular_nombre_1, titular_nombre_2,
@@ -65,16 +65,12 @@ if ($error === null) {
             $ineReverso = procesarArchivoSubido("titular_ine_reverso_$i");
 
             if ($i === 1) {
-                if ($curp === '') {
-                    $error = 'Falta la CURP del titular 1 (propietario).';
+                if (!$telefono) {
+                    $error = 'Falta el teléfono del titular 1 (propietario).';
                     break;
                 }
-                if (!$ineFrente && !$tId) {
-                    $error = 'Falta el INE (frente) del titular 1 (propietario).';
-                    break;
-                }
-                if (!$telefono && !$correo) {
-                    $error = 'Falta el teléfono o el correo del titular 1 (propietario) — se necesita al menos uno para poder contactarlo.';
+                if (!$correo) {
+                    $error = 'Falta el correo del titular 1 (propietario).';
                     break;
                 }
             }
@@ -103,7 +99,7 @@ if ($error === null) {
     }
 }
 
-// ===== Documentos del inmueble =====
+// ===== Documentos del inmueble (ambos opcionales) =====
 $escritura = null;
 $relacion = null;
 if ($error === null) {
@@ -114,15 +110,6 @@ if ($error === null) {
         http_response_code(400);
         renderError('No se pudo completar — Villas del Palmar', 'Error al subir un archivo.', $e->getMessage());
         exit;
-    }
-
-    if (!$escritura && !($esEdicion && !empty($villaActual['escritura_archivo']))) {
-        $error = 'Falta adjuntar la escritura del inmueble.';
-    }
-
-    $requiereRelacion = count($titularesData) > 1;
-    if ($error === null && $requiereRelacion && !$relacion && !($esEdicion && !empty($villaActual['relacion_copropietarios_archivo']))) {
-        $error = 'La relación de copropietarios es obligatoria cuando hay más de un titular.';
     }
 }
 

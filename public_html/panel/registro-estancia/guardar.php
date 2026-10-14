@@ -22,7 +22,7 @@ $villa = getVillaPorId($villaUsuarioId);
 
 $error = null;
 if (!$villa) {
-    $error = 'Selecciona una villa o departamento válido.';
+    $error = 'Selecciona una villa válida.';
 }
 
 $fechaLlegada = trim($_POST['fecha_llegada'] ?? '');

@@ -1,18 +1,19 @@
 <?php
-// OJO: esta página muestra a los integrantes del Comité (comite_miembros —
-// un cargo dentro del condominio, ej. Presidente, Tesorero), que NO es lo
-// mismo que una cuenta de Administración (usuarios.tipo='mesa', el acceso
-// al panel de gestión). Antes esta página sí mostraba las cuentas de
-// Administración con getMesa() — se corrigió porque Emmanuel aclaró que son
-// dos cosas separadas: alguien puede ser del Comité sin tener cuenta de
-// Administración, y viceversa. La fuente de verdad real de "quién está en
-// el Comité" es /panel/directorio (pestaña "Integrantes del Comité"); esta
-// página es solo un acceso directo de solo lectura a esos mismos datos.
+// OJO: esta página muestra a los integrantes del Consejo de Administración
+// (comite_miembros — un cargo dentro del condominio, ej. Presidente,
+// Tesorero), que NO es lo mismo que una cuenta de Administración
+// (usuarios.tipo='mesa', el acceso al panel de gestión). Antes esta página
+// sí mostraba las cuentas de Administración con getMesa() — se corrigió
+// porque Emmanuel aclaró que son dos cosas separadas: alguien puede ser del
+// Consejo sin tener cuenta de Administración, y viceversa. La fuente de
+// verdad real de "quién está en el Consejo" es /panel/directorio (pestaña
+// "Integrantes del Consejo de Administración"); esta página es solo un
+// acceso directo de solo lectura a esos mismos datos.
 require_once __DIR__ . '/../../app/bootstrap.php';
 requireAuth();
 
-$title = 'Comité — Villas del Palmar';
-$description = 'Integrantes del comité de Villas del Palmar.';
+$title = 'Consejo de Administración — Villas del Palmar';
+$description = 'Integrantes del Consejo de Administración de Villas del Palmar.';
 $miembros = getComiteMiembros();
 ?>
 <!DOCTYPE html>
@@ -27,14 +28,14 @@ $miembros = getComiteMiembros();
   <section class="page-banner page-banner--plain">
     <div class="page-banner-content">
       <span class="eyebrow">Quién es quién</span>
-      <h1>Comité</h1>
+      <h1>Consejo de Administración</h1>
       <p class="page-banner-lead">Integrantes actuales y su cargo. Ver todo el detalle (periodo, titular/suplente) en <a href="/panel/directorio?tab=comite" style="color: inherit; text-decoration: underline;">Directorio</a>.</p>
     </div>
   </section>
 
   <section class="detail-sections">
     <?php if (empty($miembros)): ?>
-      <p class="placeholder-note">Todavía no hay integrantes del Comité capturados.</p>
+      <p class="placeholder-note">Todavía no hay integrantes del Consejo de Administración capturados.</p>
     <?php else: ?>
       <div class="amenities-grid" data-reveal>
         <?php foreach ($miembros as $m): ?>

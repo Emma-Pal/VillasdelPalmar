@@ -83,7 +83,7 @@ $slidesGaleria = [
 
       <?php if ($usuario['tipo'] === 'mesa'): ?>
         <div class="dashboard-card">
-          <span class="eyebrow">Comité</span>
+          <span class="eyebrow">Administración</span>
           <h2>Publicar algo nuevo</h2>
           <p>Comparte un estado financiero, una mejora o un aviso general.</p>
           <a href="/panel/avisos/nueva" class="btn btn-ghost-light">Nueva publicación</a>

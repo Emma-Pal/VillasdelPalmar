@@ -77,15 +77,15 @@ $bloqueTitular = function (int $indice, array $t, bool $bloqueado) use ($archivo
       <?php endif; ?>
 
       <label>
-        CURP <?= $bloqueado ? '*' : '' ?>
-        <input type="text" name="titular_curp_<?= $indice ?>" value="<?= htmlspecialchars($t['curp'] ?? '') ?>" maxlength="18" placeholder="18 caracteres" <?= $bloqueado ? 'required' : '' ?> />
+        CURP (opcional)
+        <input type="text" name="titular_curp_<?= $indice ?>" value="<?= htmlspecialchars($t['curp'] ?? '') ?>" maxlength="18" placeholder="18 caracteres" />
       </label>
 
       <div style="display: flex; gap: 16px; flex-wrap: wrap;">
         <div class="campo-grupo" style="flex: 1; min-width: 200px;">
-          <span class="campo-grupo-label">INE — frente <?= $bloqueado ? '*' : '' ?></span>
+          <span class="campo-grupo-label">INE — frente (opcional)</span>
           <label class="dropzone">
-            <input type="file" name="titular_ine_frente_<?= $indice ?>" accept=".pdf,.jpg,.jpeg,.png" class="dropzone-input" <?= $bloqueado && empty($t['id']) ? 'required' : '' ?> />
+            <input type="file" name="titular_ine_frente_<?= $indice ?>" accept=".pdf,.jpg,.jpeg,.png" class="dropzone-input" />
             <span class="dropzone-icon" aria-hidden="true">⬆</span>
             <span class="dropzone-text">Arrastra o elige el archivo<small>Imagen o PDF · máx. 10 MB</small></span>
             <span class="btn btn-ghost-light dropzone-btn" aria-hidden="true">Elegir archivo</span>
@@ -106,15 +106,14 @@ $bloqueTitular = function (int $indice, array $t, bool $bloqueado) use ($archivo
         </div>
       </div>
 
-      <?php if ($bloqueado): ?><p class="form-nota" style="margin-top: -4px;">Teléfono o correo — al menos uno de los dos es obligatorio, para poder contactar al propietario.</p><?php endif; ?>
       <div style="display: flex; gap: 16px;">
         <label style="flex: 1;">
-          Teléfono<?= $bloqueado ? '' : ' (opcional)' ?>
-          <input type="text" name="titular_telefono_<?= $indice ?>" value="<?= htmlspecialchars($t['telefono'] ?? '') ?>" inputmode="numeric" placeholder="10 dígitos" maxlength="10" />
+          Teléfono<?= $bloqueado ? ' *' : ' (opcional)' ?>
+          <input type="text" name="titular_telefono_<?= $indice ?>" value="<?= htmlspecialchars($t['telefono'] ?? '') ?>" inputmode="numeric" placeholder="10 dígitos" maxlength="10" <?= $bloqueado ? 'required' : '' ?> />
         </label>
         <label style="flex: 1;">
-          Correo electrónico<?= $bloqueado ? '' : ' (opcional)' ?>
-          <input type="email" name="titular_correo_<?= $indice ?>" value="<?= htmlspecialchars($t['correo'] ?? '') ?>" />
+          Correo electrónico<?= $bloqueado ? ' *' : ' (opcional)' ?>
+          <input type="email" name="titular_correo_<?= $indice ?>" value="<?= htmlspecialchars($t['correo'] ?? '') ?>" <?= $bloqueado ? 'required' : '' ?> />
         </label>
       </div>
     </div>
@@ -161,12 +160,12 @@ $bloqueTitular = function (int $indice, array $t, bool $bloqueado) use ($archivo
 
   <div style="display: flex; gap: 16px; flex-wrap: wrap;">
     <label style="flex: 1; min-width: 140px;">
-      Recámaras registradas *
-      <input type="number" name="recamaras_registradas" min="0" max="20" data-recamaras-registradas value="<?= htmlspecialchars((string) ($villa['recamaras_registradas'] ?? '')) ?>" required />
+      Recámaras registradas (opcional)
+      <input type="number" name="recamaras_registradas" min="0" max="20" data-recamaras-registradas value="<?= htmlspecialchars((string) ($villa['recamaras_registradas'] ?? '')) ?>" />
     </label>
     <label style="flex: 1; min-width: 140px;">
-      Recámaras físicas *
-      <input type="number" name="recamaras_fisicas" min="0" max="20" data-recamaras-fisicas value="<?= htmlspecialchars((string) ($villa['recamaras_fisicas'] ?? '')) ?>" required />
+      Recámaras físicas (opcional)
+      <input type="number" name="recamaras_fisicas" min="0" max="20" data-recamaras-fisicas value="<?= htmlspecialchars((string) ($villa['recamaras_fisicas'] ?? '')) ?>" />
     </label>
   </div>
   <p class="candado-aviso" data-recamaras-advertencia hidden>⚠ Hay más recámaras físicas que registradas. Esta villa queda marcada para revisión de Administración.</p>
@@ -183,9 +182,9 @@ $bloqueTitular = function (int $indice, array $t, bool $bloqueado) use ($archivo
   <span class="form-card-numero">4 · Documentos del inmueble</span>
 
   <div class="campo-grupo">
-    <span class="campo-grupo-label">Escritura del inmueble (PDF) <?= $esEdicionVilla && !empty($villa['escritura_archivo']) ? '' : '*' ?></span>
+    <span class="campo-grupo-label">Escritura del inmueble (PDF, opcional)</span>
     <label class="dropzone">
-      <input type="file" name="escritura" accept=".pdf" class="dropzone-input" <?= $esEdicionVilla && !empty($villa['escritura_archivo']) ? '' : 'required' ?> />
+      <input type="file" name="escritura" accept=".pdf" class="dropzone-input" />
       <span class="dropzone-icon" aria-hidden="true">⬆</span>
       <span class="dropzone-text">Arrastra la escritura o haz clic para elegirla<small>Escritura completa, escaneada. Máximo 10 MB.<?= $esEdicionVilla && !empty($villa['escritura_archivo']) ? ' Si no subes una nueva, se conserva la actual.' : '' ?></small></span>
       <span class="btn btn-ghost-light dropzone-btn" aria-hidden="true">Seleccionar</span>
@@ -195,11 +194,11 @@ $bloqueTitular = function (int $indice, array $t, bool $bloqueado) use ($archivo
   </div>
 
   <div class="campo-grupo">
-    <span class="campo-grupo-label">Relación de copropietarios (PDF)</span>
+    <span class="campo-grupo-label">Relación de copropietarios (PDF, opcional)</span>
     <label class="dropzone">
       <input type="file" name="relacion_copropietarios" accept=".pdf" class="dropzone-input" />
       <span class="dropzone-icon" aria-hidden="true">⬆</span>
-      <span class="dropzone-text">Obligatoria si hay más de un titular<small>Máximo 10 MB.<?= $esEdicionVilla && !empty($villa['relacion_copropietarios_archivo']) ? ' Si no subes una nueva, se conserva la actual.' : '' ?></small></span>
+      <span class="dropzone-text">Arrastra el PDF o haz clic para elegirlo<small>Máximo 10 MB.<?= $esEdicionVilla && !empty($villa['relacion_copropietarios_archivo']) ? ' Si no subes una nueva, se conserva la actual.' : '' ?></small></span>
       <span class="btn btn-ghost-light dropzone-btn" aria-hidden="true">Seleccionar</span>
     </label>
     <p class="dropzone-filenames"></p>
