@@ -427,6 +427,39 @@ document.querySelectorAll('[data-recamaras-registradas]').forEach((campoRegistra
   actualizarCapacidad();
 });
 
+// ===== Login: cuenta regresiva en vivo del bloqueo por intentos fallidos
+// (ver app/repos/login_intentos.php) — baja sola cada segundo sin recargar
+// la página, y al llegar a 0 reactiva el formulario. El servidor sigue
+// siendo quien de verdad manda: si por lo que sea el bloqueo real dura más
+// (ej. el reloj del navegador de la persona está mal), el siguiente intento
+// lo rechaza otra vez y vuelve a mostrar este mismo aviso. =====
+const bloqueoLogin = document.querySelector('[data-login-bloqueo]');
+if (bloqueoLogin) {
+  let segundosRestantes = parseInt(bloqueoLogin.dataset.segundos, 10) || 0;
+  const spanSegundos = bloqueoLogin.querySelector('[data-segundos-restantes]');
+  const spanPlural = bloqueoLogin.querySelector('[data-segundos-plural]');
+  const loginForm = document.querySelector('.login-form');
+  const campoUsuario = loginForm ? loginForm.querySelector('input[name="usuario"]') : null;
+  const campoPassword = document.getElementById('login-password');
+  const botonSubmit = loginForm ? loginForm.querySelector('.login-submit') : null;
+
+  const intervalo = setInterval(() => {
+    segundosRestantes--;
+
+    if (segundosRestantes <= 0) {
+      clearInterval(intervalo);
+      bloqueoLogin.remove();
+      if (campoUsuario) campoUsuario.disabled = false;
+      if (campoPassword) campoPassword.disabled = false;
+      if (botonSubmit) botonSubmit.disabled = false;
+      return;
+    }
+
+    if (spanSegundos) spanSegundos.textContent = segundosRestantes;
+    if (spanPlural) spanPlural.textContent = segundosRestantes === 1 ? '' : 's';
+  }, 1000);
+}
+
 // ===== Fecha de salida nunca antes que la de llegada (Registro de
 // estancia): el date picker de salida no deja seleccionar un día anterior
 // (min se actualiza solo), y si de todos modos llega un valor inválido

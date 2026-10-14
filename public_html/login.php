@@ -83,7 +83,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="login-sub">Ingresa tus datos para continuar</p>
 
         <?php if ($segundosBloqueado > 0): ?>
-          <p class="login-error">Demasiados intentos fallidos. Espera <?= (int) $segundosBloqueado ?> segundo<?= $segundosBloqueado === 1 ? '' : 's' ?> antes de volver a intentar.</p>
+          <p class="login-error" data-login-bloqueo data-segundos="<?= (int) $segundosBloqueado ?>">
+            Demasiados intentos fallidos. Espera <span data-segundos-restantes><?= (int) $segundosBloqueado ?></span> segundo<span data-segundos-plural><?= $segundosBloqueado === 1 ? '' : 's' ?></span> antes de volver a intentar.
+          </p>
         <?php elseif ($error): ?>
           <p class="login-error">Usuario o contraseña incorrectos.</p>
         <?php endif; ?>
