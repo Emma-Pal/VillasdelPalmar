@@ -23,9 +23,7 @@ $segundosBloqueado = segundosBloqueadoLogin($ip);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verificarCsrf();
 
-    if ($segundosBloqueado > 0) {
-        $error = true;
-    } else {
+    if ($segundosBloqueado === 0) {
         $usuarioInput = trim($_POST['usuario'] ?? '');
         $password = $_POST['password'] ?? '';
         $cuenta = $usuarioInput !== '' ? getUsuarioPorLogin($usuarioInput) : null;
@@ -45,9 +43,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         registrarIntentoFallidoLogin($ip);
-        $segundosBloqueado = segundosBloqueadoLogin($ip);
-        $error = true;
+        $_SESSION['login_error'] = true;
     }
+
+    // Post/Redirect/Get: sin esto, recargar la página (F5) después de un
+    // intento reenvía el mismo POST con la contraseña otra vez — y encima
+    // contaba como un intento fallido extra para el límite de arriba, solo
+    // por recargar. El estatus de "bloqueado" no necesita nada especial
+    // para sobrevivir este redirect (se vuelve a calcular solo, ya que vive
+    // en la base de datos); el de "usuario o contraseña incorrectos" sí,
+    // por eso viaja una sola vez en sesión.
+    header('Location: /login');
+    exit;
+}
+
+if (!empty($_SESSION['login_error'])) {
+    $error = true;
+    unset($_SESSION['login_error']);
 }
 ?>
 <!DOCTYPE html>

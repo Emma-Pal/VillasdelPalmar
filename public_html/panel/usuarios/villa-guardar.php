@@ -65,12 +65,8 @@ if ($error === null) {
             $ineReverso = procesarArchivoSubido("titular_ine_reverso_$i");
 
             if ($i === 1) {
-                if (!$telefono) {
-                    $error = 'Falta el teléfono del titular 1 (propietario).';
-                    break;
-                }
-                if (!$correo) {
-                    $error = 'Falta el correo del titular 1 (propietario).';
+                if (!$telefono && !$correo) {
+                    $error = 'Falta el teléfono o el correo del titular 1 (propietario) — se necesita al menos uno para poder contactarlo.';
                     break;
                 }
             }
