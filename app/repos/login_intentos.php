@@ -9,16 +9,24 @@ const LOGIN_BLOQUEO_SEGUNDOS = 60;
 // recargar la página o cerrar y volver a abrir el navegador no sirve para
 // "resetear" el bloqueo (la IP es lo que persiste, no la sesión ni la
 // pestaña).
+//
+// TIMESTAMPDIFF se calcula DENTRO de MySQL, comparando bloqueado_hasta
+// contra el NOW() de MySQL mismo — a propósito, para nunca restar la hora
+// de MySQL contra time() de PHP: si el huso horario de uno no coincide
+// exactamente con el del otro (muy común en hosting compartido, donde cada
+// uno puede traer su propia zona configurada por separado), esa resta sale
+// mal — normalmente da un número negativo, que max(0, ...) convierte en 0,
+// o sea "nunca bloqueado" aunque sí se haya bloqueado. Así se evita esa
+// clase de bug por completo.
 function segundosBloqueadoLogin(string $ip): int
 {
-    $stmt = db()->prepare('SELECT bloqueado_hasta FROM login_intentos WHERE ip = ?');
+    $stmt = db()->prepare('SELECT TIMESTAMPDIFF(SECOND, NOW(), bloqueado_hasta) FROM login_intentos WHERE ip = ?');
     $stmt->execute([$ip]);
-    $bloqueadoHasta = $stmt->fetchColumn();
-    if (!$bloqueadoHasta) {
+    $segundos = $stmt->fetchColumn();
+    if ($segundos === false || $segundos === null) {
         return 0;
     }
-    $segundos = strtotime($bloqueadoHasta) - time();
-    return max(0, $segundos);
+    return max(0, (int) $segundos);
 }
 
 // Suma un intento fallido para esta IP (sin importar qué "usuario" haya
