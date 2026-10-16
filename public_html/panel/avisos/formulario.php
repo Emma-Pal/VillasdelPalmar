@@ -43,6 +43,14 @@ $esAsamblea = in_array($categoriaOculta, CATEGORIAS_ASAMBLEA, true);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verificarCsrf();
 
+    // Máximo 10 publicaciones nuevas cada 15 minutos por cuenta — no aplica
+    // al editar (modificar algo que ya existe no es "spam" del mismo modo).
+    if (!$esEdicion && !limiteAccionPermitido($usuario['id'], 'crear_aviso', 10, 900)) {
+        http_response_code(429);
+        renderError('Demasiadas publicaciones — Villas del Palmar', 'Espera unos minutos.', 'Se publicaron demasiadas cosas en poco tiempo desde esta cuenta. Espera unos minutos antes de volver a intentarlo.');
+        exit;
+    }
+
     $categoria = trim($_POST['categoria'] ?? '') ?: 'aviso';
     $titulo = trim($_POST['titulo'] ?? '');
     $cuerpo = trim($_POST['cuerpo'] ?? '');

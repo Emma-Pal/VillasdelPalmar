@@ -12,6 +12,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 verificarCsrf();
 
+// Máximo 5 registros de estancia cada 15 minutos por cuenta — evita que una
+// cuenta (comprometida, o por error) genere de golpe decenas de registros.
+if (!limiteAccionPermitido($usuario['id'], 'crear_estancia', 5, 900)) {
+    http_response_code(429);
+    renderError('Demasiados registros — Villas del Palmar', 'Espera unos minutos.', 'Enviaste demasiados registros de estancia en poco tiempo. Espera unos minutos antes de volver a intentarlo.');
+    exit;
+}
+
 $esMesa = $usuario['tipo'] === 'mesa';
 
 // El propietario NUNCA puede elegir otra villa aunque manipule el campo

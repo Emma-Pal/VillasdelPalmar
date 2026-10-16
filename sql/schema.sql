@@ -293,6 +293,18 @@ CREATE TABLE IF NOT EXISTS login_intentos (
   actualizado_en DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Límite de acciones por cuenta (no por IP) — evita que una cuenta ya
+-- logueada inunde el sitio creando de golpe cientos de solicitudes,
+-- registros de estancia o avisos. Ver app/repos/limite_acciones.php.
+CREATE TABLE IF NOT EXISTS limite_acciones (
+  usuario_id INT NOT NULL,
+  accion VARCHAR(50) NOT NULL,
+  ventana_inicio DATETIME NOT NULL,
+  cantidad SMALLINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (usuario_id, accion),
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ===== Migración 2026-09b: Galería administrable =====
 -- Las 3 páginas de Galería (alberca, áreas verdes, departamentos) siguen
 -- teniendo sus bloques originales fijos en el código; esta tabla es para
@@ -461,3 +473,13 @@ CREATE TABLE IF NOT EXISTS galeria_items (
 -- Los folios ya entregados (filas con folio_token NULL) se siguen aceptando
 -- sin sufijo — no hace falta rellenar nada para las solicitudes existentes.
 -- ALTER TABLE solicitudes ADD COLUMN folio_token VARCHAR(8) NULL AFTER ubicacion;
+
+-- ===== Migración 2026-10m: límite de acciones por cuenta (spam) =====
+-- CREATE TABLE limite_acciones (
+--   usuario_id INT NOT NULL,
+--   accion VARCHAR(50) NOT NULL,
+--   ventana_inicio DATETIME NOT NULL,
+--   cantidad SMALLINT NOT NULL DEFAULT 0,
+--   PRIMARY KEY (usuario_id, accion),
+--   FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

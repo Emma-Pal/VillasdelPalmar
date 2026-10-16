@@ -10,6 +10,14 @@ $folioGenerado = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verificarCsrf();
 
+    // Máximo 5 solicitudes cada 15 minutos por cuenta — evita que una
+    // cuenta (comprometida, o por error) inunde a Administración de golpe.
+    if (!limiteAccionPermitido($usuario['id'], 'crear_solicitud', 5, 900)) {
+        http_response_code(429);
+        renderError('Demasiadas solicitudes — Villas del Palmar', 'Espera unos minutos.', 'Enviaste demasiadas solicitudes en poco tiempo. Espera unos minutos antes de volver a intentarlo.');
+        exit;
+    }
+
     $tipo = in_array($_POST['tipo'] ?? '', TIPOS_SOLICITUD, true) ? $_POST['tipo'] : 'falla';
     $asunto = trim($_POST['asunto'] ?? '');
     $descripcion = trim($_POST['descripcion'] ?? '');
