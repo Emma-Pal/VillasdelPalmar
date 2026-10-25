@@ -188,19 +188,21 @@ unset($v);
               </td>
               <td><?= htmlspecialchars($a['usuario']) ?></td>
               <td class="tabla-acciones">
-                <?php if ($puedeEditarFila): ?>
-                  <button type="button" class="btn-editar" data-modal-open="modal-editar-administrador-<?= (int) $a['id'] ?>">Editar</button>
-                <?php endif; ?>
-                <?php if ($puedeEliminarFila): ?>
-                  <form action="/panel/usuarios/eliminar?id=<?= (int) $a['id'] ?>" method="POST"
-                        onsubmit="return confirm('¿Eliminar la cuenta de <?= htmlspecialchars(str_replace("'", '', $a['nombre'])) ?>? Esto no se puede deshacer.');">
-                    <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
-                    <button type="submit" class="btn-eliminar">Eliminar</button>
-                  </form>
-                <?php endif; ?>
-                <?php if (!$puedeEditarFila && !$puedeEliminarFila): ?>
-                  <span style="color: var(--color-text-muted);">—</span>
-                <?php endif; ?>
+                <div class="tabla-acciones-fila">
+                  <?php if ($puedeEditarFila): ?>
+                    <button type="button" class="btn-editar" data-modal-open="modal-editar-administrador-<?= (int) $a['id'] ?>">Editar</button>
+                  <?php endif; ?>
+                  <?php if ($puedeEliminarFila): ?>
+                    <form action="/panel/usuarios/eliminar?id=<?= (int) $a['id'] ?>" method="POST"
+                          onsubmit="return confirm('¿Eliminar la cuenta de <?= htmlspecialchars(str_replace("'", '', $a['nombre'])) ?>? Esto no se puede deshacer.');">
+                      <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
+                      <button type="submit" class="btn-eliminar">Eliminar</button>
+                    </form>
+                  <?php endif; ?>
+                  <?php if (!$puedeEditarFila && !$puedeEliminarFila): ?>
+                    <span style="color: var(--color-text-muted);">—</span>
+                  <?php endif; ?>
+                </div>
               </td>
             </tr>
           <?php endforeach; ?>
