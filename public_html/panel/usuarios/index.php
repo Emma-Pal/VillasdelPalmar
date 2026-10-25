@@ -170,7 +170,11 @@ unset($v);
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($administradores as $a): $esElMismo = (int) $a['id'] === (int) $usuario['id']; ?>
+          <?php foreach ($administradores as $a):
+            $esElMismo = (int) $a['id'] === (int) $usuario['id'];
+            $puedeEditarFila = $esSuperadminActual || $esElMismo;
+            $puedeEliminarFila = $puedeGestionarAdminsActual && !$esElMismo;
+          ?>
             <tr>
               <td>
                 <?= htmlspecialchars($a['nombre']) ?>
@@ -182,15 +186,18 @@ unset($v);
               </td>
               <td><?= htmlspecialchars($a['usuario']) ?></td>
               <td class="tabla-acciones">
-                <?php if ($esSuperadminActual || $esElMismo): ?>
+                <?php if ($puedeEditarFila): ?>
                   <button type="button" class="btn-editar" data-modal-open="modal-editar-administrador-<?= (int) $a['id'] ?>">Editar</button>
                 <?php endif; ?>
-                <?php if ($puedeGestionarAdminsActual && !$esElMismo): ?>
+                <?php if ($puedeEliminarFila): ?>
                   <form action="/panel/usuarios/eliminar?id=<?= (int) $a['id'] ?>" method="POST"
                         onsubmit="return confirm('¿Eliminar la cuenta de <?= htmlspecialchars(str_replace("'", '', $a['nombre'])) ?>? Esto no se puede deshacer.');">
                     <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
                     <button type="submit" class="btn-eliminar">Eliminar</button>
                   </form>
+                <?php endif; ?>
+                <?php if (!$puedeEditarFila && !$puedeEliminarFila): ?>
+                  <span class="form-nota">—</span>
                 <?php endif; ?>
               </td>
             </tr>
