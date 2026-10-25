@@ -136,12 +136,14 @@ unset($v);
                   <?php endif; ?>
                 </td>
                 <td class="tabla-acciones">
-                  <button type="button" class="btn-editar" data-modal-open="modal-editar-villa-<?= (int) $v['id'] ?>">Editar</button>
-                  <form action="/panel/usuarios/villa-eliminar?id=<?= (int) $v['id'] ?>" method="POST"
-                        onsubmit="return confirm('¿Eliminar la villa <?= htmlspecialchars($v['villa']) ?> y todos sus titulares? Esto no se puede deshacer.');">
-                    <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
-                    <button type="submit" class="btn-eliminar">Eliminar</button>
-                  </form>
+                  <div class="tabla-acciones-fila">
+                    <button type="button" class="btn-editar" data-modal-open="modal-editar-villa-<?= (int) $v['id'] ?>">Editar</button>
+                    <form action="/panel/usuarios/villa-eliminar?id=<?= (int) $v['id'] ?>" method="POST"
+                          onsubmit="return confirm('¿Eliminar la villa <?= htmlspecialchars($v['villa']) ?> y todos sus titulares? Esto no se puede deshacer.');">
+                      <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
+                      <button type="submit" class="btn-eliminar">Eliminar</button>
+                    </form>
+                  </div>
                 </td>
               </tr>
             <?php endforeach; ?>

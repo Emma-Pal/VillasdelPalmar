@@ -195,12 +195,14 @@ if ($tipoActaFiltro) $sufijoActas .= '&tipo_acta=' . urlencode($tipoActaFiltro);
                   </td>
                   <?php if ($esMesa): ?>
                     <td class="tabla-acciones">
-                      <button type="button" class="btn-editar" data-modal-open="modal-editar-acta-<?= (int) $a['id'] ?>">Editar</button>
-                      <form action="/panel/avisos/eliminar?id=<?= (int) $a['id'] ?>" method="POST"
-                            onsubmit="return confirm('¿Eliminar esta acta? Esto no se puede deshacer.');">
-                        <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
-                        <button type="submit" class="btn-eliminar">Eliminar</button>
-                      </form>
+                      <div class="tabla-acciones-fila">
+                        <button type="button" class="btn-editar" data-modal-open="modal-editar-acta-<?= (int) $a['id'] ?>">Editar</button>
+                        <form action="/panel/avisos/eliminar?id=<?= (int) $a['id'] ?>" method="POST"
+                              onsubmit="return confirm('¿Eliminar esta acta? Esto no se puede deshacer.');">
+                          <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
+                          <button type="submit" class="btn-eliminar">Eliminar</button>
+                        </form>
+                      </div>
                     </td>
                   <?php endif; ?>
                 </tr>

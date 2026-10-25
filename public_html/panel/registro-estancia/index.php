@@ -99,7 +99,7 @@ if ($esMesa) {
                   <td><?= htmlspecialchars(date('d/m', strtotime($e['fecha_llegada']))) ?> – <?= htmlspecialchars(date('d/m/Y', strtotime($e['fecha_salida']))) ?></td>
                   <td><?= (int) $e['adultos'] + (int) $e['menores'] + (int) $e['infantes'] ?> personas</td>
                   <td><span class="estatus-pill estatus-pill--<?= htmlspecialchars($e['estatus']) ?>"><?= htmlspecialchars(etiquetaEstatus($e['estatus'])) ?></span></td>
-                  <td class="tabla-acciones"><a href="/panel/registro-estancia/detalle?id=<?= (int) $e['id'] ?>" class="btn-editar">Ver detalle</a></td>
+                  <td class="tabla-acciones"><div class="tabla-acciones-fila"><a href="/panel/registro-estancia/detalle?id=<?= (int) $e['id'] ?>" class="btn-editar">Ver detalle</a></div></td>
                 </tr>
               <?php endforeach; ?>
             </tbody>

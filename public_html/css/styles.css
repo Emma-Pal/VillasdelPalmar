@@ -1870,7 +1870,12 @@ a.nav-user:hover {
   color: var(--color-accent);
 }
 
-.tabla-acciones {
+/* Ya NO lleva display:flex — un <td> con flex directo encima a veces deja
+   de sincronizar su ancho/borde con el resto de la columna (fila con poco
+   contenido se ve "desfasada" contra una fila con más). El flex ahora vive
+   en .tabla-acciones-fila, un <div> adentro del <td>; .tabla-acciones se
+   queda como el <td> normal (hereda el padding/borde de .tabla-pagos td). */
+.tabla-acciones-fila {
   display: flex;
   align-items: center;
   gap: 14px;

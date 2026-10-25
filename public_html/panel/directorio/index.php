@@ -116,12 +116,14 @@ $cargosSugeridos = array_unique(getCargosComiteSugeridos());
                   <td><span class="badge <?= $c['estatus'] === 'activo' ? 'badge--ok' : 'badge--alerta' ?>"><?= $c['estatus'] === 'activo' ? 'Activo' : 'Baja' ?></span></td>
                   <?php if ($esMesa): ?>
                     <td class="tabla-acciones">
-                      <a href="/panel/directorio/ficha?id=<?= (int) $c['id'] ?>" class="btn-editar">Ver ficha</a>
-                      <form action="/panel/directorio/colaborador-eliminar?id=<?= (int) $c['id'] ?>" method="POST"
-                            onsubmit="return confirm('¿Eliminar a <?= htmlspecialchars(str_replace("'", '', $c['nombre'])) ?> del directorio? Esto no se puede deshacer.');">
-                        <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
-                        <button type="submit" class="btn-eliminar">Eliminar</button>
-                      </form>
+                      <div class="tabla-acciones-fila">
+                        <a href="/panel/directorio/ficha?id=<?= (int) $c['id'] ?>" class="btn-editar">Ver ficha</a>
+                        <form action="/panel/directorio/colaborador-eliminar?id=<?= (int) $c['id'] ?>" method="POST"
+                              onsubmit="return confirm('¿Eliminar a <?= htmlspecialchars(str_replace("'", '', $c['nombre'])) ?> del directorio? Esto no se puede deshacer.');">
+                          <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
+                          <button type="submit" class="btn-eliminar">Eliminar</button>
+                        </form>
+                      </div>
                     </td>
                   <?php endif; ?>
                 </tr>
@@ -189,12 +191,14 @@ $cargosSugeridos = array_unique(getCargosComiteSugeridos());
                   <?php endif; ?>
                   <?php if ($esMesa): ?>
                     <td class="tabla-acciones">
-                      <button type="button" class="btn-editar" data-modal-open="modal-editar-comite-<?= (int) $m['id'] ?>">Editar</button>
-                      <form action="/panel/directorio/comite-eliminar?id=<?= (int) $m['id'] ?>" method="POST"
-                            onsubmit="return confirm('¿Eliminar a <?= htmlspecialchars(str_replace("'", '', $m['nombre'])) ?> del directorio del Consejo de Administración?');">
-                        <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
-                        <button type="submit" class="btn-eliminar">Eliminar</button>
-                      </form>
+                      <div class="tabla-acciones-fila">
+                        <button type="button" class="btn-editar" data-modal-open="modal-editar-comite-<?= (int) $m['id'] ?>">Editar</button>
+                        <form action="/panel/directorio/comite-eliminar?id=<?= (int) $m['id'] ?>" method="POST"
+                              onsubmit="return confirm('¿Eliminar a <?= htmlspecialchars(str_replace("'", '', $m['nombre'])) ?> del directorio del Consejo de Administración?');">
+                          <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
+                          <button type="submit" class="btn-eliminar">Eliminar</button>
+                        </form>
+                      </div>
                     </td>
                   <?php endif; ?>
                 </tr>

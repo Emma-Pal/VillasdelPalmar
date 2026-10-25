@@ -103,7 +103,9 @@ if ($esMesa) {
                   <td><span class="estatus-pill estatus-pill--<?= htmlspecialchars($s['estatus']) ?>"><?= htmlspecialchars(etiquetaEstatus($s['estatus'])) ?></span></td>
                   <td><?= htmlspecialchars(date('d/m/Y', strtotime($s['creado_en']))) ?></td>
                   <td class="tabla-acciones">
-                    <a href="/panel/solicitudes/detalle?id=<?= (int) $s['id'] ?>" class="btn-editar">Ver</a>
+                    <div class="tabla-acciones-fila">
+                      <a href="/panel/solicitudes/detalle?id=<?= (int) $s['id'] ?>" class="btn-editar">Ver</a>
+                    </div>
                   </td>
                 </tr>
               <?php endforeach; ?>
