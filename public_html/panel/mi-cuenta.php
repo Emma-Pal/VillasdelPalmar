@@ -43,8 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $passwordHash = $password !== '' ? password_hash($password, PASSWORD_BCRYPT) : null;
             actualizarUsuario($id, 'mesa', $nombre, $cargo, $usuarioLogin, $passwordHash);
 
-            // Refrescar la sesión para que el header muestre los datos nuevos de inmediato.
-            $_SESSION['usuario'] = ['id' => $id, 'tipo' => 'mesa', 'nombre' => $nombre, 'cargo' => $cargo];
+            // Refrescar la sesión para que el header muestre los datos nuevos
+            // de inmediato — conservando es_superadmin, que este formulario
+            // nunca toca pero que sin esto se perdía de la sesión al guardar.
+            $_SESSION['usuario'] = ['id' => $id, 'tipo' => 'mesa', 'nombre' => $nombre, 'cargo' => $cargo, 'es_superadmin' => esSuperadmin()];
             header('Location: /panel/mi-cuenta?ok=1');
             exit;
         } catch (PDOException $e) {

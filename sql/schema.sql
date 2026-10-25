@@ -5,6 +5,13 @@
 CREATE TABLE IF NOT EXISTS usuarios (
   id INT AUTO_INCREMENT PRIMARY KEY,
   tipo ENUM('propietario','mesa') NOT NULL,
+  -- Marca a LA cuenta de administrador con privilegios extra (dar de alta o
+  -- eliminar otras cuentas de administrador). Solo aplica con tipo='mesa'.
+  -- No hay ningún formulario en la app que la active — se asigna una sola
+  -- vez por SQL directo (ver migración al final de este archivo), así que
+  -- en la práctica nunca puede haber más de una cuenta con este valor en 1,
+  -- sin necesidad de una restricción especial en la base de datos.
+  es_superadmin TINYINT(1) NOT NULL DEFAULT 0,
   nombre VARCHAR(150) NOT NULL,
   cargo VARCHAR(100) NULL,             -- solo aplica a mesa directiva (ej. "Tesorero")
   -- Solo aplica a propietario (cada propietario tiene su propia cuenta y su
@@ -483,3 +490,11 @@ CREATE TABLE IF NOT EXISTS galeria_items (
 --   PRIMARY KEY (usuario_id, accion),
 --   FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 -- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ===== Migración 2026-10n: superadministrador =====
+-- 1) La columna nueva:
+-- ALTER TABLE usuarios ADD COLUMN es_superadmin TINYINT(1) NOT NULL DEFAULT 0 AFTER tipo;
+-- 2) Marcar a la cuenta "superadmin" (Señora Karina) como LA superadmin —
+--    correr esto una sola vez. No hay forma de crear una segunda desde la
+--    app, así que no hace falta repetir esto ni cuidar que no se duplique:
+-- UPDATE usuarios SET es_superadmin = 1 WHERE usuario = 'superadmin' AND tipo = 'mesa';

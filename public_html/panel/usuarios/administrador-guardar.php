@@ -20,6 +20,13 @@ if ($esEdicion && (!$existente || $existente['tipo'] !== 'mesa')) {
     exit;
 }
 
+// Dar de alta un administrador nuevo es exclusivo del superadmin — editar
+// uno ya existente (el propio cargo/usuario/contraseña, o el de otro admin)
+// se queda abierto a cualquier administrador, como ya era.
+if (!$esEdicion) {
+    requireSuperadmin();
+}
+
 $nombre = trim($_POST['nombre'] ?? '');
 $cargo = trim($_POST['cargo'] ?? '');
 $usuarioLogin = trim($_POST['usuario'] ?? '');
@@ -49,9 +56,10 @@ try {
         actualizarUsuario($id, 'mesa', $nombre, $cargo, $usuarioLogin, $passwordHash);
 
         // Si el administrador se edita a sí mismo, se refresca la sesión
-        // para que el header muestre los datos correctos de inmediato.
+        // para que el header muestre los datos correctos de inmediato —
+        // conservando es_superadmin, que este formulario nunca toca.
         if ((int) $_SESSION['usuario']['id'] === $id) {
-            $_SESSION['usuario'] = ['id' => $id, 'tipo' => 'mesa', 'nombre' => $nombre, 'cargo' => $cargo];
+            $_SESSION['usuario'] = ['id' => $id, 'tipo' => 'mesa', 'nombre' => $nombre, 'cargo' => $cargo, 'es_superadmin' => esSuperadmin()];
         }
     } else {
         crearUsuario('mesa', $nombre, $cargo, $usuarioLogin, password_hash($password, PASSWORD_BCRYPT));

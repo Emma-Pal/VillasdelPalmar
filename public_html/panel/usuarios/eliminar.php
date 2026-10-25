@@ -17,6 +17,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    // Esta ruta solo borra cuentas de administrador (las de propietario se
+    // borran aparte, en villa-eliminar.php) — y entre administradores, solo
+    // el superadmin puede eliminarse unos a otros. Un admin normal puede
+    // eliminar cuentas de usuario (propietario) sin restricción, pero nunca
+    // a otro admin.
+    $objetivo = getUsuarioPorId($id);
+    if ($objetivo && $objetivo['tipo'] === 'mesa') {
+        requireSuperadmin();
+    }
+
     try {
         eliminarUsuario($id);
     } catch (PDOException $e) {

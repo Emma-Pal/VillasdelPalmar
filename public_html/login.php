@@ -37,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'nombre' => $cuenta['nombre'],
                 'cargo' => $cuenta['cargo'],
                 'villa' => $cuenta['villa'],
+                'es_superadmin' => !empty($cuenta['es_superadmin']),
             ];
             header('Location: /panel');
             exit;
