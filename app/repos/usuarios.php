@@ -26,7 +26,7 @@ function getUsuarioPorId($id): ?array
 // usa getComiteMiembros().
 function getMesa(): array
 {
-    return db()->query("SELECT * FROM usuarios WHERE tipo = 'mesa' ORDER BY cargo")->fetchAll();
+    return db()->query("SELECT * FROM usuarios WHERE tipo = 'mesa' ORDER BY es_superadmin DESC, nombre")->fetchAll();
 }
 
 // Villas (cuentas tipo='propietario'), cada una con su

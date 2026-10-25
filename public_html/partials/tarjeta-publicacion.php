@@ -49,7 +49,7 @@
   <?php endif; ?>
 
   <footer>
-    <span><?= htmlspecialchars($pub['autor_nombre']) ?> · <?= htmlspecialchars($pub['autor_cargo']) ?> — <?= htmlspecialchars($pub['fecha']) ?></span>
+    <span><?= htmlspecialchars($pub['autor_nombre']) ?><?= !empty($pub['autor_cargo']) ? ' · ' . htmlspecialchars($pub['autor_cargo']) : '' ?> — <?= htmlspecialchars($pub['fecha']) ?></span>
     <?php if ($usuario['tipo'] === 'mesa'): ?>
       <span class="publicacion-acciones">
         <a href="/panel/avisos/editar?id=<?= (int) $pub['id'] ?>" class="btn-editar">Editar</a>

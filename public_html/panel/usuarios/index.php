@@ -159,7 +159,6 @@ unset($v);
         <thead>
           <tr>
             <th>Nombre</th>
-            <th>Cargo</th>
             <th>Usuario</th>
             <th></th>
           </tr>
@@ -171,7 +170,6 @@ unset($v);
                 <?= htmlspecialchars($a['nombre']) ?>
                 <?php if (!empty($a['es_superadmin'])): ?><span class="badge badge--ok" title="Puede dar de alta o eliminar otras cuentas de administrador">★ Superadmin</span><?php endif; ?>
               </td>
-              <td><?= htmlspecialchars($a['cargo'] ?: '—') ?></td>
               <td><?= htmlspecialchars($a['usuario']) ?></td>
               <td class="tabla-acciones">
                 <button type="button" class="btn-editar" data-modal-open="modal-editar-administrador-<?= (int) $a['id'] ?>">Editar</button>

@@ -40,7 +40,7 @@
           <span class="nav-user-avatar"><?= htmlspecialchars(mb_substr($usuario['nombre'], 0, 1)) ?></span>
           <span class="nav-user-text">
             <span class="nav-user-nombre"><?= htmlspecialchars($usuario['nombre']) ?></span>
-            <span class="nav-user-rol"><?= htmlspecialchars($usuario['cargo']) ?></span>
+            <span class="nav-user-rol"><?= !empty($usuario['es_superadmin']) ? 'Superadmin' : 'Administrador' ?></span>
           </span>
         </a>
       <?php else: ?>

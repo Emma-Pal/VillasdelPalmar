@@ -13,13 +13,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $id = $usuario['id'];
     $nombre = trim($_POST['nombre'] ?? '');
-    $cargo = trim($_POST['cargo'] ?? '');
     $usuarioLogin = trim($_POST['usuario'] ?? '');
     $contrasenaActual = $_POST['contrasenaActual'] ?? '';
     $password = $_POST['password'] ?? '';
     $passwordConfirmar = $_POST['passwordConfirmar'] ?? '';
 
-    $datos = ['nombre' => $nombre, 'cargo' => $cargo, 'usuario' => $usuarioLogin];
+    $datos = ['nombre' => $nombre, 'usuario' => $usuarioLogin];
 
     // Cambiar la contraseña es lo único que exige más que "estar logueado":
     // sin esto, cualquiera que se encuentre la sesión abierta (ej. la
@@ -41,12 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($error === null) {
         try {
             $passwordHash = $password !== '' ? password_hash($password, PASSWORD_BCRYPT) : null;
-            actualizarUsuario($id, 'mesa', $nombre, $cargo, $usuarioLogin, $passwordHash);
+            // "Cargo" ya no aplica a una cuenta de administrador.
+            actualizarUsuario($id, 'mesa', $nombre, null, $usuarioLogin, $passwordHash);
 
             // Refrescar la sesión para que el header muestre los datos nuevos
             // de inmediato — conservando es_superadmin, que este formulario
             // nunca toca pero que sin esto se perdía de la sesión al guardar.
-            $_SESSION['usuario'] = ['id' => $id, 'tipo' => 'mesa', 'nombre' => $nombre, 'cargo' => $cargo, 'es_superadmin' => esSuperadmin()];
+            $_SESSION['usuario'] = ['id' => $id, 'tipo' => 'mesa', 'nombre' => $nombre, 'cargo' => null, 'es_superadmin' => esSuperadmin()];
             header('Location: /panel/mi-cuenta?ok=1');
             exit;
         } catch (PDOException $e) {
@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="page-banner-content">
       <span class="eyebrow">Mi cuenta</span>
       <h1><?= htmlspecialchars($datos['nombre']) ?></h1>
-      <p class="page-banner-lead">Edita tu nombre, cargo, usuario o contraseña.</p>
+      <p class="page-banner-lead">Edita tu nombre, usuario o contraseña.</p>
     </div>
   </section>
 
@@ -91,11 +91,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label>
           Nombre completo
           <input type="text" name="nombre" value="<?= htmlspecialchars($datos['nombre']) ?>" required />
-        </label>
-
-        <label>
-          Cargo
-          <input type="text" name="cargo" value="<?= htmlspecialchars($datos['cargo'] ?? '') ?>" required />
         </label>
 
         <label>

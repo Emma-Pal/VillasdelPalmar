@@ -160,7 +160,7 @@ $slidesGaleria = [
             <h3><?= htmlspecialchars($pub['titulo']) ?></h3>
             <p><?= nl2brSeguro($pub['cuerpo']) ?></p>
             <footer>
-              <span><?= htmlspecialchars($pub['autor_nombre']) ?> · <?= htmlspecialchars($pub['autor_cargo']) ?> — <?= htmlspecialchars($pub['fecha']) ?></span>
+              <span><?= htmlspecialchars($pub['autor_nombre']) ?><?= !empty($pub['autor_cargo']) ? ' · ' . htmlspecialchars($pub['autor_cargo']) : '' ?> — <?= htmlspecialchars($pub['fecha']) ?></span>
             </footer>
             <?php if (!empty($pub['editado_en'])): ?>
               <p class="publicacion-editada">Editado el <?= htmlspecialchars(date('d/m/Y', strtotime($pub['editado_en']))) ?></p>

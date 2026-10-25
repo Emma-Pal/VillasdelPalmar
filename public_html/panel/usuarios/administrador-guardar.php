@@ -28,13 +28,12 @@ if (!$esEdicion) {
 }
 
 $nombre = trim($_POST['nombre'] ?? '');
-$cargo = trim($_POST['cargo'] ?? '');
 $usuarioLogin = trim($_POST['usuario'] ?? '');
 $password = $_POST['password'] ?? '';
 $passwordConfirmar = $_POST['passwordConfirmar'] ?? '';
 
 $error = null;
-if ($nombre === '' || $cargo === '' || $usuarioLogin === '') {
+if ($nombre === '' || $usuarioLogin === '') {
     $error = 'Faltan campos obligatorios.';
 } elseif (!$esEdicion || $password !== '') {
     if (!passwordEsValida($password)) {
@@ -53,16 +52,18 @@ if ($error !== null) {
 try {
     if ($esEdicion) {
         $passwordHash = $password !== '' ? password_hash($password, PASSWORD_BCRYPT) : null;
-        actualizarUsuario($id, 'mesa', $nombre, $cargo, $usuarioLogin, $passwordHash);
+        // "Cargo" ya no aplica a una cuenta de administrador (ver nota en
+        // administrador-campos.php) — se guarda null pase lo que pase.
+        actualizarUsuario($id, 'mesa', $nombre, null, $usuarioLogin, $passwordHash);
 
         // Si el administrador se edita a sí mismo, se refresca la sesión
         // para que el header muestre los datos correctos de inmediato —
         // conservando es_superadmin, que este formulario nunca toca.
         if ((int) $_SESSION['usuario']['id'] === $id) {
-            $_SESSION['usuario'] = ['id' => $id, 'tipo' => 'mesa', 'nombre' => $nombre, 'cargo' => $cargo, 'es_superadmin' => esSuperadmin()];
+            $_SESSION['usuario'] = ['id' => $id, 'tipo' => 'mesa', 'nombre' => $nombre, 'cargo' => null, 'es_superadmin' => esSuperadmin()];
         }
     } else {
-        crearUsuario('mesa', $nombre, $cargo, $usuarioLogin, password_hash($password, PASSWORD_BCRYPT));
+        crearUsuario('mesa', $nombre, null, $usuarioLogin, password_hash($password, PASSWORD_BCRYPT));
     }
 } catch (PDOException $e) {
     http_response_code(400);

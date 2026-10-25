@@ -121,7 +121,7 @@ $volverTexto = $esAsamblea ? '← Volver a asambleas' : '← Volver a avisos';
       <span class="eyebrow">Administración</span>
       <h1><?= $esEdicion ? 'Editar publicación' : 'Capturar aviso' ?></h1>
       <?php if (!$esEdicion): ?>
-        <p class="page-banner-lead">Se firmará como <?= htmlspecialchars($usuario['nombre']) ?> — <?= htmlspecialchars($usuario['cargo']) ?>.</p>
+        <p class="page-banner-lead">Se firmará como <?= htmlspecialchars($usuario['nombre']) ?>.</p>
       <?php endif; ?>
     </div>
   </section>
