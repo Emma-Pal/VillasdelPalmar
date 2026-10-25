@@ -197,11 +197,11 @@ unset($v);
           <?php endforeach; ?>
         </tbody>
       </table>
-      <p class="form-nota" style="margin-top: 10px;">
-        Cada quien edita su propia cuenta desde aquí — editar la de otro administrador es exclusivo del superadmin.
-        <?php if (!$puedeGestionarAdminsActual): ?>Dar de alta o eliminar cuentas de administrador requiere permiso del superadmin.<?php endif; ?>
-      </p>
     </div>
+    <p class="form-nota" style="margin-top: 10px;">
+      Cada quien edita su propia cuenta desde aquí — editar la de otro administrador es exclusivo del superadmin.
+      <?php if (!$puedeGestionarAdminsActual): ?>Dar de alta o eliminar cuentas de administrador requiere permiso del superadmin.<?php endif; ?>
+    </p>
   </section>
 
   <!-- ===== Modal: Nuevo administrador ===== -->
