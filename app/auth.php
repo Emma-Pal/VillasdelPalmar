@@ -40,9 +40,10 @@ function esSuperadmin(): bool
     return !empty($_SESSION['usuario']['es_superadmin']);
 }
 
-// Para las pocas acciones que son EXCLUSIVAS del superadmin (dar de alta o
-// eliminar una cuenta de administrador). Requiere que ya haya pasado
-// requireMesa() — no vuelve a checar sesión por separado.
+// Para las acciones que son EXCLUSIVAS del superadmin de verdad (editar la
+// cuenta de OTRO administrador — su usuario, su contraseña). Esto nunca se
+// puede otorgar como permiso: ver dar de alta/eliminar abajo, que sí.
+// Requiere que ya haya pasado requireMesa().
 function requireSuperadmin(): void
 {
     if (!esSuperadmin()) {
@@ -50,7 +51,33 @@ function requireSuperadmin(): void
         renderError(
             'Acción no permitida — Villas del Palmar',
             'Esta acción es solo para el superadministrador.',
-            'Solo el superadministrador puede dar de alta o eliminar cuentas de administrador.'
+            'Solo el superadministrador puede editar la cuenta de otro administrador.'
+        );
+        exit;
+    }
+}
+
+// Dar de alta o eliminar cuentas de administrador: del superadmin por
+// default, pero el superadmin puede otorgarle este permiso a cuentas
+// específicas (ver PERMISO_GESTIONAR_ADMINS en app/repos/permisos.php). Se
+// consulta la base de datos directo (no la sesión) para que, si el
+// superadmin le quita el permiso a alguien, se note de inmediato, sin
+// esperar a que esa cuenta cierre sesión.
+function puedeGestionarAdmins(): bool
+{
+    if (esSuperadmin()) return true;
+    $id = $_SESSION['usuario']['id'] ?? null;
+    return $id ? tienePermiso($id, PERMISO_GESTIONAR_ADMINS) : false;
+}
+
+function requireGestionarAdmins(): void
+{
+    if (!puedeGestionarAdmins()) {
+        http_response_code(403);
+        renderError(
+            'Acción no permitida — Villas del Palmar',
+            'No tienes permiso para gestionar administradores.',
+            'Dar de alta o eliminar cuentas de administrador requiere el permiso correspondiente — pídeselo al superadministrador.'
         );
         exit;
     }

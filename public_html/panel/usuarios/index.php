@@ -10,6 +10,12 @@ $villas = getVillas($buscar !== '' ? $buscar : null);
 $administradores = getMesa();
 $cargosComiteSugeridos = array_unique(getCargosComiteSugeridos());
 $esSuperadminActual = esSuperadmin();
+$puedeGestionarAdminsActual = puedeGestionarAdmins();
+
+foreach ($administradores as &$a) {
+    $a['_puedeGestionar'] = $a['es_superadmin'] || tienePermiso($a['id'], PERMISO_GESTIONAR_ADMINS);
+}
+unset($a);
 
 // Para cada villa: si hay más recámaras físicas que registradas, o falta
 // algún documento obligatorio (escritura siempre; relación de
@@ -149,7 +155,7 @@ unset($v);
 
     <div class="section-heading-fila">
       <h2 style="margin: 0;">Administradores</h2>
-      <?php if ($esSuperadminActual): ?>
+      <?php if ($puedeGestionarAdminsActual): ?>
         <button type="button" class="btn btn-primary" data-modal-open="modal-nuevo-administrador">+ Nuevo administrador</button>
       <?php endif; ?>
     </div>
@@ -164,16 +170,22 @@ unset($v);
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($administradores as $a): ?>
+          <?php foreach ($administradores as $a): $esElMismo = (int) $a['id'] === (int) $usuario['id']; ?>
             <tr>
               <td>
                 <?= htmlspecialchars($a['nombre']) ?>
-                <?php if (!empty($a['es_superadmin'])): ?><span class="badge badge--ok" title="Puede dar de alta o eliminar otras cuentas de administrador">★ Superadmin</span><?php endif; ?>
+                <?php if (!empty($a['es_superadmin'])): ?>
+                  <span class="badge badge--ok" title="Puede dar de alta o eliminar otras cuentas de administrador, y editar cualquier cuenta de administrador">★ Superadmin</span>
+                <?php elseif ($a['_puedeGestionar']): ?>
+                  <span class="badge badge--doc-reglamento" title="Permiso otorgado por el superadmin">Puede gestionar admins</span>
+                <?php endif; ?>
               </td>
               <td><?= htmlspecialchars($a['usuario']) ?></td>
               <td class="tabla-acciones">
-                <button type="button" class="btn-editar" data-modal-open="modal-editar-administrador-<?= (int) $a['id'] ?>">Editar</button>
-                <?php if ($esSuperadminActual && (int) $a['id'] !== (int) $usuario['id']): ?>
+                <?php if ($esSuperadminActual || $esElMismo): ?>
+                  <button type="button" class="btn-editar" data-modal-open="modal-editar-administrador-<?= (int) $a['id'] ?>">Editar</button>
+                <?php endif; ?>
+                <?php if ($puedeGestionarAdminsActual && !$esElMismo): ?>
                   <form action="/panel/usuarios/eliminar?id=<?= (int) $a['id'] ?>" method="POST"
                         onsubmit="return confirm('¿Eliminar la cuenta de <?= htmlspecialchars(str_replace("'", '', $a['nombre'])) ?>? Esto no se puede deshacer.');">
                     <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
@@ -185,14 +197,15 @@ unset($v);
           <?php endforeach; ?>
         </tbody>
       </table>
-      <?php if (!$esSuperadminActual): ?>
-        <p class="form-nota" style="margin-top: 10px;">Solo el superadministrador puede dar de alta o eliminar cuentas de administrador.</p>
-      <?php endif; ?>
+      <p class="form-nota" style="margin-top: 10px;">
+        Cada quien edita su propia cuenta desde aquí — editar la de otro administrador es exclusivo del superadmin.
+        <?php if (!$puedeGestionarAdminsActual): ?>Dar de alta o eliminar cuentas de administrador requiere permiso del superadmin.<?php endif; ?>
+      </p>
     </div>
   </section>
 
-  <!-- ===== Modal: Nuevo administrador (solo superadmin) ===== -->
-  <?php if ($esSuperadminActual): ?>
+  <!-- ===== Modal: Nuevo administrador ===== -->
+  <?php if ($puedeGestionarAdminsActual): ?>
     <div class="aviso-modal-overlay" id="modal-nuevo-administrador" hidden>
       <div class="aviso-modal">
         <button type="button" class="aviso-modal-close" data-modal-close aria-label="Cerrar">&times;</button>
@@ -202,7 +215,7 @@ unset($v);
           <p class="form-nota" style="margin-bottom: 16px;">Cuenta con privilegios de administrador (acceso a todo el panel de gestión).</p>
           <form action="/panel/usuarios/administrador-guardar" method="POST" class="contact-form">
             <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
-            <?php $admin = []; include __DIR__ . '/../../partials/administrador-campos.php'; ?>
+            <?php $admin = []; $mostrarPermisoGestionar = false; include __DIR__ . '/../../partials/administrador-campos.php'; ?>
             <div class="modal-botones">
               <button type="button" class="btn btn-ghost-light" data-modal-close>Cancelar</button>
               <button type="submit" class="btn btn-primary">Crear administrador</button>
@@ -213,8 +226,11 @@ unset($v);
     </div>
   <?php endif; ?>
 
-  <!-- ===== Modales: Editar administrador (uno por administrador) ===== -->
-  <?php foreach ($administradores as $a): ?>
+  <!-- ===== Modales: Editar administrador — uno por administrador que el
+       usuario actual sí puede editar (él mismo, o cualquiera si es
+       superadmin). El checkbox de "gestionar admins" solo se le muestra al
+       superadmin, y nunca sobre su propia fila. ===== -->
+  <?php foreach ($administradores as $a): $esElMismo = (int) $a['id'] === (int) $usuario['id']; if (!$esSuperadminActual && !$esElMismo) continue; ?>
     <div class="aviso-modal-overlay" id="modal-editar-administrador-<?= (int) $a['id'] ?>" hidden>
       <div class="aviso-modal">
         <button type="button" class="aviso-modal-close" data-modal-close aria-label="Cerrar">&times;</button>
@@ -224,7 +240,12 @@ unset($v);
           <form action="/panel/usuarios/administrador-guardar" method="POST" class="contact-form">
             <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrfToken) ?>" />
             <input type="hidden" name="id" value="<?= (int) $a['id'] ?>" />
-            <?php $admin = $a; include __DIR__ . '/../../partials/administrador-campos.php'; ?>
+            <?php
+            $admin = $a;
+            $mostrarPermisoGestionar = $esSuperadminActual && !$esElMismo && empty($a['es_superadmin']);
+            $permisoGestionarActual = $a['_puedeGestionar'];
+            include __DIR__ . '/../../partials/administrador-campos.php';
+            ?>
             <div class="modal-botones">
               <button type="button" class="btn btn-ghost-light" data-modal-close>Cancelar</button>
               <button type="submit" class="btn btn-primary">Guardar cambios</button>

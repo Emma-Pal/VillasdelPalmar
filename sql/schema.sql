@@ -312,6 +312,20 @@ CREATE TABLE IF NOT EXISTS limite_acciones (
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Permisos que el superadmin le otorga a cuentas de administrador
+-- específicas (ver PERMISO_GESTIONAR_ADMINS en app/repos/permisos.php). Una
+-- fila = una cuenta tiene ese permiso; sin fila = no lo tiene. Pensada para
+-- crecer con más valores de "permiso" en el futuro sin tocar la tabla.
+CREATE TABLE IF NOT EXISTS permisos_usuario (
+  usuario_id INT NOT NULL,
+  permiso VARCHAR(50) NOT NULL,
+  otorgado_por INT NOT NULL,
+  creado_en DATETIME NOT NULL,
+  PRIMARY KEY (usuario_id, permiso),
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+  FOREIGN KEY (otorgado_por) REFERENCES usuarios(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ===== Migración 2026-09b: Galería administrable =====
 -- Las 3 páginas de Galería (alberca, áreas verdes, departamentos) siguen
 -- teniendo sus bloques originales fijos en el código; esta tabla es para
@@ -498,3 +512,14 @@ CREATE TABLE IF NOT EXISTS galeria_items (
 --    correr esto una sola vez. No hay forma de crear una segunda desde la
 --    app, así que no hace falta repetir esto ni cuidar que no se duplique:
 -- UPDATE usuarios SET es_superadmin = 1 WHERE usuario = 'superadmin' AND tipo = 'mesa';
+
+-- ===== Migración 2026-10o: permisos otorgables =====
+-- CREATE TABLE permisos_usuario (
+--   usuario_id INT NOT NULL,
+--   permiso VARCHAR(50) NOT NULL,
+--   otorgado_por INT NOT NULL,
+--   creado_en DATETIME NOT NULL,
+--   PRIMARY KEY (usuario_id, permiso),
+--   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+--   FOREIGN KEY (otorgado_por) REFERENCES usuarios(id)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -13,6 +13,7 @@ verificarCsrf();
 
 $id = (int) ($_POST['id'] ?? 0);
 $esEdicion = $id > 0;
+$esUnoMismo = $esEdicion && $id === (int) $usuario['id'];
 $existente = $esEdicion ? getUsuarioPorId($id) : null;
 
 if ($esEdicion && (!$existente || $existente['tipo'] !== 'mesa')) {
@@ -20,10 +21,15 @@ if ($esEdicion && (!$existente || $existente['tipo'] !== 'mesa')) {
     exit;
 }
 
-// Dar de alta un administrador nuevo es exclusivo del superadmin — editar
-// uno ya existente (el propio cargo/usuario/contraseña, o el de otro admin)
-// se queda abierto a cualquier administrador, como ya era.
+// Dar de alta un administrador nuevo: requiere el permiso "gestionar
+// admins" (el superadmin siempre lo tiene; a otras cuentas se les puede
+// otorgar, ver más abajo). Editar la cuenta de OTRO administrador (su
+// usuario, su contraseña) es exclusivo del superadmin de verdad — eso nunca
+// se delega. Editar la propia cuenta siempre está permitido, para eso está
+// este mismo formulario además de /panel/mi-cuenta.
 if (!$esEdicion) {
+    requireGestionarAdmins();
+} elseif (!$esUnoMismo) {
     requireSuperadmin();
 }
 
@@ -59,8 +65,17 @@ try {
         // Si el administrador se edita a sí mismo, se refresca la sesión
         // para que el header muestre los datos correctos de inmediato —
         // conservando es_superadmin, que este formulario nunca toca.
-        if ((int) $_SESSION['usuario']['id'] === $id) {
+        if ($esUnoMismo) {
             $_SESSION['usuario'] = ['id' => $id, 'tipo' => 'mesa', 'nombre' => $nombre, 'cargo' => null, 'es_superadmin' => esSuperadmin()];
+        } elseif (esSuperadmin()) {
+            // Solo el superadmin, y solo editando a OTRO administrador,
+            // puede otorgarle o quitarle el permiso de gestionar admins —
+            // el checkbox del formulario ni siquiera se le muestra a nadie más.
+            if (!empty($_POST['permiso_gestionar_admins'])) {
+                otorgarPermiso($id, PERMISO_GESTIONAR_ADMINS, $usuario['id']);
+            } else {
+                revocarPermiso($id, PERMISO_GESTIONAR_ADMINS);
+            }
         }
     } else {
         crearUsuario('mesa', $nombre, null, $usuarioLogin, password_hash($password, PASSWORD_BCRYPT));
