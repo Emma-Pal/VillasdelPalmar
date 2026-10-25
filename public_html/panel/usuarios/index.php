@@ -197,7 +197,7 @@ unset($v);
                   </form>
                 <?php endif; ?>
                 <?php if (!$puedeEditarFila && !$puedeEliminarFila): ?>
-                  <span class="form-nota">—</span>
+                  <span style="color: var(--color-text-muted);">—</span>
                 <?php endif; ?>
               </td>
             </tr>
