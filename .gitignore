@@ -1,9 +1,4 @@
-node_modules/
-.env
-
-# Base de datos local (versión Node, ya no se usa en producción) y archivos
-# subidos: contienen datos de propietarios y nunca deben subirse al repositorio.
-data/
+# Archivos subidos: contienen datos de propietarios y nunca deben subirse al repositorio.
 uploads/
 
 # Credenciales reales de MySQL (versión PHP) — solo existe en el servidor,
