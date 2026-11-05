@@ -38,6 +38,11 @@ body {
   color: var(--color-text);
   background: var(--color-bg);
   line-height: 1.6;
+  /* Red de seguridad: si algún elemento (tabla ancha, texto largo sin
+     espacios, etc.) se pasa de ancho, que se note adentro de su propio
+     contenedor con scroll (ej. .tabla-wrap) y no como un segundo scroll
+     horizontal de toda la página en el celular. */
+  overflow-x: hidden;
 }
 
 img {
@@ -746,6 +751,25 @@ input[type="date"]::-webkit-datetime-edit-year-field:focus {
     gap: 10px;
   }
 
+  /* La fila de header (marca + avatar + "Cerrar sesión" + hamburguesa) es
+     la única parte del portal que sigue siendo una fila horizontal en
+     celular (el menú de secciones se vuelve el desplegable de abajo) — sin
+     esto, marca + botón de cerrar sesión no alcanzan a caber uno junto al
+     otro en una pantalla angosta y el texto se parte en dos líneas. */
+  .portal-header .nav-wrap {
+    padding: 10px 16px;
+    gap: 10px;
+  }
+
+  .portal-header .brand-name {
+    font-size: 15px;
+  }
+
+  .nav-logout-btn {
+    padding: 6px 10px;
+    font-size: 10.5px;
+  }
+
   .gallery-grid {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
@@ -1345,6 +1369,9 @@ a.nav-user:hover {
 .tabla-wrap {
   overflow-x: auto;
   margin-bottom: 40px;
+  /* Scroll con inercia en iOS — sin esto, arrastrar la tabla ancha se
+     siente "trabado" en vez de deslizarse. */
+  -webkit-overflow-scrolling: touch;
 }
 
 .tabla-pagos {
@@ -2209,6 +2236,29 @@ a.nav-user:hover {
 
   .publicacion-imagenes.imagenes-multiples .publicacion-imagen {
     height: 200px;
+  }
+
+  /* Tablas (Avisos, Asambleas, Solicitudes, Villas, Administradores...):
+     el contenedor .tabla-wrap ya resuelve el ancho con scroll horizontal;
+     esto solo hace que cada celda ocupe menos espacio, para que haga falta
+     deslizar menos en un celular. */
+  .tabla-pagos th,
+  .tabla-pagos td {
+    padding: 10px 12px;
+    font-size: 13.5px;
+  }
+
+  .form-card {
+    padding: 24px 20px;
+  }
+
+  .dropzone {
+    padding: 24px 16px;
+  }
+
+  .ficha-encabezado {
+    padding: 20px;
+    gap: 16px;
   }
 }
 
@@ -3305,8 +3355,62 @@ a.nav-user:hover {
   margin-top: 14px;
 }
 
+@media (max-width: 860px) {
+  .estancia-card-datos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 640px) {
   .estancia-card-datos {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Celulares angostos (≤480px: iPhone SE, Android chicos) =====
+   Todo lo de arriba (tablas, menú, modales, tarjetas) ya funciona desde
+   700px para abajo; esto solo recupera un poco más de ancho útil en el
+   extremo más angosto, donde el padding normal deja muy poco espacio para
+   el contenido real. */
+@media (max-width: 480px) {
+  section {
+    padding: 48px 16px;
+  }
+
+  .contact-form {
+    padding: 26px 18px;
+  }
+
+  .form-card {
+    padding: 20px 16px;
+  }
+
+  .dropzone {
+    padding: 20px 12px;
+  }
+
+  .tabla-pagos th,
+  .tabla-pagos td {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .ficha-encabezado {
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .ficha-avatar {
+    width: 52px;
+    height: 52px;
+    font-size: 18px;
+  }
+
+  .aviso-modal-overlay {
+    padding: 16px 10px;
+  }
+
+  .galeria-carousel-main {
+    height: 220px;
   }
 }
